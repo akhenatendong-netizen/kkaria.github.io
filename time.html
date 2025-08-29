@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Minimal Timezone Picker — BJ / NY / LA (+ Chicago)</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
+<style>
+  :root{
+    --bg:#f7f7f8; --card:#fff; --text:#111; --muted:#6b7280; --primary:#16a34a;
+    --danger:#dc2626; --ring:#e5e7eb; --chip:#e8eef3;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+  header{display:flex;align-items:center;gap:12px;padding:20px 16px 8px}
+  h1{font-size:22px;margin:0 8px 0 0}
+  .btn{border:0;border-radius:10px;padding:8px 12px;background:#e9f7ee;color:#0f5132}
+  .btn:active{transform:translateY(1px)}
+  .btn.gray{background:#eef2f7;color:#334155}
+  .btn.danger{background:#fee2e2;color:#991b1b}
+  .switch{display:flex;align-items:center;gap:8px;margin-left:auto}
+  .wrap{padding:8px 12px 28px}
+  .cols{display:grid;grid-template-columns:repeat(3,minmax(260px,1fr));gap:14px}
+  @media (max-width:980px){.cols{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--ring);border-radius:16px;padding:14px 14px 18px;box-shadow:0 1px 2px rgba(0,0,0,.03);transition:all 0.2s ease}
+  .card.active{border-color:var(--primary);box-shadow:0 0 0 2px rgba(22,163,74,0.2)}
+  .title{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .title h2{margin:0;font-size:18px}
+  .muted{color:var(--muted)}
+  .radio{display:flex;gap:10px;margin:8px 0 6px}
+  .chip{display:inline-flex;align-items:center;gap:6px;background:var(--chip);color:#244361;border-radius:999px;padding:6px 10px;font-size:13px;cursor:pointer}
+  .result{margin-top:10px;border-radius:10px;border:1px dashed var(--ring);padding:10px 12px;background:#fafafa}
+  .badge{font-weight:600}
+  .plus{margin:14px 0}
+  .danger{color:var(--danger)} .ok{color:var(--primary)}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap}
+  .selectable{cursor:pointer}
+  /* modal (wheel picker) */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:20}
+  .modal.show{display:flex}
+  .sheet{background:#fff;border-radius:16px;width:90%;max-width:480px;margin:0 auto;padding:12px;max-height:90vh;overflow-y:auto}
+  .sheet .bar{height:4px;width:44px;border-radius:999px;background:#e5e7eb;margin:6px auto 12px}
+  .wheels{display:flex;gap:8px;justify-content:center;margin:6px 0 12px}
+  .wheel{flex:1;min-width:80px}
+  select, .date-input{width:100%;padding:8px;border-radius:10px;border:1px solid var(--ring);background:#fff;font-size:15px}
+  .sheet .row{display:flex;align-items:center;justify-content:space-between;margin:8px 0}
+  .switch-label{display:flex;align-items:center;cursor:pointer}
+  .switch-text{margin-left:8px;font-size:14px;color:var(--muted)}
+  .sheet .actions{display:flex;gap:10px;justify-content:space-between;margin-top:8px}
+  .hint{font-size:11px;color:var(--muted)}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<header>
+  <h1>Simple Timezone Converter</h1>
+  <div class="toolbar">
+    <button class="btn" id="btnToday">今天</button>
+    <button class="btn" id="btnNow">现在</button>
+    <button class="btn danger" id="btnClear">清空</button>
+  </div>
+  <label class="switch">
+    <input type="checkbox" id="fmt24" checked>
+    <span class="muted">24h</span>
+  </label>
+</header>
+
+<div class="wrap">
+  <div class="plus">
+    <span class="chip" id="toggleChicago">+ Chicago（CT）</span>
+  </div>
+
+  <div id="cols" class="cols"></div>
+</div>
+
+<!-- wheel picker modal -->
+<div class="modal" id="pickerModal" role="dialog" aria-modal="true">
+  <div class="sheet">
+    <div class="row">
+      <strong id="pickerTitle">选择时间</strong>
+      <span class="muted" id="pickerZone"></span>
+    </div>
+    <div class="row">
+      <label class="switch-label">
+        <input type="checkbox" id="rangeToggle">
+        <span class="switch-text">时间段</span>
+      </label>
+    </div>
+    <div class="row">
+      <input type="date" id="pickerDate" class="date-input">
+    </div>
+    <div id="pointBox" class="wheels">
+      <div class="wheel"><select id="pointHour"></select></div>
+      <div class="wheel"><select id="pointMin"></select></div>
+    </div>
+    <div id="rangeBox" class="wheels hidden">
+      <div class="wheel"><select id="startHour"></select></div>
+      <div class="wheel"><select id="startMin"></select></div>
+      <div class="wheel"><select id="endHour"></select></div>
+      <div class="wheel"><select id="endMin"></select></div>
+    </div>
+
+    <!-- DST info is now shown in the timezone abbreviation -->
+
+    <div class="actions">
+      <button class="btn gray" id="cancelPick">取消</button>
+      <button class="btn" id="okPick">确定</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const { DateTime, Duration, Interval, Settings } = luxon;
+
+// ------------------ Config ------------------
+const ZONES = {
+  bj: { label: "Beijing (CST)", zone: "Asia/Shanghai", short: () => "CST"},
+  ny: { label: "Eastern Time (ET)", zone: "America/New_York", short: (dt)=>dt.offsetNameShort },
+  la: { label: "Pacific Time (PT)", zone: "America/Los_Angeles", short: (dt)=>dt.offsetNameShort },
+  chi:{ label: "Chicago (CT)", zone: "America/Chicago", short: (dt)=>dt.offsetNameShort },
+};
+const ORDER = ["ny","bj","la"]; // chi 可选
+let showChicago = false;
+
+const state = {
+  src: "ny",            // 当前输入源列
+  fmt24: true,
+  // 每列的输入：point: {date, hour, minute} or range: {date, sh, sm, eh, em}
+  bj: { mode: "point", input: {}, value: {} },
+  ny: { mode: "point", input: {}, value: {} },
+  la: { mode: "point", input: {}, value: {} },
+  chi:{ mode: "point", input: {}, value: {} },
+  dstPreference: "DST", // 回拨夜消歧偏好：DST 或 STD
+};
+const stepMinutes = 5; // 滚轮粒度
+
+// ------------------ Helpers ------------------
+function pad(n){ return String(n).padStart(2,"0"); }
+function fmtDate(dt){ return dt.toFormat("yyyy-LL-dd (ccc)"); }
+function fmtTime(dt){
+  return state.fmt24 ? dt.toFormat("HH:mm") : dt.toFormat("hh:mm a");
+}
+function dayShiftText(from, to){
+  const f = from.startOf("day"), t = to.startOf("day");
+  const diff = t.diff(f,"days").days;
+  if(diff > 0) return " (+1 day)";
+  if(diff < 0) return " (-1 day)";
+  return "";
+}
+function zoneShort(zone, dt){
+  const z = Object.values(ZONES).find(z=>z.zone===zone);
+  if(z && z.short) return z.short(dt.setZone(zone));
+  return dt.setZone(zone).offsetNameShort;
+}
+
+function makeLocalDT({zone, date, hour, minute}){
+  // 构造"该时区下"的本地时间（不硬编码 DST）
+  let dt = DateTime.fromISO(date, {zone});
+  dt = dt.set({hour, minute});
+  
+  // 对于回拨夜（DST结束时的重复小时），默认使用较早的时间（夏令时）
+  try {
+    const before = dt.minus({hours:2}).isInDST;
+    const after = dt.plus({hours:2}).isInDST;
+    const todayDST = dt.isInDST;
+    const isFallBackDay = before !== after && !todayDST && (dt.hour===1);
+    
+    if(isFallBackDay && !dt.isInDST){
+      // 如果是回拨夜且当前是标准时，默认使用夏令时（较早的那个小时）
+      dt = dt.minus({hours:1});
+    }
+  } catch(e){}
+  
+  return dt;
+}
+
+function convertPoint(date, hour, minute, fromZone, toZone){
+  const src = makeLocalDT({zone: fromZone, date, hour, minute});
+  const dst = src.setZone(toZone);
+  return {src, dst};
+}
+
+function convertRange(date, sh, sm, eh, em, fromZone, toZone){
+  const s = makeLocalDT({zone: fromZone, date, hour:sh, minute:sm});
+  let e = makeLocalDT({zone: fromZone, date, hour:eh, minute:em});
+  // 跨午夜：结束早于开始，视为次日
+  if(e < s) e = e.plus({days:1});
+  const s2 = s.setZone(toZone), e2 = e.setZone(toZone);
+  return {s1:s, e1:e, s2, e2};
+}
+
+// ------------------ UI Build ------------------
+const colsEl = document.getElementById("cols");
+
+function build(){
+  colsEl.innerHTML = "";
+  const keys = [...ORDER, ...(showChicago ? ["chi"]:[])];
+  keys.forEach(key=>{
+    const cfg = ZONES[key];
+    const card = document.createElement("div");
+    card.className = `card ${state.src===key?'active':''}`; 
+    card.id = `card-${key}`;
+    card.innerHTML = `
+      <div class="title">
+        <h2 class="selectable" data-key="${key}">${cfg.label}</h2>
+      </div>
+      <div class="radio">
+        <span class="muted" id="abbr-${key}"></span>
+      </div>
+      <div class="toolbar">
+        <button class="btn" data-pick="point" data-key="${key}">选择时间</button>
+        <button class="btn gray" data-clear="${key}">清空</button>
+      </div>
+      <div class="result" id="res-${key}">
+        <span class="muted">未选择</span>
+      </div>
+    `;
+    colsEl.appendChild(card);
+  });
+  bind();
+  renderAll();
+}
+
+// ------------------ Picker (modal) ------------------
+const modal = document.getElementById("pickerModal");
+const pointBox = document.getElementById("pointBox");
+const rangeBox = document.getElementById("rangeBox");
+const pickerTitle = document.getElementById("pickerTitle");
+const pickerZone = document.getElementById("pickerZone");
+const dstRow = document.getElementById("dstRow");
+const preferDST = document.getElementById("preferDST");
+const preferSTD = document.getElementById("preferSTD");
+let currentPick = { key:"", mode:"point" };
+
+function fillWheel(sel, from, to, step=1, padZero=true){
+  sel.innerHTML = "";
+  for(let v=from; v<=to; v+=step){
+    const opt = document.createElement("option");
+    opt.value = v; opt.textContent = padZero? pad(v): v;
+    sel.appendChild(opt);
+  }
+}
+const pointHour = document.getElementById("pointHour");
+const pointMin  = document.getElementById("pointMin");
+const startHour = document.getElementById("startHour");
+const startMin  = document.getElementById("startMin");
+const endHour   = document.getElementById("endHour");
+const endMin    = document.getElementById("endMin");
+fillWheel(pointHour,0,23,1);
+fillWheel(pointMin,0,55,stepMinutes);
+["startHour","endHour"].forEach(id=>fillWheel(document.getElementById(id),0,23,1));
+["startMin","endMin"].forEach(id=>fillWheel(document.getElementById(id),0,55,stepMinutes));
+
+function openPicker(key, mode){
+  currentPick = {key, mode};
+  const zone = ZONES[key].zone;
+  pickerTitle.textContent = "选择时间";
+  pickerZone.textContent = zone;
+  
+  // Set date to today or existing date
+  const today = DateTime.now().setZone(zone).toFormat("yyyy-LL-dd");
+  const existingDate = state[key].input.date || today;
+  document.getElementById("pickerDate").value = existingDate;
+  
+  // Set range toggle based on current mode
+  document.getElementById("rangeToggle").checked = mode === "range";
+  
+  // Show appropriate time picker based on toggle
+  updateTimePickerVisibility();
+  
+  modal.classList.add("show");
+}
+
+function updateTimePickerVisibility() {
+  const isRange = document.getElementById("rangeToggle").checked;
+  pointBox.classList.toggle("hidden", isRange);
+  rangeBox.classList.toggle("hidden", !isRange);
+  currentPick.mode = isRange ? "range" : "point";
+}
+
+// Mode selection is now determined by the button that was clicked
+document.getElementById("cancelPick").onclick = ()=> modal.classList.remove("show");
+document.getElementById("okPick").onclick = ()=>{
+  const key=currentPick.key; 
+  const zone = ZONES[key].zone;
+  const selectedDate = document.getElementById("pickerDate").value;
+  const isRange = document.getElementById("rangeToggle").checked;
+  
+  if(!isRange){
+    const h=+pointHour.value, m=+pointMin.value;
+    state[key].mode="point";
+    state[key].input={date:selectedDate, hour:h, minute:m};
+  }else{
+    const sh=+startHour.value, sm=+startMin.value, eh=+endHour.value, em=+endMin.value;
+    state[key].mode="range";
+    state[key].input={date:selectedDate, sh, sm, eh, em};
+  }
+  state.src = key; // 用当前列作为输入源
+  
+  // Update the UI to show this zone as the active source
+  setActiveZone(key);
+  
+  modal.classList.remove("show");
+  propagateFrom(key);
+};
+
+// Add event listener for range toggle
+document.getElementById("rangeToggle").addEventListener("change", updateTimePickerVisibility);
+
+// DST preference is now automatically handled
+
+// ------------------ Events on cards ------------------
+function bind(){
+  document.querySelectorAll("[data-pick]").forEach(btn=>{
+    btn.onclick = ()=> {
+      const key = btn.dataset.key;
+      const mode = state[key].mode || "point";
+      openPicker(key, mode);
+    };
+  });
+  document.querySelectorAll("[data-clear]").forEach(btn=>{
+    btn.onclick = ()=>{ 
+      const key = btn.dataset.clear;
+      state[key].input={}; 
+      state[key].value={}; 
+      render(key); 
+    };
+  });
+  // Make result area clickable to open time picker
+  document.querySelectorAll(".result").forEach(res=>{
+    res.onclick = ()=> {
+      const key = res.id.split('-')[1];
+      const mode = state[key].mode || 'point';
+      openPicker(key, mode);
+      setActiveZone(key);
+    };
+  });
+  // Mode selection is now handled directly in the picker
+  document.querySelectorAll(".title h2").forEach(h=>{
+    h.onclick = ()=>{ 
+      setActiveZone(h.dataset.key);
+    };
+  });
+}
+
+// ------------------ Convert & Render ------------------
+function propagateFrom(srcKey){
+  const srcZ = ZONES[srcKey].zone;
+  const src = state[srcKey];
+  const keys = Object.keys(ZONES).filter(k=>k!==srcKey && (k!=="chi" || showChicago));
+  if(Object.keys(src.input).length===0){ renderAll(); return; }
+
+  if(src.mode==="point" && src.input.hour!=null){
+    const {date,hour,minute}=src.input;
+    keys.forEach(k=>{
+      const toZ = ZONES[k].zone;
+      const {src:srcDT, dst} = convertPoint(date,hour,minute, srcZ, toZ);
+      state[k].value = { kind:"point", dt: dst, from: srcDT };
+    });
+    state[srcKey].value = { kind:"point", dt: makeLocalDT({zone:srcZ,date:src.input.date,hour:src.input.hour,minute:src.input.minute}), from:null };
+  }else if(src.mode==="range" && src.input.sh!=null){
+    const {date,sh,sm,eh,em}=src.input;
+    keys.forEach(k=>{
+      const toZ = ZONES[k].zone;
+      const res = convertRange(date,sh,sm,eh,em, srcZ, toZ);
+      state[k].value = { kind:"range", s: res.s2, e: res.e2, fromS: res.s1, fromE: res.e1 };
+    });
+    const resSelf = convertRange(date,sh,sm,eh,em, srcZ, srcZ);
+    state[srcKey].value = { kind:"range", s: resSelf.s2, e: resSelf.e2, fromS:null, fromE:null };
+  }
+  renderAll();
+}
+
+function renderAll(){
+  const keys = [...ORDER, ...(showChicago ? ["chi"]:[])];
+  keys.forEach(render);
+  // 更新缩写展示
+  keys.forEach(k=>{
+    const ab = document.getElementById(`abbr-${k}`);
+    const zone = ZONES[k].zone;
+    const now = DateTime.now().setZone(zone);
+    const abbr = zoneShort(zone, now);
+    
+    // Add DST indicator for US time zones
+    if (/(New_York|Los_Angeles|Chicago)/.test(zone)) {
+      const isDST = now.isInDST;
+      ab.innerHTML = `${abbr} <span class="hint">(${isDST ? '夏令时' : '标准时'})</span>`;
+    } else {
+      ab.textContent = abbr;
+    }
+  });
+}
+
+function render(k){
+  const box = document.getElementById(`res-${k}`); if(!box) return;
+  const val = state[k].value;
+  if(!val || !val.kind){ box.innerHTML = `<span class="muted">未选择</span>`; return; }
+  if(val.kind==="point"){
+    const dt = val.dt;
+    const dateStr = fmtDate(dt);
+    const timeStr = `<strong>${fmtTime(dt)}</strong>`;
+    // Remove timezone abbreviation from display
+    const txt = `${dateStr} ${timeStr}`;
+    if(val.from){
+      const extra = dayShiftText(val.from, dt);
+      box.innerHTML = `<div>${txt} <span class="${extra? 'ok':''}">${extra}</span></div>`;
+    }else box.innerHTML = `<div>${txt}</div>`;
+  }else{
+    const s = val.s, e = val.e;
+    let extra = "";
+    if(val.fromS && val.fromE){
+      extra = dayShiftText(val.fromS, s) || dayShiftText(val.fromE, e);
+    }
+    const dateStr = fmtDate(s);
+    const timeStrStart = `<strong>${fmtTime(s)}</strong>`;
+    const timeStrEnd = `<strong>${fmtTime(e)}</strong>`;
+    // Remove timezone abbreviation from display
+    const txt = `${dateStr} ${timeStrStart} — ${timeStrEnd}`;
+    box.innerHTML = `<div>${txt} <span class="${extra? (extra.includes('+')?'ok':'danger') : ''}">${extra}</span></div>`;
+  }
+}
+
+// ------------------ Top controls ------------------
+document.getElementById("btnToday").onclick = ()=>{
+  const keys = [...ORDER, ...(showChicago?["chi"]:[])];
+  keys.forEach(k=>{
+    const z = ZONES[k].zone;
+    const d = DateTime.now().setZone(z).toFormat("yyyy-LL-dd");
+    // 仅写入日期，不覆盖已挑选的时分
+    if(state[k].mode==="point" && state[k].input.hour!=null){
+      state[k].input.date = d;
+    }else if(state[k].mode==="range" && state[k].input.sh!=null){
+      state[k].input.date = d;
+    }
+  });
+  propagateFrom(state.src);
+};
+document.getElementById("btnNow").onclick = ()=>{
+  const k = state.src;
+  const z = ZONES[k].zone;
+  const now = DateTime.now().setZone(z);
+  state[k].mode = "point";
+  state[k].input = { date: now.toFormat("yyyy-LL-dd"), hour: now.hour, minute: now.minute - (now.minute%stepMinutes) };
+  propagateFrom(k);
+};
+document.getElementById("btnClear").onclick = ()=>{
+  ["bj","ny","la","chi"].forEach(k=>{ state[k].input={}; state[k].value={}; });
+  renderAll();
+};
+document.getElementById("fmt24").onchange = (e)=>{ state.fmt24 = e.target.checked; renderAll(); };
+
+document.getElementById("toggleChicago").onclick = ()=>{
+  showChicago = !showChicago;
+  document.getElementById("toggleChicago").textContent = showChicago ? "− Chicago（收起）" : "+ Chicago（CT）";
+  build();
+};
+
+// 初始渲染
+build();
+
+// 关闭 modal 点击遮罩
+modal.addEventListener("click",(e)=>{ if(e.target===modal) modal.classList.remove("show"); });
+
+// Add function to set active zone and update UI
+function setActiveZone(key) {
+  state.src = key;
+  document.querySelectorAll('.card').forEach(card => {
+    card.classList.remove('active');
+  });
+  document.getElementById(`card-${key}`).classList.add('active');
+}
+
+// We no longer need updateButtonStyles since we only use point mode
+
+</script>
+</body>
+</html>
