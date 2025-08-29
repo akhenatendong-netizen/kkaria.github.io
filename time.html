@@ -56,7 +56,6 @@
 <header>
   <h1>Simple Timezone Converter</h1>
   <div class="toolbar">
-    <button class="btn" id="btnToday">今天</button>
     <button class="btn" id="btnNow">现在</button>
     <button class="btn danger" id="btnClear">清空</button>
   </div>
@@ -422,20 +421,6 @@ function render(k){
 }
 
 // ------------------ Top controls ------------------
-document.getElementById("btnToday").onclick = ()=>{
-  const keys = [...ORDER, ...(showChicago?["chi"]:[])];
-  keys.forEach(k=>{
-    const z = ZONES[k].zone;
-    const d = DateTime.now().setZone(z).toFormat("yyyy-LL-dd");
-    // 仅写入日期，不覆盖已挑选的时分
-    if(state[k].mode==="point" && state[k].input.hour!=null){
-      state[k].input.date = d;
-    }else if(state[k].mode==="range" && state[k].input.sh!=null){
-      state[k].input.date = d;
-    }
-  });
-  propagateFrom(state.src);
-};
 document.getElementById("btnNow").onclick = ()=>{
   const k = state.src;
   const z = ZONES[k].zone;
