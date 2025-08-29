@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
 <title>Minimal Timezone Picker — BJ / NY / LA (+ Chicago)</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
@@ -13,41 +13,109 @@
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
-  header{display:flex;align-items:center;gap:12px;padding:20px 16px 8px}
-  h1{font-size:22px;margin:0 8px 0 0}
-  .btn{border:0;border-radius:10px;padding:8px 12px;background:#e9f7ee;color:#0f5132}
-  .btn:active{transform:translateY(1px)}
+  header{display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:16px 12px 8px}
+  h1{font-size:20px;margin:0 8px 0 0}
+  .btn{border:0;border-radius:10px;padding:8px 12px;background:#e9f7ee;color:#0f5132;font-size:14px}
+  .btn:active{transform:translateY(1px);opacity:0.8}
   .btn.gray{background:#eef2f7;color:#334155}
   .btn.danger{background:#fee2e2;color:#991b1b}
   .switch{display:flex;align-items:center;gap:8px;margin-left:auto}
   .wrap{padding:8px 12px 28px}
+  @media (max-width:480px){
+    header{padding:12px 10px 6px}
+    h1{font-size:18px;flex:1 1 auto}
+    .toolbar{flex:0 0 auto;display:flex;gap:6px}
+    .switch{margin-left:0;flex:0 0 auto}
+    .wrap{padding:6px 10px 20px}
+  }
   .cols{display:grid;grid-template-columns:repeat(3,minmax(260px,1fr));gap:14px}
   @media (max-width:980px){.cols{grid-template-columns:1fr}}
-  .card{background:var(--card);border:1px solid var(--ring);border-radius:16px;padding:14px 14px 18px;box-shadow:0 1px 2px rgba(0,0,0,.03);transition:all 0.2s ease}
+  .card{background:var(--card);border:1px solid var(--ring);border-radius:16px;padding:14px 14px 18px;box-shadow:0 1px 2px rgba(0,0,0,.03);transition:all 0.2s ease;-webkit-tap-highlight-color:transparent}
   .card.active{border-color:var(--primary);box-shadow:0 0 0 2px rgba(22,163,74,0.2)}
   .title{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  @media (max-width:480px){.title{margin-bottom:8px}}
   .title h2{margin:0;font-size:18px}
+  @media (max-width:480px){.title h2{font-size:16px}}
   .muted{color:var(--muted)}
   .radio{display:flex;gap:10px;margin:8px 0 6px}
+  @media (max-width:480px){.radio{margin:6px 0 4px;gap:8px}}
   .chip{display:inline-flex;align-items:center;gap:6px;background:var(--chip);color:#244361;border-radius:999px;padding:6px 10px;font-size:13px;cursor:pointer}
+  @media (max-width:480px){.chip{padding:5px 8px;font-size:12px}}
   .result{margin-top:10px;border-radius:10px;border:1px dashed var(--ring);padding:10px 12px;background:#fafafa}
+  @media (max-width:480px){.result{padding:8px 10px;margin-top:8px}}
   .badge{font-weight:600}
   .plus{margin:14px 0}
+  @media (max-width:480px){.plus{margin:10px 0}}
   .danger{color:var(--danger)} .ok{color:var(--primary)}
   .toolbar{display:flex;gap:8px;flex-wrap:wrap}
+  @media (max-width:480px){
+    .toolbar{gap:6px}
+    .btn{padding:6px 10px;font-size:13px}
+  }
   .selectable{cursor:pointer}
+  @media (max-width:480px){.selectable{padding:2px 0}}
   /* modal (wheel picker) */
-  .modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:20}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:20;-webkit-tap-highlight-color:transparent}
   .modal.show{display:flex}
-  .sheet{background:#fff;border-radius:16px;width:90%;max-width:480px;margin:0 auto;padding:12px;max-height:90vh;overflow-y:auto}
+  .sheet{background:#fff;border-radius:16px;width:90%;max-width:480px;margin:0 auto;padding:16px;max-height:90vh;overflow-y:auto;position:relative}
   .sheet .bar{height:4px;width:44px;border-radius:999px;background:#e5e7eb;margin:6px auto 12px}
   .wheels{display:flex;gap:8px;justify-content:center;margin:6px 0 12px}
-  .wheel{flex:1;min-width:80px}
+  .wheel{flex:1;min-width:80px;position:relative}
   select, .date-input{width:100%;padding:8px;border-radius:10px;border:1px solid var(--ring);background:#fff;font-size:15px}
   .sheet .row{display:flex;align-items:center;justify-content:space-between;margin:8px 0}
   .switch-label{display:flex;align-items:center;cursor:pointer}
   .switch-text{margin-left:8px;font-size:14px;color:var(--muted)}
-  .sheet .actions{display:flex;gap:10px;justify-content:space-between;margin-top:8px}
+  .sheet .actions{display:flex;gap:10px;justify-content:space-between;margin-top:16px}
+  @media (max-width:480px){
+    .sheet{padding:12px;width:95%;border-radius:12px}
+    .wheels{gap:4px}
+    .wheel{min-width:60px}
+    select, .date-input{padding:6px;font-size:14px}
+    #rangeBox{flex-wrap:wrap}
+    #rangeBox .wheel{min-width:calc(50% - 4px);margin-bottom:8px}
+    #rangeBox .wheel:nth-child(1)::after,
+    #rangeBox .wheel:nth-child(3)::after{
+      content:"时";
+      position:absolute;
+      right:8px;
+      top:50%;
+      transform:translateY(-50%);
+      font-size:12px;
+      color:var(--muted);
+      pointer-events:none;
+    }
+    #rangeBox .wheel:nth-child(2)::after,
+    #rangeBox .wheel:nth-child(4)::after{
+      content:"分";
+      position:absolute;
+      right:8px;
+      top:50%;
+      transform:translateY(-50%);
+      font-size:12px;
+      color:var(--muted);
+      pointer-events:none;
+    }
+    #pointBox .wheel:nth-child(1)::after{
+      content:"时";
+      position:absolute;
+      right:8px;
+      top:50%;
+      transform:translateY(-50%);
+      font-size:12px;
+      color:var(--muted);
+      pointer-events:none;
+    }
+    #pointBox .wheel:nth-child(2)::after{
+      content:"分";
+      position:absolute;
+      right:8px;
+      top:50%;
+      transform:translateY(-50%);
+      font-size:12px;
+      color:var(--muted);
+      pointer-events:none;
+    }
+  }
   .hint{font-size:11px;color:var(--muted)}
   .hidden{display:none}
 </style>
@@ -76,6 +144,7 @@
 <!-- wheel picker modal -->
 <div class="modal" id="pickerModal" role="dialog" aria-modal="true">
   <div class="sheet">
+    <div class="bar"></div>
     <div class="row">
       <strong id="pickerTitle">选择时间</strong>
       <span class="muted" id="pickerZone"></span>
