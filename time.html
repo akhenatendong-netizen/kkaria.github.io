@@ -67,20 +67,56 @@
   .switch-text{margin-left:8px;font-size:14px;color:var(--muted)}
   .sheet .actions{display:flex;gap:10px;justify-content:space-between;margin-top:16px}
   @media (max-width:480px){
-    .sheet{padding:12px;width:95%;border-radius:12px}
-    .wheels{gap:4px}
-    .wheel{min-width:60px}
-    select, .date-input{padding:6px;font-size:14px}
-    #rangeBox{flex-wrap:wrap}
-    #rangeBox .wheel{min-width:calc(50% - 4px);margin-bottom:8px}
+    .sheet{
+      padding:16px;
+      width:95%;
+      border-radius:12px;
+      margin-top:-10%;
+      min-height:60vh;
+      display:flex;
+      flex-direction:column;
+    }
+    .wheels{gap:10px}
+    .wheel{min-width:80px}
+    select, .date-input{
+      padding:10px 32px 10px 10px;
+      font-size:16px;
+      height:44px;
+    }
+    #rangeBox{
+      flex-wrap:nowrap;
+      overflow-x:auto;
+      padding-bottom:5px;
+      margin-bottom:10px;
+    }
+    #rangeBox .wheel{
+      min-width:80px;
+      margin-bottom:0;
+    }
+    .sheet .actions{
+      margin-top:auto;
+      padding-top:16px;
+    }
+    .sheet .actions .btn{
+      padding:12px;
+      font-size:16px;
+      flex:1;
+    }
+    .sheet .row{
+      margin:12px 0;
+    }
+    .date-input{
+      height:44px;
+    }
+    /* Time indicators */
     #rangeBox .wheel:nth-child(1)::after,
     #rangeBox .wheel:nth-child(3)::after{
       content:"时";
       position:absolute;
-      right:8px;
+      right:12px;
       top:50%;
       transform:translateY(-50%);
-      font-size:12px;
+      font-size:14px;
       color:var(--muted);
       pointer-events:none;
     }
@@ -88,30 +124,30 @@
     #rangeBox .wheel:nth-child(4)::after{
       content:"分";
       position:absolute;
-      right:8px;
+      right:12px;
       top:50%;
       transform:translateY(-50%);
-      font-size:12px;
+      font-size:14px;
       color:var(--muted);
       pointer-events:none;
     }
     #pointBox .wheel:nth-child(1)::after{
       content:"时";
       position:absolute;
-      right:8px;
+      right:12px;
       top:50%;
       transform:translateY(-50%);
-      font-size:12px;
+      font-size:14px;
       color:var(--muted);
       pointer-events:none;
     }
     #pointBox .wheel:nth-child(2)::after{
       content:"分";
       position:absolute;
-      right:8px;
+      right:12px;
       top:50%;
       transform:translateY(-50%);
-      font-size:12px;
+      font-size:14px;
       color:var(--muted);
       pointer-events:none;
     }
