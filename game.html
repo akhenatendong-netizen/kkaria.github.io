@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>如何活过这一天</title>
+  <style>
+    body {
+      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background-color: #0a0a0a;
+      color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    
+    .container {
+      width: 90%;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    
+    .card {
+      background-color: #1a1a1a;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      margin-bottom: 20px;
+    }
+    
+    h1 {
+      color: #ff6b6b;
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+    
+    .options {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .option {
+      flex: 1;
+      background-color: #2a2a2a;
+      border: 2px solid #333;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .option:hover, .option.selected {
+      border-color: #ff6b6b;
+      background-color: rgba(255, 107, 107, 0.2);
+    }
+    
+    .button {
+      background-color: #ff6b6b;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .button:hover {
+      background-color: #ff5252;
+    }
+    
+    .button:disabled {
+      background-color: #333;
+      cursor: not-allowed;
+    }
+    
+    .event-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .event-round {
+      color: #a0a0a0;
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+    
+    .event-desc {
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    
+    .choice {
+      background-color: #2a2a2a;
+      border: 2px solid #333;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .choice:hover {
+      border-color: #ff6b6b;
+    }
+    
+    .death-title {
+      color: #fa5252;
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    
+    .success-title {
+      color: #40c057;
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    
+    .summary-item {
+      background-color: #2a2a2a;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .summary-round {
+      color: #ff6b6b;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .summary-choice {
+      padding: 8px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+    
+    .summary-choice.selected {
+      background-color: rgba(64, 192, 87, 0.2);
+      border-left: 3px solid #40c057;
+    }
+    
+    .summary-choice.danger {
+      background-color: rgba(250, 82, 82, 0.1);
+      border-left: 3px solid #fa5252;
+    }
+    
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Start Screen -->
+    <div id="start-screen" class="card">
+      <h1>如何活过这一天</h1>
+      <div class="options">
+        <div class="option" id="workday-option" onclick="selectStoryType('workday')">工作日</div>
+        <div class="option" id="weekend-option" onclick="selectStoryType('weekend')">周末</div>
+      </div>
+      <button class="button" id="start-button" onclick="startGame()" disabled>开始游戏</button>
+    </div>
+    
+    <!-- Event Screen -->
+    <div id="event-screen" class="card hidden">
+      <div class="event-round" id="event-round">选择 1/7</div>
+      <div class="event-title" id="event-title">早晨</div>
+      <div class="event-desc" id="event-desc">闹钟响起，新的一天开始了。早餐，你要选择吃什么？</div>
+      <div class="choice" id="choice-1" onclick="makeChoice(0)">街角面包店的面包</div>
+      <div class="choice" id="choice-2" onclick="makeChoice(1)">邻居奶奶推车的馄饨</div>
+    </div>
+    
+    <!-- Death Screen -->
+    <div id="death-screen" class="card hidden">
+      <div class="death-title">你死了！</div>
+      <div id="death-desc" class="event-desc">馄饨变质，食物中毒导致多器官衰竭，你在痛苦中离开了人世。</div>
+      <button class="button" onclick="resetGame()">再试一次</button>
+    </div>
+    
+    <!-- Success Screen -->
+    <div id="success-screen" class="card hidden">
+      <div class="success-title">你活下来了！</div>
+      <div class="event-desc">你成功度过了这一天！尽管困难重重，你成功避开了今天生活中的致命陷阱。现在你安全地回到家中，准备休息，迎接明天的挑战。</div>
+      <button class="button" onclick="showSummary()">查看总结</button>
+    </div>
+    
+    <!-- Summary Screen -->
+    <div id="summary-screen" class="card hidden">
+      <div class="success-title">你的一天旅程</div>
+      <div class="event-desc">你今天成功避开了所有七个致命选择。以下是你旅程的回顾和你避开的危险：</div>
+      <div id="summary-content"></div>
+      <button class="button" onclick="resetGame()">再玩一次</button>
+    </div>
+  </div>
+
+  <script>
+    // Game data
+    const gameData = {
+      "workday": [
+        {
+          "id": "w1",
+          "round": 1,
+          "time": "早晨",
+          "desc": "闹钟响起，新的一天开始了。早餐，你要选择吃什么？",
+          "choices": [
+            {
+              "text": "街角面包店的面包",
+              "result": "survive",
+              "surviveNext": "w2"
+            },
+            {
+              "text": "邻居奶奶推车的馄饨",
+              "result": "death",
+              "deathDesc": "馄饨变质，食物中毒导致多器官衰竭，你在痛苦中离开了人世。"
+            }
+          ]
+        },
+        {
+          "id": "w2",
+          "round": 2,
+          "time": "上班路口",
+          "desc": "吃完早餐，你来到了去公司的路口。今天你要走哪条路？",
+          "choices": [
+            {
+              "text": "习惯的大路",
+              "result": "death",
+              "deathDesc": "一辆失控的卡车冲上人行道，你来不及躲避，被当场撞飞。医生宣布你当场死亡。"
+            },
+            {
+              "text": "遮阳的小路",
+              "result": "survive",
+              "surviveNext": "w3"
+            }
+          ]
+        },
+        {
+          "id": "w3",
+          "round": 3,
+          "time": "进办公室",
+          "desc": "你顺利到达公司大楼，准备进公司时，电梯刚好开门，里面已经挤满了人。",
+          "choices": [
+            {
+              "text": "跟着人群挤电梯",
+              "result": "death",
+              "deathDesc": "电梯超载，在上升过程中突然断缆坠落。你和电梯里的所有人都没能幸免于难。"
+            },
+            {
+              "text": "走楼梯",
+              "result": "survive",
+              "surviveNext": "w4"
+            }
+          ]
+        },
+        {
+          "id": "w4",
+          "round": 4,
+          "time": "上午咖啡",
+          "desc": "工作几小时后，困意袭来。你需要喝点什么提神，有什么选择？",
+          "choices": [
+            {
+              "text": "公司咖啡机的咖啡",
+              "result": "survive",
+              "surviveNext": "w5"
+            },
+            {
+              "text": "同事安利的新速溶粉",
+              "result": "death",
+              "deathDesc": "速溶粉中含有未经检测的有害物质，你喝下后不久就出现了严重的过敏反应，呼吸困难，最终因窒息而亡。"
+            }
+          ]
+        },
+        {
+          "id": "w5",
+          "round": 5,
+          "time": "午餐",
+          "desc": "中午到了，你的肚子开始咕咕叫。午餐你想吃什么？",
+          "choices": [
+            {
+              "text": "外卖炸鸡",
+              "result": "death",
+              "deathDesc": "炸鸡太过油腻，刺激了你的胃部，导致突发胃出血。失血过多，你在送医途中离开了人世。"
+            },
+            {
+              "text": "清爽沙拉",
+              "result": "survive",
+              "surviveNext": "w6"
+            }
+          ]
+        },
+        {
+          "id": "w6",
+          "round": 6,
+          "time": "下班时刻",
+          "desc": "工作接近尾声，领导走过来问你今晚要不要留下来加班完成紧急项目？",
+          "choices": [
+            {
+              "text": "留下加班",
+              "result": "death",
+              "deathDesc": "你工作到深夜，办公室只剩下你一人。半夜电线老化短路引发火灾，浓烟迅速充满了整层楼。你被困在办公室里，最终因吸入过多有毒气体而窒息身亡。"
+            },
+            {
+              "text": "早走回家",
+              "result": "survive",
+              "surviveNext": "w7"
+            }
+          ]
+        },
+        {
+          "id": "w7",
+          "round": 7,
+          "time": "回家路上",
+          "desc": "你走出公司大楼，天色已晚。你考虑着要怎么回家？",
+          "choices": [
+            {
+              "text": "网约车",
+              "result": "survive",
+              "surviveNext": "end"
+            },
+            {
+              "text": "便宜的黑车",
+              "result": "death",
+              "deathDesc": "黑车司机原来是一名连环杀手，他将你带到偏僻的地方，残忍地结束了你的生命。你的遗体三天后才被发现。"
+            }
+          ]
+        }
+      ],
+      "weekend": [
+        {
+          "id": "s1",
+          "round": 1,
+          "time": "清晨",
+          "desc": "周末清晨，阳光透过窗帘照进房间。你刚醒来，想着如何开始这一天？",
+          "choices": [
+            {
+              "text": "继续躺床上刷手机",
+              "result": "death",
+              "deathDesc": "你的手机电池因过热突然爆炸，碎片刺入你的颈部动脉，你在剧痛中失血过多而亡。"
+            },
+            {
+              "text": "去晨跑",
+              "result": "survive",
+              "surviveNext": "s2"
+            }
+          ]
+        },
+        {
+          "id": "s2",
+          "round": 2,
+          "time": "早餐",
+          "desc": "晨跑回来后，你感到饥肠辘辘。早餐你想吃什么？",
+          "choices": [
+            {
+              "text": "早市豆浆油条",
+              "result": "death",
+              "deathDesc": "早市的豆浆机已经很久没有彻底清洗了，里面滋生了大量细菌。你喝下豆浆后不久就出现剧烈腹痛和呕吐，最终因严重食物中毒而死亡。"
+            },
+            {
+              "text": "在家冲牛奶",
+              "result": "survive",
+              "surviveNext": "s3"
+            }
+          ]
+        },
+        {
+          "id": "s3",
+          "round": 3,
+          "time": "出门",
+          "desc": "吃完早餐，你打算出门去购物中心。你会选择什么交通方式？",
+          "choices": [
+            {
+              "text": "开车去商场",
+              "result": "death",
+              "deathDesc": "在高速公路上，一辆大货车突然失控，撞向你的车。巨大的冲击力让你当场死亡，车辆完全变形。"
+            },
+            {
+              "text": "坐公交",
+              "result": "survive",
+              "surviveNext": "s4"
+            }
+          ]
+        },
+        {
+          "id": "s4",
+          "round": 4,
+          "time": "上午活动",
+          "desc": "你安全到达了市中心。上午你想去哪里消遣一下？",
+          "choices": [
+            {
+              "text": "电影院",
+              "result": "death",
+              "deathDesc": "电影正放到一半，突然电路短路引发了火灾。在混乱的疏散过程中，你被踩踏并被困在火场，最终因烟雾中毒而丧生。"
+            },
+            {
+              "text": "公园散步",
+              "result": "survive",
+              "surviveNext": "s5"
+            }
+          ]
+        },
+        {
+          "id": "s5",
+          "round": 5,
+          "time": "午餐",
+          "desc": "在公园散步后，你感到饥饿。午餐你想吃什么？",
+          "choices": [
+            {
+              "text": "海鲜大餐",
+              "result": "death",
+              "deathDesc": "你不知道自己对贝类有严重过敏。吃了几口后，你开始出现呼吸困难、皮肤瘙痒和喉咙肿胀。餐厅里没有人知道如何处理过敏性休克，等救护车到达时已经太晚了。"
+            },
+            {
+              "text": "快餐汉堡",
+              "result": "survive",
+              "surviveNext": "s6"
+            }
+          ]
+        },
+        {
+          "id": "s6",
+          "round": 6,
+          "time": "下午活动",
+          "desc": "吃完午餐，你的朋友打电话邀请你一起出去玩。你们要去哪里？",
+          "choices": [
+            {
+              "text": "密室逃脱",
+              "result": "death",
+              "deathDesc": "在密室逃脱游戏中，一个重型金属道具突然从天花板上掉落，正好砸中你的头部。你当场失去意识，被送往医院后因脑出血不治身亡。"
+            },
+            {
+              "text": "书店闲逛",
+              "result": "survive",
+              "surviveNext": "s7"
+            }
+          ]
+        },
+        {
+          "id": "s7",
+          "round": 7,
+          "time": "晚上",
+          "desc": "夜幕降临，你的朋友提议继续今天的活动。晚上你想去哪里？",
+          "choices": [
+            {
+              "text": "去夜店",
+              "result": "death",
+              "deathDesc": "夜店里人声鼎沸，突然两群人因为小摩擦爆发了激烈冲突。你试图躲避，却被卷入混战。一个酒瓶击中了你的太阳穴，你当场倒地，再也没能站起来。"
+            },
+            {
+              "text": "回家看剧",
+              "result": "survive",
+              "surviveNext": "end"
+            }
+          ]
+        }
+      ]
+    };
+    
+    // Game state
+    let gameState = {
+      round: 1,
+      storyType: null,
+      choices: [],
+      currentScenarioId: null
+    };
+    
+    // DOM elements
+    const startScreen = document.getElementById('start-screen');
+    const eventScreen = document.getElementById('event-screen');
+    const deathScreen = document.getElementById('death-screen');
+    const successScreen = document.getElementById('success-screen');
+    const summaryScreen = document.getElementById('summary-screen');
+    
+    const workdayOption = document.getElementById('workday-option');
+    const weekendOption = document.getElementById('weekend-option');
+    const startButton = document.getElementById('start-button');
+    
+    const eventRound = document.getElementById('event-round');
+    const eventTitle = document.getElementById('event-title');
+    const eventDesc = document.getElementById('event-desc');
+    const choice1 = document.getElementById('choice-1');
+    const choice2 = document.getElementById('choice-2');
+    
+    const deathDesc = document.getElementById('death-desc');
+    const summaryContent = document.getElementById('summary-content');
+    
+    // Select story type
+    function selectStoryType(type) {
+      gameState.storyType = type;
+      
+      if (type === 'workday') {
+        workdayOption.classList.add('selected');
+        weekendOption.classList.remove('selected');
+      } else {
+        weekendOption.classList.add('selected');
+        workdayOption.classList.remove('selected');
+      }
+      
+      startButton.disabled = false;
+    }
+    
+    // Start game
+    function startGame() {
+      gameState.round = 1;
+      gameState.choices = [];
+      
+      // Set first scenario based on story type
+      if (gameState.storyType === 'workday') {
+        gameState.currentScenarioId = 'w1';
+      } else {
+        gameState.currentScenarioId = 's1';
+      }
+      
+      // Hide start screen, show event screen
+      startScreen.classList.add('hidden');
+      eventScreen.classList.remove('hidden');
+      
+      // Show first event
+      showEvent();
+    }
+    
+    // Show event
+    function showEvent() {
+      const scenarios = gameState.storyType === 'workday' ? gameData.workday : gameData.weekend;
+      const scenario = scenarios.find(s => s.id === gameState.currentScenarioId);
+      
+      if (!scenario) {
+        // We've reached the end
+        showSuccess();
+        return;
+      }
+      
+      // Update UI
+      eventRound.textContent = `选择 ${gameState.round}/7`;
+      eventTitle.textContent = scenario.time;
+      eventDesc.textContent = scenario.desc;
+      
+      // Update choices
+      choice1.textContent = scenario.choices[0].text;
+      choice2.textContent = scenario.choices[1].text;
+    }
+    
+    // Make choice
+    function makeChoice(choiceIndex) {
+      const scenarios = gameState.storyType === 'workday' ? gameData.workday : gameData.weekend;
+      const scenario = scenarios.find(s => s.id === gameState.currentScenarioId);
+      const choice = scenario.choices[choiceIndex];
+      
+      // Record the choice
+      gameState.choices.push({
+        scenarioId: gameState.currentScenarioId,
+        choiceIndex: choiceIndex,
+        scenario: scenario,
+        choice: choice
+      });
+      
+      if (choice.result === 'survive') {
+        // Safe choice, continue to next scenario
+        gameState.currentScenarioId = choice.surviveNext;
+        gameState.round++;
+        
+        if (gameState.currentScenarioId === 'end' || gameState.round > 7) {
+          // Reached the end successfully
+          eventScreen.classList.add('hidden');
+          successScreen.classList.remove('hidden');
+        } else {
+          // Show next event
+          showEvent();
+        }
+      } else {
+        // Deadly choice, show death screen
+        eventScreen.classList.add('hidden');
+        deathDesc.textContent = choice.deathDesc;
+        deathScreen.classList.remove('hidden');
+      }
+    }
+    
+    // Show summary
+    function showSummary() {
+      successScreen.classList.add('hidden');
+      
+      // Generate summary content
+      let content = '';
+      
+      gameState.choices.forEach((choiceData, index) => {
+        const scenario = choiceData.scenario;
+        const choice = choiceData.choice;
+        const otherChoice = scenario.choices[choiceData.choiceIndex === 0 ? 1 : 0];
+        
+        content += `
+          <div class="summary-item">
+            <div class="summary-round">选择 ${index + 1}: ${scenario.time}</div>
+            <div class="event-desc">${scenario.desc}</div>
+            <div class="summary-choice ${choiceData.choiceIndex === 0 ? 'selected' : 'danger'}">${scenario.choices[0].text}</div>
+            <div class="summary-choice ${choiceData.choiceIndex === 1 ? 'selected' : 'danger'}">${scenario.choices[1].text}</div>
+            <div class="event-desc"><strong>避开的命运:</strong> ${otherChoice.deathDesc}</div>
+          </div>
+        `;
+      });
+      
+      summaryContent.innerHTML = content;
+      summaryScreen.classList.remove('hidden');
+    }
+    
+    // Reset game
+    function resetGame() {
+      // Reset game state
+      gameState.round = 1;
+      gameState.choices = [];
+      gameState.currentScenarioId = null;
+      
+      // Hide all screens except start screen
+      eventScreen.classList.add('hidden');
+      deathScreen.classList.add('hidden');
+      successScreen.classList.add('hidden');
+      summaryScreen.classList.add('hidden');
+      
+      // Show start screen
+      startScreen.classList.remove('hidden');
+      
+      // Reset story options
+      workdayOption.classList.remove('selected');
+      weekendOption.classList.remove('selected');
+      startButton.disabled = true;
+    }
+  </script>
+</body>
+</html>
