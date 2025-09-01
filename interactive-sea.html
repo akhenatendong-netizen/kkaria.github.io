@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Sea Surface</title>
+  <link rel="stylesheet" href="sea-styles.css">
+</head>
+<body>
+  <div class="loading">
+    <div class="loading-text">Loading Sea Surface...</div>
+  </div>
+  
+  <canvas id="sea-canvas"></canvas>
+  
+  <div class="controls">
+    <button id="mic-toggle" class="control-btn" title="Toggle Microphone">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"></path>
+        <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"></path>
+      </svg>
+    </button>
+    <button id="style-toggle" class="control-btn" title="Change Visual Style">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"></path>
+      </svg>
+    </button>
+    <button id="clear-btn" class="control-btn" title="Clear All Ripples">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+      </svg>
+    </button>
+  </div>
+
+  <div id="help-overlay" class="help-overlay">
+    <p>Click/Hold/Drag: Create ripples</p>
+    <p>Enable microphone: Paint with sound</p>
+  </div>
+
+  <script src="sea-utils.js"></script>
+  <script src="sea-audio.js"></script>
+  <script src="sea-webgl.js"></script>
+  <script src="sea-canvas2d.js"></script>
+  <script src="sea-main.js"></script>
+</body>
+</html>
