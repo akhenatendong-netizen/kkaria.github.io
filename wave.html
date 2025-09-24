@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Flowing Gradient Dot Wave</title>
+<style>
+  html,body{margin:0;height:100%;background:#000;overflow:hidden}
+  canvas{display:block}
+  .hud{position:fixed;left:12px;bottom:12px;color:#9bb1ff;font:12px/1.2 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.14);padding:8px 12px;border-radius:10px}
+</style>
+</head>
+<body>
+<canvas id="wave"></canvas>
+<div class="hud">移动/点击：激起局部波纹 · 全屏自适应</div>
+<script>
+const canvas = document.getElementById('wave');
+const ctx = canvas.getContext('2d',{alpha:false});
+let W=0,H=0,DPR=1;
+function resize(){
+  DPR = Math.max(1, Math.min(2, window.devicePixelRatio||1));
+  W = canvas.width  = Math.floor(innerWidth * DPR);
+  H = canvas.height = Math.floor(innerHeight * DPR);
+}
+addEventListener('resize', resize); resize();
+
+let t = 0;
+let ripples = [];
+const rows = 44, cols = 96; // 网格密度
+function addRipple(x,y){ ripples.push({x:x*DPR,y:y*DPR,r:0}); if(ripples.length>10) ripples.shift(); }
+canvas.addEventListener('mousemove', e=> addRipple(e.clientX,e.clientY));
+canvas.addEventListener('click',    e=> addRipple(e.clientX,e.clientY));
+canvas.addEventListener('touchmove',e=>{ const p=e.touches[0]; if(p) addRipple(p.clientX,p.clientY); },{passive:true});
+canvas.addEventListener('touchstart',e=>{ const p=e.touches[0]; if(p) addRipple(p.clientX,p.clientY); },{passive:true});
+
+function draw(){
+  ctx.fillStyle = '#020204'; ctx.fillRect(0,0,W,H);
+  const sx = W/cols, sy = H/rows;
+  for(let i=0;i<rows;i++){
+    for(let j=0;j<cols;j++){
+      const x = j*sx + sx/2;
+      const y = i*sy + sy/2;
+      // 主波
+      let wave = Math.sin(j*0.32 + t) * 14*DPR + Math.cos(i*0.32 + t*0.6) * 14*DPR;
+      // 涟漪
+      for(const r of ripples){
+        const dx = x - r.x, dy = y - r.y, dist = Math.hypot(dx,dy);
+        wave += Math.sin(dist*0.06 - r.r*0.2) * 9*DPR * Math.exp(-dist/420);
+      }
+      const finalY = y + wave*0.8;
+      // 颜色渐变（随列 + 时间）
+      const hue = (j/cols)*300 + t*18;
+      ctx.fillStyle = `hsl(${hue%360}, 90%, 60%)`;
+      // 点半径与亮度
+      const rad = Math.max(0.8*DPR, 1.8*DPR + wave*0.02);
+      ctx.globalAlpha = 0.35 + Math.max(-0.35, Math.min(0.55, wave/(30*DPR)));
+      ctx.beginPath(); ctx.arc(x, finalY, rad, 0, Math.PI*2); ctx.fill();
+    }
+  }
+  ctx.globalAlpha = 1;
+  // 涟漪扩散
+  for(const r of ripples) r.r += 0.9;
+  ripples = ripples.filter(r=> r.r < 120);
+  t += 0.03;
+  requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+</script>
+</body>
+</html>
