@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Basic Breathing City</title>
+  <title>Crystal Breathing City</title>
   <style>
     body {
       margin: 0;
@@ -23,11 +23,10 @@
       pointer-events: none;
       text-shadow: 0 0 5px #000;
     }
-    #resetBtn {
+    .control-btn {
       position: absolute;
       bottom: 20px;
-      left: 20px;
-      background-color: #4CAF50;
+      background-color: rgba(76, 80, 175, 0.7);
       border: none;
       color: white;
       padding: 10px 15px;
@@ -36,6 +35,15 @@
       cursor: pointer;
       border-radius: 5px;
       z-index: 100;
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      box-shadow: 0 0 10px rgba(128, 0, 255, 0.3);
+    }
+    #resetBtn {
+      left: 20px;
+    }
+    #musicBtn {
+      left: 150px;
     }
     #loading {
       position: fixed;
@@ -55,8 +63,9 @@
 </head>
 <body>
   <div id="loading">Loading...</div>
-  <div id="info">Breath City - Click to increase heartbeat, hover for nature effect</div>
-  <button id="resetBtn">Reset Breathing</button>
+  <div id="info">Crystal Breathing City - Click to increase heartbeat, hover for nature effect</div>
+  <button id="resetBtn" class="control-btn">Reset Breathing</button>
+  <button id="musicBtn" class="control-btn">Toggle Music</button>
   
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -74,7 +83,9 @@
         amplitudeFalloff: 0.08,
         phaseOffset: 0.2,
         hoverRadius: 5,
-        emissiveIntensity: 0.3
+        emissiveIntensity: 0.4,
+        glassOpacity: 0.9, // Less transparent
+        glassShininess: 50
       };
       
       // State variables
@@ -82,6 +93,9 @@
       let anxietyLevel = 0;
       let lastClickTime = 0;
       let clickCount = 0;
+      let musicPlaying = false;
+      let audioContext;
+      let backgroundMusic;
       
       // Main variables
       let scene, camera, renderer, controls;
@@ -98,15 +112,15 @@
       function init() {
         // Create scene
         scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x050510);
-        scene.fog = new THREE.FogExp2(0x050510, 0.02);
+        scene.background = new THREE.Color(0x050518); // Darker blue background
+        scene.fog = new THREE.FogExp2(0x050518, 0.02);
         
         // Create camera
         camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(config.gridSize / 2, config.gridSize / 2, config.gridSize);
         
         // Create renderer
-        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         document.body.appendChild(renderer.domElement);
@@ -126,9 +140,11 @@
           config.gridSize * config.cellSize * 1.5
         );
         const groundMaterial = new THREE.MeshStandardMaterial({
-          color: 0x111122,
+          color: 0x111133,
           roughness: 0.8,
-          metalness: 0.2
+          metalness: 0.2,
+          emissive: 0x001133,
+          emissiveIntensity: 0.15
         });
         ground = new THREE.Mesh(groundGeometry, groundMaterial);
         ground.rotation.x = -Math.PI / 2;
@@ -136,12 +152,25 @@
         scene.add(ground);
         
         // Add lights
-        const ambientLight = new THREE.AmbientLight(0x333344, 1);
+        const ambientLight = new THREE.AmbientLight(0x333355, 1);
         scene.add(ambientLight);
         
-        const directionalLight = new THREE.DirectionalLight(0xaaaaff, 1);
+        const directionalLight = new THREE.DirectionalLight(0x8888ff, 1);
         directionalLight.position.set(config.gridSize, config.gridSize, config.gridSize);
         scene.add(directionalLight);
+        
+        // Add point lights for glass effect
+        const blueLight = new THREE.PointLight(0x0044ff, 1, config.gridSize * 2);
+        blueLight.position.set(config.gridSize/2, config.gridSize/2, config.gridSize/2);
+        scene.add(blueLight);
+        
+        const purpleLight = new THREE.PointLight(0x6600cc, 0.8, config.gridSize * 3);
+        purpleLight.position.set(-config.gridSize/3, config.gridSize/4, -config.gridSize/3);
+        scene.add(purpleLight);
+        
+        const pinkLight = new THREE.PointLight(0xcc0088, 0.5, config.gridSize * 3);
+        pinkLight.position.set(config.gridSize/3, config.gridSize/3, -config.gridSize/2);
+        scene.add(pinkLight);
         
         // Create city
         createCity();
@@ -149,14 +178,134 @@
         // Setup clock
         clock = new THREE.Clock();
         
+        // Initialize audio
+        initAudio();
+        
         // Add event listeners
         window.addEventListener('resize', onWindowResize);
         window.addEventListener('mousemove', onMouseMove);
         window.addEventListener('click', onClick);
         document.getElementById('resetBtn').addEventListener('click', resetBreathing);
+        document.getElementById('musicBtn').addEventListener('click', toggleMusic);
         
         // Hide loading screen
         document.getElementById('loading').style.display = 'none';
+      }
+      
+      function initAudio() {
+        try {
+          // Create audio context
+          window.AudioContext = window.AudioContext || window.webkitAudioContext;
+          audioContext = new AudioContext();
+          
+          // Create oscillators for ambient music
+          backgroundMusic = {
+            oscillators: [],
+            gains: [],
+            isPlaying: false
+          };
+          
+          // Create base frequencies for a pleasant chord
+          const baseFrequencies = [
+            220, // A3
+            277.18, // C#4
+            329.63, // E4
+            440, // A4
+          ];
+          
+          // Create oscillators
+          for (let i = 0; i < baseFrequencies.length; i++) {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.type = i % 2 === 0 ? 'sine' : 'triangle';
+            oscillator.frequency.value = baseFrequencies[i];
+            
+            // Set initial gain to 0
+            gainNode.gain.value = 0;
+            
+            // Connect nodes
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Start oscillator
+            oscillator.start();
+            
+            // Store references
+            backgroundMusic.oscillators.push(oscillator);
+            backgroundMusic.gains.push(gainNode);
+          }
+        } catch (e) {
+          console.error("Web Audio API is not supported in this browser");
+        }
+      }
+      
+      function toggleMusic() {
+        if (!audioContext) return;
+        
+        if (audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
+        
+        musicPlaying = !musicPlaying;
+        
+        if (musicPlaying) {
+          // Fade in
+          backgroundMusic.gains.forEach((gainNode, i) => {
+            gainNode.gain.cancelScheduledValues(audioContext.currentTime);
+            gainNode.gain.setValueAtTime(gainNode.gain.value, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.1 / backgroundMusic.gains.length, audioContext.currentTime + 2);
+          });
+          document.getElementById('musicBtn').textContent = "Music: On";
+        } else {
+          // Fade out
+          backgroundMusic.gains.forEach((gainNode) => {
+            gainNode.gain.cancelScheduledValues(audioContext.currentTime);
+            gainNode.gain.setValueAtTime(gainNode.gain.value, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 1);
+          });
+          document.getElementById('musicBtn').textContent = "Music: Off";
+        }
+      }
+      
+      function updateMusic(elapsedTime, heartbeatLevel, anxietyLevel) {
+        if (!musicPlaying || !audioContext) return;
+        
+        // Update oscillator frequencies based on breathing
+        const breathePhase = Math.sin(elapsedTime * config.breatheSpeed);
+        
+        backgroundMusic.oscillators.forEach((osc, i) => {
+          // Subtle frequency modulation
+          const baseFreq = osc.frequency.value;
+          const detune = breathePhase * 5 + heartbeatLevel * 10 + anxietyLevel * 20;
+          osc.detune.value = detune;
+          
+          // Adjust volume based on anxiety
+          const gain = backgroundMusic.gains[i];
+          const targetVolume = 0.1 / backgroundMusic.gains.length * (1 - anxietyLevel * 0.5);
+          gain.gain.setTargetAtTime(targetVolume, audioContext.currentTime, 0.1);
+        });
+      }
+      
+      function playHeartbeatSound() {
+        if (!audioContext) return;
+        
+        // Create heartbeat sound
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.value = 80;
+        
+        gain.gain.setValueAtTime(0, audioContext.currentTime);
+        gain.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.05);
+        gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.3);
+        
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        
+        osc.start();
+        osc.stop(audioContext.currentTime + 0.3);
       }
       
       function createCity() {
@@ -168,11 +317,16 @@
         );
         geometry.translate(0, 0.5, 0); // Move pivot to bottom
         
-        // Create material
-        const material = new THREE.MeshStandardMaterial({
-          color: 0x4488ff,
-          emissive: 0x0055aa,
-          emissiveIntensity: config.emissiveIntensity
+        // Create glass material - more blue-purple color variations
+        const material = new THREE.MeshPhongMaterial({
+          color: 0x6688cc, // More blue-purple base color
+          emissive: 0x2233aa,
+          emissiveIntensity: config.emissiveIntensity,
+          specular: 0xaaaaff, // Blue-tinted specular
+          shininess: config.glassShininess,
+          transparent: true,
+          opacity: config.glassOpacity,
+          reflectivity: 1
         });
         
         // Create instanced mesh
@@ -208,7 +362,9 @@
               i,
               j,
               distanceToCenter,
-              natureEffect: 0
+              natureEffect: 0,
+              // Add color variation based on position
+              colorShift: (Math.sin(i * 0.2) * 0.5 + 0.5) * (Math.cos(j * 0.3) * 0.5 + 0.5)
             });
             
             // Set initial matrix
@@ -251,6 +407,11 @@
         }
         
         lastClickTime = currentTime;
+        
+        // Play heartbeat sound
+        if (audioContext && audioContext.state === 'running') {
+          playHeartbeatSound();
+        }
       }
       
       function resetBreathing() {
@@ -291,7 +452,10 @@
         updateBuildings(deltaTime, elapsedTime, hoverPoint);
         
         // Update material color based on anxiety level
-        updateCityMood();
+        updateCityMood(elapsedTime);
+        
+        // Update music
+        updateMusic(elapsedTime, heartbeatLevel, anxietyLevel);
         
         // Render scene
         renderer.render(scene, camera);
@@ -360,10 +524,10 @@
         instancedMesh.instanceMatrix.needsUpdate = true;
       }
       
-      function updateCityMood() {
-        // Base colors
-        const calmColor = new THREE.Color(0x4488ff);
-        const calmEmissive = new THREE.Color(0x0055aa);
+      function updateCityMood(elapsedTime) {
+        // Base colors - blue-purple variations
+        const calmColor = new THREE.Color(0x6688cc);
+        const calmEmissive = new THREE.Color(0x2233aa);
         
         const anxiousColor = new THREE.Color(0xff5500);
         const anxiousEmissive = new THREE.Color(0x550000);
@@ -392,11 +556,29 @@
         // If there's nature effect, blend with nature color
         if (hasNatureEffect) {
           const natureColor = new THREE.Color(0x00cc44);
+          const natureEmissive = new THREE.Color(0x005522);
           finalColor.lerp(natureColor, maxNatureEffect * 0.3);
+          finalEmissive.lerp(natureEmissive, maxNatureEffect * 0.3);
           instancedMesh.material.emissiveIntensity = config.emissiveIntensity * 1.5;
+          instancedMesh.material.shininess = config.glassShininess * 1.5;
         } else {
           instancedMesh.material.emissiveIntensity = config.emissiveIntensity;
+          instancedMesh.material.shininess = config.glassShininess;
         }
+        
+        // Subtle color pulsing
+        const pulseAmount = Math.sin(elapsedTime * 0.5) * 0.05 + 0.95;
+        finalColor.multiplyScalar(pulseAmount);
+        
+        // Add color variation based on breathing
+        const breathePhase = Math.sin(elapsedTime * config.breatheSpeed);
+        const hueShift = breathePhase * 0.05; // Subtle hue shift
+        
+        // Convert to HSL for easier hue manipulation
+        const hsl = {};
+        finalColor.getHSL(hsl);
+        hsl.h += hueShift;
+        finalColor.setHSL(hsl.h, hsl.s, hsl.l);
         
         // Update material colors
         instancedMesh.material.color.copy(finalColor);
