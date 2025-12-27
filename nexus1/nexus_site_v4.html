@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NEXUS Rehab Platform</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --nexus-blue: #2454ff;
+      --nexus-blue-soft: #e4ecff;
+      --nexus-blue-soft2: #f4f6ff;
+      --accent-mint: #b7f0e5;
+      --bg-page: #f5f7fc;
+      --text-main: #111827;
+      --text-sub: #6b7280;
+      --card-radius: 24px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top left, #f3f6ff 0, #f9fbff 32%, #f4f6fb 100%);
+      color: var(--text-main);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---------- Global top nav ---------- */
+    .global-nav {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: linear-gradient(90deg, #2044e8, #3261ff);
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.28);
+    }
+
+    .global-nav-inner {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      color: #ffffff;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo img {
+      height: 30px;
+      display: block;
+      filter: brightness(0) invert(1); /* 把蓝色 logo 显示成白色视觉 */
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      opacity: 0.78;
+    }
+
+    .nav-center {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-tabs {
+      display: inline-flex;
+      padding: 4px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.22);
+      gap: 4px;
+    }
+
+    .nav-tab {
+      font-size: 12px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.78);
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+    }
+
+    .nav-tab--active {
+      background: #ffffff;
+      color: var(--nexus-blue);
+      font-weight: 600;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.35);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .pill-light {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.32);
+      font-size: 11px;
+      opacity: 0.9;
+    }
+
+    .pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
+    .avatar-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.35);
+    }
+
+    .avatar-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .avatar-label {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .avatar-role {
+      font-size: 11px;
+      opacity: 0.76;
+    }
+
+    /* ---------- Screen shell ---------- */
+    .screens {
+      padding: 32px 20px 40px;
+    }
+
+    .screen {
+      max-width: 1300px;
+      margin: 0 auto 40px;
+      border-radius: 32px;
+      padding: 32px 32px 34px;
+      background: radial-gradient(circle at top left, #f7f9ff 0, #ffffff 55%, #f4f7ff 100%);
+      box-shadow: 0 26px 70px rgba(15, 23, 42, 0.14);
+      display: none;
+    }
+
+    .screen--active {
+      display: block;
+    }
+
+    .screen-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 26px;
+      gap: 16px;
+    }
+
+    .screen-title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-sub);
+    }
+
+    .screen-title {
+      font-size: 24px;
+      font-weight: 650;
+      color: var(--text-main);
+    }
+
+    .screen-sub {
+      font-size: 13px;
+      color: var(--text-sub);
+      max-width: 520px;
+    }
+
+    .screen-tag {
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(180, 208, 255, 0.95), rgba(190, 242, 228, 0.95));
+      font-size: 11px;
+      color: #0f172a;
+      white-space: nowrap;
+    }
+
+    /* Layout helpers */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 0.28fr 0.46fr 0.26fr;
+      gap: 20px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 0.52fr 0.48fr;
+      gap: 22px;
+    }
+
+    .col {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Card */
+    .card {
+      border-radius: var(--card-radius);
+      padding: 20px 20px 18px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+    }
+
+    .card--soft {
+      background: linear-gradient(135deg, #f4f7ff, #ffffff);
+      box-shadow: 0 20px 46px rgba(148, 163, 184, 0.32);
+    }
+
+    .section-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      gap: 8px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .card-sub {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-top: 2px;
+    }
+
+    /* Patient profile & stats */
+    .profile-main {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .profile-avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      background: linear-gradient(145deg, #2454ff, #7f9dff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 700;
+      box-shadow: 0 16px 35px rgba(37, 99, 235, 0.5);
+    }
+
+    .profile-name {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .profile-meta {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-top: 4px;
+    }
+
+    .pill-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .info-pill {
+      border-radius: 13px;
+      padding: 8px 10px;
+      background: #f7f8fd;
+      font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-sub);
+    }
+
+    .info-pill span:last-child {
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stat-card {
+      border-radius: 18px;
+      padding: 12px 13px;
+      background: #f7f8ff;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-sub);
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--nexus-blue);
+      margin-bottom: 2px;
+    }
+
+    .stat-caption {
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+
+    /* Buttons */
+    .btn-outline {
+      padding: 7px 16px;
+      border-radius: 999px;
+      border: none;
+      background: #eef1ff;
+      color: var(--nexus-blue);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .btn-outline:hover {
+      background: #e0e5ff;
+    }
+
+    .btn-primary {
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, #2454ff, #6a8dff);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 14px 35px rgba(37, 99, 235, 0.5);
+    }
+
+    /* Simple charts (fake) */
+    .tiny-chart {
+      margin-top: 10px;
+      height: 44px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #e5edff, #b8d4ff);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tiny-chart-fill {
+      position: absolute;
+      inset: 3px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #2454ff, #7f9dff);
+    }
+
+    .tiny-chart-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-size: 10px;
+      color: var(--text-sub);
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .tag-chip {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #f4f4ff;
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+
+    .tag-chip--strong {
+      background: #e0ebff;
+      color: var(--nexus-blue);
+      font-weight: 500;
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 4px;
+      font-size: 12px;
+    }
+
+    .list-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .list-label {
+      color: var(--text-sub);
+    }
+
+    .list-value {
+      font-weight: 500;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    th {
+      text-align: left;
+      padding: 8px 4px;
+      color: var(--text-sub);
+      font-weight: 500;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    td {
+      padding: 8px 4px;
+      border-bottom: 1px solid #f1f2f7;
+    }
+
+    .badge {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 500;
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .badge-soft {
+      background: #f3f4f6;
+      color: #4b5563;
+    }
+
+    .badge-danger {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .badge-success {
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    /* Responsive */
+    @media (max-width: 1000px) {
+      .screen {
+        padding: 24px 18px;
+      }
+      .grid-3,
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .global-nav-inner {
+        flex-wrap: wrap;
+      }
+      .nav-center {
+        order: 3;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Top blue bar -->
+  <header class="global-nav">
+    <div class="global-nav-inner">
+      <div class="brand">
+        <div class="brand-logo">
+          <!-- 把你的 logo 图片重命名为 Group-39780.png 且与 HTML 放在同一文件夹 -->
+          <img src="Group 39780.png" alt="NEXUS Logo">
+        </div>
+        <div class="brand-sub">Data-driven rehab companion</div>
+      </div>
+
+      <div class="nav-center">
+        <div class="nav-tabs">
+          <div class="nav-tab nav-tab--active" data-screen="patient">Patient portal</div>
+          <div class="nav-tab" data-screen="session">Session capture</div>
+          <div class="nav-tab" data-screen="doctor">Doctor dashboard</div>
+          <div class="nav-tab" data-screen="case">Case detail</div>
+        </div>
+      </div>
+
+      <div class="nav-right">
+        <div class="pill-light">
+          <span class="pill-dot"></span>
+          <span>Device online</span>
+        </div>
+        <div class="avatar-chip">
+          <div class="avatar-circle">L</div>
+          <div>
+            <div class="avatar-label">Dr. Lucas</div>
+            <div class="avatar-role">Orthopedic specialist</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="screens">
+    <!-- Patient portal -->
+    <section class="screen screen--active" id="screen-patient">
+      <div class="screen-header">
+        <div class="screen-title-block">
+          <div class="eyebrow">Patient side</div>
+          <div class="screen-title">Today’s rehab at a glance</div>
+          <div class="screen-sub">Wrist flexion, extension and rotation sessions are condensed into one clear plan, with simple feedback that patients understand at home.</div>
+        </div>
+        <div class="screen-tag">Home-based rehab · Guided by NEXUS</div>
+      </div>
+
+      <div class="grid-3">
+        <!-- Left column -->
+        <div class="col">
+          <div class="card card--soft">
+            <div class="section-label">Profile</div>
+            <div class="profile-main">
+              <div class="profile-avatar">A</div>
+              <div>
+                <div class="profile-name">Anna Lee</div>
+                <div class="profile-meta">26 · Distal radius fracture · Week 5 of rehab</div>
+              </div>
+            </div>
+            <div class="pill-grid">
+              <div class="info-pill">
+                <span>Side</span><span>Right wrist</span>
+              </div>
+              <div class="info-pill">
+                <span>Stage</span><span>Remodeling</span>
+              </div>
+              <div class="info-pill">
+                <span>Device</span><span>Splint + Airbag</span>
+              </div>
+              <div class="info-pill">
+                <span>Next visit</span><span>May 28 · 10:30</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-label">This week</div>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-label">Avg. flexion</div>
+                <div class="stat-value">52°</div>
+                <div class="stat-caption">↑ 10° vs. last week</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Daily sets</div>
+                <div class="stat-value">3.4</div>
+                <div class="stat-caption">Goal · 3 sets / day</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Adherence</div>
+                <div class="stat-value">86%</div>
+                <div class="stat-caption">Consistent in last 7 days</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Pain trend</div>
+                <div class="stat-value">↓</div>
+                <div class="stat-caption">Mild pain only at end range</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Middle column -->
+        <div class="col">
+          <div class="card card--soft">
+            <div class="card-header">
+              <div>
+                <div class="section-label">Today’s plan</div>
+                <div class="card-title">3 short sessions · 12 minutes</div>
+                <div class="card-sub">Each block includes warm‑up, guided motion and cool‑down stretch.</div>
+              </div>
+              <button class="btn-outline">Start first set</button>
+            </div>
+
+            <div class="list">
+              <div class="list-row">
+                <div>
+                  <div class="list-label">Session 1 · Morning</div>
+                  <div class="list-value">Flexion / extension · 4×12 reps</div>
+                </div>
+                <span class="badge-success">Recommended now</span>
+              </div>
+              <div class="list-row">
+                <div>
+                  <div class="list-label">Session 2 · Afternoon</div>
+                  <div class="list-value">Pronation / supination · 3×10 reps</div>
+                </div>
+                <span class="badge-soft">Later today</span>
+              </div>
+              <div class="list-row">
+                <div>
+                  <div class="list-label">Session 3 · Evening</div>
+                  <div class="list-value">Gentle stretch · 8 min</div>
+                </div>
+                <span class="badge-soft">Before sleep</span>
+              </div>
+            </div>
+
+            <div class="tiny-chart">
+              <div class="tiny-chart-fill" style="width:70%;"></div>
+            </div>
+            <div class="tiny-chart-labels">
+              <span>0 sets done</span>
+              <span>2 / 3 sets completed</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="section-label">Check‑in</div>
+                <div class="card-title">How does your wrist feel?</div>
+              </div>
+              <button class="btn-primary">Quick check</button>
+            </div>
+            <div class="tag-row">
+              <span class="tag-chip tag-chip--strong">Can use phone normally</span>
+              <span class="tag-chip">Mild stiffness in the morning</span>
+              <span class="tag-chip">No night pain</span>
+            </div>
+            <div class="card-sub" style="margin-top:10px;">These short questions update your doctor dashboard and fine‑tune the AI curve.</div>
+          </div>
+        </div>
+
+        <!-- Right column -->
+        <div class="col">
+          <div class="card">
+            <div class="section-label">AI summary</div>
+            <div class="list" style="font-size:12px;">
+              <div>• Flexion and extension improving steadily. Risk of over‑stretch is low.</div>
+              <div>• Adherence is strong on weekdays, slightly lower during weekends.</div>
+              <div>• Pain is mainly at end range; no red‑flag symptoms reported.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-label">From your doctor</div>
+            <div class="card-sub" style="margin-bottom:10px;">“Keep following the pace. If you feel sharp pain, stop the set and log it so I can see the pattern.”</div>
+            <button class="btn-outline">Send message</button>
+          </div>
+
+          <div class="card">
+            <div class="section-label">Next steps</div>
+            <div class="list">
+              <div class="list-row">
+                <span class="list-label">Plan review</span>
+                <span class="list-value">Auto at day 42</span>
+              </div>
+              <div class="list-row">
+                <span class="list-label">Clinic visit</span>
+                <span class="list-value">May 28 · X‑ray + strength test</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Session capture -->
+    <section class="screen" id="screen-session">
+      <div class="screen-header">
+        <div class="screen-title-block">
+          <div class="eyebrow">Patient side</div>
+          <div class="screen-title">Record one training set</div>
+          <div class="screen-sub">The sensor glove streams angle and pressure so patients get instant feedback, while the doctor receives a clean timeline of motion quality.</div>
+        </div>
+        <div class="screen-tag">Real‑time motion · Safety guardrail</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="col">
+          <div class="card card--soft">
+            <div class="card-header">
+              <div>
+                <div class="section-label">Live angle</div>
+                <div class="card-title">Wrist flexion · Target 60°</div>
+              </div>
+              <button class="btn-outline">Calibrate</button>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:center;margin-top:10px;margin-bottom:6px;">
+              <svg width="200" height="120" viewBox="0 0 200 120">
+                <defs>
+                  <linearGradient id="gradArc" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#22c55e;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#facc15;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#ef4444;stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+                <path d="M20 100 A80 80 0 0 1 180 100" stroke="url(#gradArc)" stroke-width="12" fill="none" stroke-linecap="round"/>
+                <path d="M20 100 A80 80 0 0 1 150 55" stroke="#2454ff" stroke-width="12" fill="none" stroke-linecap="round"/>
+                <circle cx="150" cy="55" r="5" fill="#2454ff"/>
+              </svg>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-sub);">
+              <span>0°</span><span>60°</span><span>90°</span>
+            </div>
+            <div style="margin-top:10px;font-size:13px;">
+              <span style="font-weight:600;">Current: 52°</span>
+              <span style="color:var(--text-sub);margin-left:8px;">Comfort zone · keep breathing slowly</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-label">Safety</div>
+            <div class="list">
+              <div class="list-row">
+                <span class="list-label">Red‑zone angle</span>
+                <span class="list-value">≥ 75° · 3s hold</span>
+              </div>
+              <div class="list-row">
+                <span class="list-label">AI guardrail</span>
+                <span class="list-value">Auto vibrate at 70°</span>
+              </div>
+            </div>
+            <div class="card-sub" style="margin-top:10px;">If you enter the red zone, the glove gently vibrates and the set is flagged for doctor review.</div>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="section-label">How intense was that set?</div>
+                <div class="card-title">Quick check‑in after motion</div>
+              </div>
+            </div>
+            <div class="list">
+              <div class="list-row">
+                <span class="list-label">Pain level</span>
+                <span class="list-value">0 1 2 3 4 5 6 7 8 9 10</span>
+              </div>
+              <div class="list-row">
+                <span class="list-label">Effort</span>
+                <span class="list-value">Very light · Light · Medium · Hard</span>
+              </div>
+            </div>
+            <div class="tag-row" style="margin-top:12px;">
+              <span class="tag-chip">Morning stiffness</span>
+              <span class="tag-chip">Clicking sound</span>
+              <span class="tag-chip">Numbness</span>
+              <span class="tag-chip tag-chip--strong">No unusual feeling</span>
+            </div>
+            <div class="card-sub" style="margin-top:10px;">These three answers are enough for the AI to update your safe angle curve.</div>
+            <button class="btn-primary" style="margin-top:14px;">Save set & sync to doctor</button>
+          </div>
+
+          <div class="card">
+            <div class="section-label">Data preview</div>
+            <div class="card-sub">Each set is stored as an angle‑time curve with tags. Doctors can export all sets as an Excel file or view summary statistics directly.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Doctor dashboard -->
+    <section class="screen" id="screen-doctor">
+      <div class="screen-header">
+        <div class="screen-title-block">
+          <div class="eyebrow">Doctor side</div>
+          <div class="screen-title">One list, all active patients</div>
+          <div class="screen-sub">Motion curves, adherence and alerts are merged into a single view so you can decide who needs in‑person review and who can stay remote.</div>
+        </div>
+        <div class="screen-tag">Clinic workload · Remote follow‑up</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="col">
+          <div class="card card--soft">
+            <div class="card-header">
+              <div>
+                <div class="section-label">Overview</div>
+                <div class="card-title">Today in your list</div>
+              </div>
+            </div>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-label">Active patients</div>
+                <div class="stat-value">24</div>
+                <div class="stat-caption">On NEXUS splint</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Need review</div>
+                <div class="stat-value">6</div>
+                <div class="stat-caption">Angle or pain alerts</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Tele‑visits today</div>
+                <div class="stat-value">4</div>
+                <div class="stat-caption">15‑min slots</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Avg. adherence</div>
+                <div class="stat-value">81%</div>
+                <div class="stat-caption">Last 7 days</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-label">Filters</div>
+            <div class="tag-row">
+              <span class="tag-chip tag-chip--strong">All patients</span>
+              <span class="tag-chip">Angle > target</span>
+              <span class="tag-chip">Low adherence</span>
+              <span class="tag-chip">New fracture</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card card--soft">
+            <div class="card-header">
+              <div>
+                <div class="section-label">Today’s focus</div>
+                <div class="card-title">Alerts and stage upgrades</div>
+              </div>
+            </div>
+            <div class="list">
+              <div class="list-row">
+                <span class="list-label">Red‑zone alerts</span>
+                <span class="badge-danger">2 patients</span>
+              </div>
+              <div class="list-row">
+                <span class="list-label">Ready to upgrade</span>
+                <span class="badge-success">5 patients</span>
+              </div>
+              <div class="list-row">
+                <span class="list-label">Missed 3+ days</span>
+                <span class="badge">3 patients</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:22px;">
+        <div class="card-header">
+          <div>
+            <div class="section-label">Patient list</div>
+            <div class="card-title">Prioritized by risk and opportunity</div>
+          </div>
+        </div>
+        <table>
+          <thead>
+          <tr>
+            <th>Patient</th>
+            <th>Stage</th>
+            <th>Flexion</th>
+            <th>Adherence</th>
+            <th>Last 7 days</th>
+            <th>Priority</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>Anna Lee</td>
+            <td><span class="badge-success">Remodeling</span></td>
+            <td>52° / 60°</td>
+            <td>86%</td>
+            <td>Stable angle, pain ↓</td>
+            <td><span class="badge-soft">Routine</span></td>
+          </tr>
+          <tr>
+            <td>Michael Chen</td>
+            <td><span class="badge">Repair</span></td>
+            <td>72° / 65°</td>
+            <td>74%</td>
+            <td>3 red‑zone alerts</td>
+            <td><span class="badge-danger">Review today</span></td>
+          </tr>
+          <tr>
+            <td>Emily Park</td>
+            <td><span class="badge-success">Remodeling</span></td>
+            <td>60° / 60°</td>
+            <td>92%</td>
+            <td>Completed 42‑day plan</td>
+            <td><span class="badge-success">Consider discharge</span></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Case detail -->
+    <section class="screen" id="screen-case">
+      <div class="screen-header">
+        <div class="screen-title-block">
+          <div class="eyebrow">Doctor side</div>
+          <div class="screen-title">Decide the next rehab stage</div>
+          <div class="screen-sub">NEXUS summarizes motion data and suggests a stage. You keep full control over the final decision and notes sent back to the patient.</div>
+        </div>
+        <div class="screen-tag">AI suggestion · Human decision</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="col">
+          <div class="card card--soft">
+            <div class="section-label">Case snapshot</div>
+            <div class="list">
+              <div class="list-row">
+                <span class="list-label">Patient</span>
+                <span class="list-value">Anna Lee · 26</span>
+              </div>
+              <div class="list-row">
+                <span class="list-label">Injury</span>
+                <span class="list-value">Distal radius fracture · ORIF</span>
+              </div>
+              <div class="list-row">
+                <span class="	list-label">Post‑op day</span>
+                <span class="list-value">Day 35</span>
+              </div>
+              <div class="list-row">
+                <span class="list-label">Current stage</span>
+                <span class="badge-success">Late repair</span>
+              </div>
+            </div>
+            <div class="card-sub" style="margin-top:10px;">X‑ray on day 28 showed good callus formation with no hardware issues.</div>
+          </div>
+
+          <div class="card">
+            <div class="section-label">Angle timeline</div>
+            <div class="tiny-chart">
+              <div class="tiny-chart-fill" style="width:80%;"></div>
+            </div>
+            <div class="tiny-chart-labels">
+              <span>Week 2</span><span>Week 4</span><span>Week 6</span>
+            </div>
+            <div class="card-sub" style="margin-top:10px;">Flexion improved from 20° at week 2 to 52° at week 5; no sudden drops or irregular patterns.</div>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="section-label">AI suggestion</div>
+                <div class="card-title">Move to light functional training</div>
+              </div>
+            </div>
+            <div class="list">
+              <div>• Angle and pain scores meet clinic thresholds for stage upgrade.</div>
+              <div>• Weekday adherence is high; weekend gaps are within safe range.</div>
+              <div>• No episodes of sharp pain, night pain or red‑zone overuse.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-label">Your decision</div>
+            <div class="list">
+              <div class="list-row">
+                <span class="list-label">Stage</span>
+                <span class="badge-success">Upgrade approved</span>
+              </div>
+              <div class="list-row">
+                <span class="list-label">Next in‑person visit</span>
+                <span class="list-value">In 3 weeks</span>
+              </div>
+            </div>
+            <div class="card-sub" style="margin-top:10px;">Note sent to patient: “We can start using your wrist in more daily tasks, but avoid heavy lifting and sudden load.”</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  // 顶部 tag 切换 screen
+  const tabs = document.querySelectorAll('.nav-tab');
+  const screens = {
+    patient: document.getElementById('screen-patient'),
+    session: document.getElementById('screen-session'),
+    doctor: document.getElementById('screen-doctor'),
+    case: document.getElementById('screen-case')
+  };
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.getAttribute('data-screen');
+
+      tabs.forEach(t => t.classList.remove('nav-tab--active'));
+      tab.classList.add('nav-tab--active');
+
+      Object.keys(screens).forEach(key => {
+        if (key === target) {
+          screens[key].classList.add('screen--active');
+        } else {
+          screens[key].classList.remove('screen--active');
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>
