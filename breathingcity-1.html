@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Final Breathing City</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #000;
+    }
+    canvas {
+      display: block;
+    }
+    #info {
+      position: absolute;
+      top: 10px;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      z-index: 100;
+      pointer-events: none;
+      text-shadow: 0 0 5px #000;
+    }
+  </style>
+</head>
+<body>
+  <div id="info">Final Breathing City - Click to create waves</div>
+  
+  <canvas id="canvas"></canvas>
+  
+  <script>
+    // Canvas setup
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Set canvas to full screen
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    // Configuration
+    const config = {
+      gridSize: 40,
+      cellSize: 15,
+      baseHeight: 20,
+      maxHeight: 100,
+      breatheSpeed: 0.5,
+      breatheAmplitude: 15,
+      amplitudeFalloff: 0.08,
+      phaseOffset: 0.2,
+      hoverStrength: 30,
+      hoverRadius: 5,
+      hoverDirection: 1,
+      waveSpeed: 10,
+      waveAmplitude: 25,
+      waveTemporalFreq: 5,
+      waveSpatialFreq: 0.5,
+      waveDamping: 1.5,
+      ringWidthDamping: 0.5
+    };
+    
+    // Buildings array
+    const buildings = [];
+    
+    // Click points array
+    const clickPoints = [];
+    
+    // Mouse position
+    let mouseX = canvas.width / 2;
+    let mouseY = canvas.height / 2;
+    
+    // Initialize
+    init();
+    animate();
+    
+    function init() {
+      // Calculate center offset to center the grid
+      const centerOffsetX = canvas.width / 2 - (config.gridSize * config.cellSize) / 2;
+      const centerOffsetY = canvas.height / 2 - (config.gridSize * config.cellSize) / 2;
+      
+      // Create buildings
+      for (let i = 0; i < config.gridSize; i++) {
+        for (let j = 0; j < config.gridSize; j++) {
+          // Calculate position
+          const x = i * config.cellSize + centerOffsetX;
+          const y = j * config.cellSize + centerOffsetY;
+          
+          // Calculate distance from center for initial color
+          const centerX = config.gridSize / 2;
+          const centerY = config.gridSize / 2;
+          const dx = i - centerX;
+          const dy = j - centerY;
+          const distanceToCenter = Math.sqrt(dx * dx + dy * dy);
+          
+          // Store building data
+          buildings.push({
+            x: x,
+            y: y,
+            width: config.cellSize * 0.8,
+            height: config.baseHeight,
+            targetHeight: config.baseHeight,
+            currentHeight: config.baseHeight,
+            gridX: i,
+            gridY: j,
+            distanceToCenter: distanceToCenter,
+            color: `rgba(${50 + 50 * (1 - distanceToCenter / centerX)}, ${100 + 100 * (1 - distanceToCenter / centerX)}, ${200 + 55 * (1 - distanceToCenter / centerX)}, 0.8)`
+          });
+        }
+      }
+      
+      // Add event listeners
+      window.addEventListener('resize', onWindowResize);
+      canvas.addEventListener('mousemove', onMouseMove);
+      canvas.addEventListener('click', onClick);
+      canvas.addEventListener('touchmove', onTouchMove);
+      canvas.addEventListener('touchend', onTouchEnd);
+    }
+    
+    function onWindowResize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      
+      // Recalculate building positions
+      const centerOffsetX = canvas.width / 2 - (config.gridSize * config.cellSize) / 2;
+      const centerOffsetY = canvas.height / 2 - (config.gridSize * config.cellSize) / 2;
+      
+      for (let i = 0; i < buildings.length; i++) {
+        const building = buildings[i];
+        building.x = building.gridX * config.cellSize + centerOffsetX;
+        building.y = building.gridY * config.cellSize + centerOffsetY;
+      }
+    }
+    
+    function onMouseMove(event) {
+      mouseX = event.clientX;
+      mouseY = event.clientY;
+    }
+    
+    function onTouchMove(event) {
+      event.preventDefault();
+      if (event.touches.length > 0) {
+        mouseX = event.touches[0].clientX;
+        mouseY = event.touches[0].clientY;
+      }
+    }
+    
+    function onClick(event) {
+      addClickPoint(event.clientX, event.clientY);
+    }
+    
+    function onTouchEnd(event) {
+      event.preventDefault();
+      if (event.changedTouches.length > 0) {
+        addClickPoint(event.changedTouches[0].clientX, event.changedTouches[0].clientY);
+      }
+    }
+    
+    function addClickPoint(x, y) {
+      clickPoints.push({
+        x: x,
+        y: y,
+        time: Date.now() / 1000
+      });
+    }
+    
+    function animate() {
+      requestAnimationFrame(animate);
+      
+      // Clear canvas
+      ctx.fillStyle = 'rgba(0, 0, 10, 0.3)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Current time
+      const currentTime = Date.now() / 1000;
+      
+      // Filter out old click points
+      while (clickPoints.length > 0 && currentTime - clickPoints[0].time > 10) {
+        clickPoints.shift();
+      }
+      
+      // Update and draw buildings
+      updateBuildings(currentTime);
+      
+      // Draw click waves
+      drawClickWaves(currentTime);
+    }
+    
+    function updateBuildings(currentTime) {
+      const centerX = config.gridSize / 2;
+      const centerY = config.gridSize / 2;
+      
+      for (let i = 0; i < buildings.length; i++) {
+        const building = buildings[i];
+        
+        // Calculate base height with breathing effect
+        const localPhase = building.distanceToCenter * config.phaseOffset;
+        const localAmplitude = config.breatheAmplitude * Math.exp(-building.distanceToCenter * config.amplitudeFalloff);
+        
+        let targetHeight = config.baseHeight + 
+          Math.sin(currentTime * config.breatheSpeed + localPhase) * localAmplitude;
+        
+        // Apply hover effect
+        const dx = building.x + building.width / 2 - mouseX;
+        const dy = building.y + building.width / 2 - mouseY;
+        const distanceToMouse = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distanceToMouse < config.hoverRadius * config.cellSize) {
+          const hoverEffect = config.hoverStrength * 
+            Math.exp(-(distanceToMouse * distanceToMouse) / (2 * config.hoverRadius * config.hoverRadius * config.cellSize * config.cellSize)) * 
+            config.hoverDirection;
+          
+          targetHeight += hoverEffect;
+        }
+        
+        // Apply click wave effects
+        for (const clickPoint of clickPoints) {
+          const clickDx = building.x + building.width / 2 - clickPoint.x;
+          const clickDy = building.y + building.width / 2 - clickPoint.y;
+          const distanceToClick = Math.sqrt(clickDx * clickDx + clickDy * clickDy);
+          
+          const elapsed = currentTime - clickPoint.time;
+          const waveFront = config.waveSpeed * config.cellSize * elapsed;
+          const envelope = Math.exp(-elapsed * config.waveDamping) * 
+            Math.exp(-Math.abs(distanceToClick - waveFront) * config.ringWidthDamping / config.cellSize);
+          
+          const waveDelta = Math.sin(
+            distanceToClick * config.waveSpatialFreq / config.cellSize - 
+            elapsed * config.waveTemporalFreq
+          ) * config.waveAmplitude * envelope;
+          
+          targetHeight += waveDelta;
+        }
+        
+        // Ensure minimum height
+        targetHeight = Math.max(5, targetHeight);
+        
+        // Smooth transition to target height
+        building.targetHeight = targetHeight;
+        building.currentHeight += (building.targetHeight - building.currentHeight) * 0.1;
+        
+        // Draw building
+        const heightRatio = building.currentHeight / config.maxHeight;
+        const brightness = 0.5 + 0.5 * heightRatio;
+        
+        // Base color with brightness adjustment
+        const baseColor = building.color.replace('rgba(', '').replace(')', '').split(',');
+        const r = Math.min(255, parseInt(baseColor[0]) * brightness);
+        const g = Math.min(255, parseInt(baseColor[1]) * brightness);
+        const b = Math.min(255, parseInt(baseColor[2]) * brightness);
+        const a = parseFloat(baseColor[3]);
+        
+        // Draw building with 3D effect
+        const x = building.x;
+        const y = building.y;
+        const width = building.width;
+        const height = building.currentHeight;
+        
+        // Top face (lighter)
+        ctx.fillStyle = `rgba(${r + 30}, ${g + 30}, ${b + 30}, ${a})`;
+        ctx.fillRect(x, y - height, width, width);
+        
+        // Right face (darker)
+        ctx.fillStyle = `rgba(${r * 0.7}, ${g * 0.7}, ${b * 0.7}, ${a})`;
+        ctx.beginPath();
+        ctx.moveTo(x + width, y - height);
+        ctx.lineTo(x + width + width * 0.2, y - height + width * 0.2);
+        ctx.lineTo(x + width + width * 0.2, y + width * 0.2);
+        ctx.lineTo(x + width, y);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Left face (medium)
+        ctx.fillStyle = `rgba(${r * 0.85}, ${g * 0.85}, ${b * 0.85}, ${a})`;
+        ctx.beginPath();
+        ctx.moveTo(x, y - height);
+        ctx.lineTo(x + width, y - height);
+        ctx.lineTo(x + width, y);
+        ctx.lineTo(x, y);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Glow effect
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.1)`;
+        ctx.beginPath();
+        ctx.arc(x + width / 2, y - height / 2, height / 2 + 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    
+    function drawClickWaves(currentTime) {
+      for (const clickPoint of clickPoints) {
+        const elapsed = currentTime - clickPoint.time;
+        const radius = config.waveSpeed * config.cellSize * elapsed;
+        const alpha = Math.max(0, 0.5 - elapsed * 0.05);
+        
+        ctx.strokeStyle = `rgba(100, 200, 255, ${alpha})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(clickPoint.x, clickPoint.y, radius, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+  </script>
+</body>
+</html>

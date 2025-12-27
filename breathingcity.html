@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crystal Breathing City</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #000;
+      font-family: Arial, sans-serif;
+    }
+    #info {
+      position: absolute;
+      top: 10px;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-size: 16px;
+      z-index: 100;
+      pointer-events: none;
+      text-shadow: 0 0 5px #000;
+    }
+    .control-btn {
+      position: absolute;
+      bottom: 20px;
+      background-color: rgba(76, 80, 175, 0.7);
+      border: none;
+      color: white;
+      padding: 10px 15px;
+      text-align: center;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      z-index: 100;
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      box-shadow: 0 0 10px rgba(128, 0, 255, 0.3);
+    }
+    #resetBtn {
+      left: 20px;
+    }
+    #musicBtn {
+      left: 150px;
+    }
+    #loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 24px;
+      background-color: #000;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <div id="loading">Loading...</div>
+  <div id="info">Crystal Breathing City - Click to increase heartbeat, hover for nature effect</div>
+  <button id="resetBtn" class="control-btn">Reset Breathing</button>
+  <button id="musicBtn" class="control-btn">Toggle Music</button>
+  
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  
+  <script>
+    // Wait for Three.js to load
+    window.addEventListener('load', function() {
+      // Configuration
+      const config = {
+        gridSize: 32,
+        cellSize: 1,
+        baseHeight: 2,
+        breatheSpeed: 0.5,
+        baseAmplitude: 1.5,
+        amplitudeFalloff: 0.08,
+        phaseOffset: 0.2,
+        hoverRadius: 5,
+        emissiveIntensity: 0.4,
+        glassOpacity: 0.9, // Less transparent
+        glassShininess: 50
+      };
+      
+      // State variables
+      let heartbeatLevel = 0;
+      let anxietyLevel = 0;
+      let lastClickTime = 0;
+      let clickCount = 0;
+      let musicPlaying = false;
+      let audioContext;
+      let backgroundMusic;
+      
+      // Main variables
+      let scene, camera, renderer, controls;
+      let instancedMesh, dummy;
+      let buildings = [];
+      let mouse = new THREE.Vector2();
+      let raycaster = new THREE.Raycaster();
+      let ground, clock;
+      
+      // Initialize
+      init();
+      animate();
+      
+      function init() {
+        // Create scene
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x050518); // Darker blue background
+        scene.fog = new THREE.FogExp2(0x050518, 0.02);
+        
+        // Create camera
+        camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(config.gridSize / 2, config.gridSize / 2, config.gridSize);
+        
+        // Create renderer
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.body.appendChild(renderer.domElement);
+        
+        // Create orbit controls
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minDistance = 10;
+        controls.maxDistance = config.gridSize * 1.5;
+        controls.maxPolarAngle = Math.PI / 2.1;
+        controls.minPolarAngle = Math.PI / 6;
+        
+        // Create ground
+        const groundGeometry = new THREE.PlaneGeometry(
+          config.gridSize * config.cellSize * 1.5, 
+          config.gridSize * config.cellSize * 1.5
+        );
+        const groundMaterial = new THREE.MeshStandardMaterial({
+          color: 0x111133,
+          roughness: 0.8,
+          metalness: 0.2,
+          emissive: 0x001133,
+          emissiveIntensity: 0.15
+        });
+        ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = -0.1;
+        scene.add(ground);
+        
+        // Add lights
+        const ambientLight = new THREE.AmbientLight(0x333355, 1);
+        scene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0x8888ff, 1);
+        directionalLight.position.set(config.gridSize, config.gridSize, config.gridSize);
+        scene.add(directionalLight);
+        
+        // Add point lights for glass effect
+        const blueLight = new THREE.PointLight(0x0044ff, 1, config.gridSize * 2);
+        blueLight.position.set(config.gridSize/2, config.gridSize/2, config.gridSize/2);
+        scene.add(blueLight);
+        
+        const purpleLight = new THREE.PointLight(0x6600cc, 0.8, config.gridSize * 3);
+        purpleLight.position.set(-config.gridSize/3, config.gridSize/4, -config.gridSize/3);
+        scene.add(purpleLight);
+        
+        const pinkLight = new THREE.PointLight(0xcc0088, 0.5, config.gridSize * 3);
+        pinkLight.position.set(config.gridSize/3, config.gridSize/3, -config.gridSize/2);
+        scene.add(pinkLight);
+        
+        // Create city
+        createCity();
+        
+        // Setup clock
+        clock = new THREE.Clock();
+        
+        // Initialize audio
+        initAudio();
+        
+        // Add event listeners
+        window.addEventListener('resize', onWindowResize);
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('click', onClick);
+        document.getElementById('resetBtn').addEventListener('click', resetBreathing);
+        document.getElementById('musicBtn').addEventListener('click', toggleMusic);
+        
+        // Hide loading screen
+        document.getElementById('loading').style.display = 'none';
+      }
+      
+      function initAudio() {
+        try {
+          // Create audio context
+          window.AudioContext = window.AudioContext || window.webkitAudioContext;
+          audioContext = new AudioContext();
+          
+          // Create oscillators for ambient music
+          backgroundMusic = {
+            oscillators: [],
+            gains: [],
+            isPlaying: false
+          };
+          
+          // Create base frequencies for a pleasant chord
+          const baseFrequencies = [
+            220, // A3
+            277.18, // C#4
+            329.63, // E4
+            440, // A4
+          ];
+          
+          // Create oscillators
+          for (let i = 0; i < baseFrequencies.length; i++) {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.type = i % 2 === 0 ? 'sine' : 'triangle';
+            oscillator.frequency.value = baseFrequencies[i];
+            
+            // Set initial gain to 0
+            gainNode.gain.value = 0;
+            
+            // Connect nodes
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Start oscillator
+            oscillator.start();
+            
+            // Store references
+            backgroundMusic.oscillators.push(oscillator);
+            backgroundMusic.gains.push(gainNode);
+          }
+        } catch (e) {
+          console.error("Web Audio API is not supported in this browser");
+        }
+      }
+      
+      function toggleMusic() {
+        if (!audioContext) return;
+        
+        if (audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
+        
+        musicPlaying = !musicPlaying;
+        
+        if (musicPlaying) {
+          // Fade in
+          backgroundMusic.gains.forEach((gainNode, i) => {
+            gainNode.gain.cancelScheduledValues(audioContext.currentTime);
+            gainNode.gain.setValueAtTime(gainNode.gain.value, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.1 / backgroundMusic.gains.length, audioContext.currentTime + 2);
+          });
+          document.getElementById('musicBtn').textContent = "Music: On";
+        } else {
+          // Fade out
+          backgroundMusic.gains.forEach((gainNode) => {
+            gainNode.gain.cancelScheduledValues(audioContext.currentTime);
+            gainNode.gain.setValueAtTime(gainNode.gain.value, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 1);
+          });
+          document.getElementById('musicBtn').textContent = "Music: Off";
+        }
+      }
+      
+      function updateMusic(elapsedTime, heartbeatLevel, anxietyLevel) {
+        if (!musicPlaying || !audioContext) return;
+        
+        // Update oscillator frequencies based on breathing
+        const breathePhase = Math.sin(elapsedTime * config.breatheSpeed);
+        
+        backgroundMusic.oscillators.forEach((osc, i) => {
+          // Subtle frequency modulation
+          const baseFreq = osc.frequency.value;
+          const detune = breathePhase * 5 + heartbeatLevel * 10 + anxietyLevel * 20;
+          osc.detune.value = detune;
+          
+          // Adjust volume based on anxiety
+          const gain = backgroundMusic.gains[i];
+          const targetVolume = 0.1 / backgroundMusic.gains.length * (1 - anxietyLevel * 0.5);
+          gain.gain.setTargetAtTime(targetVolume, audioContext.currentTime, 0.1);
+        });
+      }
+      
+      function playHeartbeatSound() {
+        if (!audioContext) return;
+        
+        // Create heartbeat sound
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.value = 80;
+        
+        gain.gain.setValueAtTime(0, audioContext.currentTime);
+        gain.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.05);
+        gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.3);
+        
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        
+        osc.start();
+        osc.stop(audioContext.currentTime + 0.3);
+      }
+      
+      function createCity() {
+        // Create building geometry
+        const geometry = new THREE.BoxGeometry(
+          config.cellSize * 0.8, 
+          1, 
+          config.cellSize * 0.8
+        );
+        geometry.translate(0, 0.5, 0); // Move pivot to bottom
+        
+        // Create glass material - more blue-purple color variations
+        const material = new THREE.MeshPhongMaterial({
+          color: 0x6688cc, // More blue-purple base color
+          emissive: 0x2233aa,
+          emissiveIntensity: config.emissiveIntensity,
+          specular: 0xaaaaff, // Blue-tinted specular
+          shininess: config.glassShininess,
+          transparent: true,
+          opacity: config.glassOpacity,
+          reflectivity: 1
+        });
+        
+        // Create instanced mesh
+        const totalBuildings = config.gridSize * config.gridSize;
+        instancedMesh = new THREE.InstancedMesh(geometry, material, totalBuildings);
+        scene.add(instancedMesh);
+        
+        // Initialize buildings
+        dummy = new THREE.Object3D();
+        const centerX = config.gridSize / 2;
+        const centerZ = config.gridSize / 2;
+        const offset = (config.gridSize * config.cellSize) / 2 - config.cellSize / 2;
+        
+        for (let i = 0; i < config.gridSize; i++) {
+          for (let j = 0; j < config.gridSize; j++) {
+            const index = i * config.gridSize + j;
+            
+            // Calculate position
+            const x = i * config.cellSize - offset;
+            const z = j * config.cellSize - offset;
+            
+            // Calculate distance from center
+            const dx = i - centerX;
+            const dz = j - centerZ;
+            const distanceToCenter = Math.sqrt(dx * dx + dz * dz);
+            
+            // Store building data
+            buildings.push({
+              position: new THREE.Vector3(x, 0, z),
+              currentHeight: config.baseHeight,
+              targetHeight: config.baseHeight,
+              index,
+              i,
+              j,
+              distanceToCenter,
+              natureEffect: 0,
+              // Add color variation based on position
+              colorShift: (Math.sin(i * 0.2) * 0.5 + 0.5) * (Math.cos(j * 0.3) * 0.5 + 0.5)
+            });
+            
+            // Set initial matrix
+            dummy.position.set(x, 0, z);
+            dummy.scale.set(1, config.baseHeight, 1);
+            dummy.updateMatrix();
+            instancedMesh.setMatrixAt(index, dummy.matrix);
+          }
+        }
+        
+        instancedMesh.instanceMatrix.needsUpdate = true;
+      }
+      
+      function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+      
+      function onMouseMove(event) {
+        // Update mouse position
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+      }
+      
+      function onClick() {
+        const currentTime = clock.getElapsedTime();
+        
+        // Increase heartbeat level
+        heartbeatLevel = Math.min(1, heartbeatLevel + 0.2);
+        
+        // Track click frequency for anxiety
+        if (currentTime - lastClickTime < 0.5) {
+          clickCount++;
+          if (clickCount > 3) {
+            anxietyLevel = Math.min(1, anxietyLevel + 0.2);
+          }
+        } else {
+          clickCount = Math.max(0, clickCount - 1);
+        }
+        
+        lastClickTime = currentTime;
+        
+        // Play heartbeat sound
+        if (audioContext && audioContext.state === 'running') {
+          playHeartbeatSound();
+        }
+      }
+      
+      function resetBreathing() {
+        heartbeatLevel = 0;
+        anxietyLevel = 0;
+        clickCount = 0;
+      }
+      
+      function animate() {
+        requestAnimationFrame(animate);
+        
+        const deltaTime = clock.getDelta();
+        const elapsedTime = clock.getElapsedTime();
+        
+        // Update controls
+        controls.update();
+        
+        // Update raycaster for hover effect
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObject(ground);
+        let hoverPoint = null;
+        
+        if (intersects.length > 0) {
+          const point = intersects[0].point;
+          
+          // Convert to grid coordinates
+          const gridX = (point.x + (config.gridSize * config.cellSize) / 2) / config.cellSize;
+          const gridZ = (point.z + (config.gridSize * config.cellSize) / 2) / config.cellSize;
+          
+          hoverPoint = new THREE.Vector2(gridX, gridZ);
+        }
+        
+        // Gradually reduce heartbeat and anxiety levels
+        heartbeatLevel = Math.max(0, heartbeatLevel - deltaTime * 0.1);
+        anxietyLevel = Math.max(0, anxietyLevel - deltaTime * 0.05);
+        
+        // Update buildings
+        updateBuildings(deltaTime, elapsedTime, hoverPoint);
+        
+        // Update material color based on anxiety level
+        updateCityMood(elapsedTime);
+        
+        // Update music
+        updateMusic(elapsedTime, heartbeatLevel, anxietyLevel);
+        
+        // Render scene
+        renderer.render(scene, camera);
+      }
+      
+      function updateBuildings(deltaTime, elapsedTime, hoverPoint) {
+        const smooth = 0.15;
+        const dt60 = deltaTime * 60;
+        const smoothFactor = 1 - Math.pow(1 - smooth, dt60);
+        
+        // Calculate breathing parameters based on heartbeat level
+        const breatheSpeed = config.breatheSpeed * (1 + heartbeatLevel * 3);
+        
+        // Reset nature effect on all buildings
+        for (const building of buildings) {
+          building.natureEffect = 0;
+        }
+        
+        // Apply nature effect to buildings near hover point
+        if (hoverPoint) {
+          for (const building of buildings) {
+            const dx = building.i - hoverPoint.x;
+            const dz = building.j - hoverPoint.y;
+            const distanceToHover = Math.sqrt(dx * dx + dz * dz);
+            
+            if (distanceToHover < config.hoverRadius) {
+              building.natureEffect = 1 - distanceToHover / config.hoverRadius;
+            }
+          }
+        }
+        
+        // Update each building
+        for (const building of buildings) {
+          // Calculate base height with breathing effect
+          const localPhase = building.distanceToCenter * config.phaseOffset;
+          const localAmplitude = config.baseAmplitude * Math.exp(-building.distanceToCenter * config.amplitudeFalloff);
+          
+          let targetHeight = config.baseHeight + 
+            Math.sin(elapsedTime * breatheSpeed + localPhase) * localAmplitude;
+          
+          // Add anxiety jitter
+          if (anxietyLevel > 0) {
+            targetHeight += (Math.random() - 0.5) * anxietyLevel * 0.5;
+          }
+          
+          // Add nature effect (make buildings taller)
+          if (building.natureEffect > 0) {
+            targetHeight += building.natureEffect * 1.5;
+          }
+          
+          // Ensure minimum height
+          targetHeight = Math.max(0.1, targetHeight);
+          
+          // Smooth transition to target height
+          building.targetHeight = targetHeight;
+          building.currentHeight += (building.targetHeight - building.currentHeight) * smoothFactor;
+          
+          // Update matrix
+          dummy.position.copy(building.position);
+          dummy.position.y = building.currentHeight / 2;
+          dummy.scale.set(1, building.currentHeight, 1);
+          dummy.updateMatrix();
+          instancedMesh.setMatrixAt(building.index, dummy.matrix);
+        }
+        
+        instancedMesh.instanceMatrix.needsUpdate = true;
+      }
+      
+      function updateCityMood(elapsedTime) {
+        // Base colors - blue-purple variations
+        const calmColor = new THREE.Color(0x6688cc);
+        const calmEmissive = new THREE.Color(0x2233aa);
+        
+        const anxiousColor = new THREE.Color(0xff5500);
+        const anxiousEmissive = new THREE.Color(0x550000);
+        
+        // Start with calm color
+        let finalColor = calmColor.clone();
+        let finalEmissive = calmEmissive.clone();
+        
+        // Blend with anxious color based on anxiety level
+        if (anxietyLevel > 0) {
+          finalColor.lerp(anxiousColor, anxietyLevel);
+          finalEmissive.lerp(anxiousEmissive, anxietyLevel);
+        }
+        
+        // Check if any buildings have nature effect
+        let hasNatureEffect = false;
+        let maxNatureEffect = 0;
+        
+        for (const building of buildings) {
+          if (building.natureEffect > 0) {
+            hasNatureEffect = true;
+            maxNatureEffect = Math.max(maxNatureEffect, building.natureEffect);
+          }
+        }
+        
+        // If there's nature effect, blend with nature color
+        if (hasNatureEffect) {
+          const natureColor = new THREE.Color(0x00cc44);
+          const natureEmissive = new THREE.Color(0x005522);
+          finalColor.lerp(natureColor, maxNatureEffect * 0.3);
+          finalEmissive.lerp(natureEmissive, maxNatureEffect * 0.3);
+          instancedMesh.material.emissiveIntensity = config.emissiveIntensity * 1.5;
+          instancedMesh.material.shininess = config.glassShininess * 1.5;
+        } else {
+          instancedMesh.material.emissiveIntensity = config.emissiveIntensity;
+          instancedMesh.material.shininess = config.glassShininess;
+        }
+        
+        // Subtle color pulsing
+        const pulseAmount = Math.sin(elapsedTime * 0.5) * 0.05 + 0.95;
+        finalColor.multiplyScalar(pulseAmount);
+        
+        // Add color variation based on breathing
+        const breathePhase = Math.sin(elapsedTime * config.breatheSpeed);
+        const hueShift = breathePhase * 0.05; // Subtle hue shift
+        
+        // Convert to HSL for easier hue manipulation
+        const hsl = {};
+        finalColor.getHSL(hsl);
+        hsl.h += hueShift;
+        finalColor.setHSL(hsl.h, hsl.s, hsl.l);
+        
+        // Update material colors
+        instancedMesh.material.color.copy(finalColor);
+        instancedMesh.material.emissive.copy(finalEmissive);
+      }
+    });
+  </script>
+</body>
+</html>

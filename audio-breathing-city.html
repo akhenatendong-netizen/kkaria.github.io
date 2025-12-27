@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio Breathing City</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #000;
+      font-family: Arial, sans-serif;
+    }
+    #info {
+      position: absolute;
+      top: 10px;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-size: 16px;
+      z-index: 100;
+      pointer-events: none;
+      text-shadow: 0 0 5px #000;
+    }
+    #controls {
+      position: fixed;
+      left: 16px;
+      bottom: 16px;
+      z-index: 1000;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .control-btn {
+      background-color: rgba(40, 44, 80, 0.6);
+      border: none;
+      color: white;
+      padding: 12px 16px;
+      text-align: center;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 10px;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      box-shadow: 0 0 10px rgba(20, 20, 40, 0.3);
+      min-width: 100px;
+      min-height: 44px;
+    }
+    .control-btn:hover {
+      background-color: rgba(50, 54, 100, 0.7);
+    }
+    .control-btn:disabled {
+      background-color: rgba(30, 30, 30, 0.6);
+      cursor: not-allowed;
+    }
+    .ambulance-btn {
+      background-color: rgba(220, 53, 69, 0.8);
+      font-weight: bold;
+    }
+    .ambulance-btn:hover {
+      background-color: rgba(220, 53, 69, 0.9);
+    }
+    .ambulance-btn.playing {
+      background-color: rgba(40, 167, 69, 0.8);
+    }
+    #audioVisualizer {
+      position: fixed;
+      top: 50px;
+      left: 16px;
+      width: 200px;
+      height: 60px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 8px;
+      padding: 10px;
+      display: none;
+    }
+    #frequencyBars {
+      display: flex;
+      height: 40px;
+      align-items: flex-end;
+      gap: 2px;
+    }
+    .freq-bar {
+      background: linear-gradient(to top, #ff6b6b, #4ecdc4, #45b7d1);
+      width: 8px;
+      transition: height 0.1s ease;
+    }
+    #loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 24px;
+      background-color: #0A0C12;
+      z-index: 1000;
+    }
+    
+    /* Responsive layout */
+    @media (max-width: 480px) {
+      #controls {
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="loading">Loading...</div>
+  <div id="info">Audio Breathing City - 点击Ambulance播放音频并同步可视化</div>
+  
+  <div id="audioVisualizer">
+    <div id="frequencyBars"></div>
+  </div>
+  
+  <div id="controls">
+    <button id="ambulanceBtn" class="control-btn ambulance-btn">Ambulance</button>
+    <button id="resetBtn" class="control-btn">Reset</button>
+    <button id="musicBtn" class="control-btn">Music: Off</button>
+  </div>
+  
+  <audio id="ambulanceAudio" preload="auto" crossorigin="anonymous">
+    <source src="./Ambulance Passing Through Heavy Traffic.wav" type="audio/wav">
+    您的浏览器不支持音频播放
+  </audio>
+  
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  
+  <script>
+    // Configuration
+    const config = {
+      gridSize: 32,
+      cellSize: 1,
+      baseHeight: 2,
+      breatheSpeed: 0.4,
+      baseAmplitude: 1.5,
+      amplitudeFalloff: 0.08,
+      phaseOffset: 0.2,
+      hoverRadius: 5,
+      emissiveIntensity: 0.15,
+      glassOpacity: 0.9,
+      glassShininess: 30,
+      uiGap: 14,
+      controlsZ: 1000,
+      waveSpeed: 8,
+      waveAmplitude: 1.5,
+      waveDamping: 1.2,
+      ringWidthDamping: 0.4,
+      // Audio visualization settings
+      audioSensitivity: 8.0,  // 大幅增加敏感度
+      bassBoost: 4.0,         // 增强低频响应
+      midBoost: 5.0,          // 大幅增强中频（救护车警报声）
+      trebleBoost: 3.0,       // 增强高频
+      frequencyBands: 16,
+      calmPalette: {
+        base: '#2B4CA9',
+        ripple: '#2FA5A0',
+        rippleHighlight: '#3AC6B0',
+        fog: '#0A0C12',
+        emissive: '#16203A',
+        audioLow: '#ff6b6b',
+        audioMid: '#4ecdc4',
+        audioHigh: '#45b7d1'
+      },
+      music: {
+        enabled: false,
+        src: 'assets/ambient.mp3'
+      },
+      sfx: {
+        heartbeat: {
+          enabled: true,
+          src: 'synth'
+        },
+        minInterval: 0.3
+      }
+    };
+    
+    // Check if Three.js is loaded, then initialize
+    function initWhenReady() {
+      if (typeof THREE !== 'undefined') {
+        console.log('Three.js loaded successfully');
+        startApp();
+      } else {
+        console.log('Waiting for Three.js...');
+        setTimeout(initWhenReady, 100);
+      }
+    }
+    
+    function startApp() {
+      // State variables
+      let heartbeatLevel = 0;
+      let anxietyLevel = 0;
+      let lastClickTime = 0;
+      let clickCount = 0;
+      let lastHeartbeatTime = 0;
+      let clickPoints = [];
+      
+      // Audio variables
+      let audioContext;
+      let backgroundMusic;
+      let musicSource;
+      let ambulanceAudio;
+      let audioAnalyser;
+      let audioSource;
+      let frequencyData;
+      let isAudioPlaying = false;
+      let audioVisualizerBars = [];
+      
+      // Main variables
+      let scene, camera, renderer, controls;
+      let instancedMesh, dummy;
+      let buildings = [];
+      let mouse = new THREE.Vector2();
+      let raycaster = new THREE.Raycaster();
+      let ground, clock;
+      
+      // Check for stored music preference
+      if (localStorage.getItem('musicEnabled') === 'true') {
+        config.music.enabled = true;
+        document.getElementById('musicBtn').textContent = 'Music: On';
+      }
+      
+      // Initialize
+      init();
+      animate();
+      
+      function init() {
+        // Create scene
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(config.calmPalette.fog);
+        scene.fog = new THREE.FogExp2(config.calmPalette.fog, 0.02);
+        
+        // Create camera
+        camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(config.gridSize / 2, config.gridSize / 2, config.gridSize);
+        
+        // Create renderer
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.body.appendChild(renderer.domElement);
+        
+        // Create orbit controls
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minDistance = 10;
+        controls.maxDistance = config.gridSize * 1.5;
+        controls.maxPolarAngle = Math.PI / 2.1;
+        controls.minPolarAngle = Math.PI / 6;
+        
+        // Create ground
+        const groundGeometry = new THREE.PlaneGeometry(
+          config.gridSize * config.cellSize * 1.5, 
+          config.gridSize * config.cellSize * 1.5
+        );
+        const groundMaterial = new THREE.MeshStandardMaterial({
+          color: config.calmPalette.fog,
+          roughness: 0.8,
+          metalness: 0.2,
+          emissive: config.calmPalette.fog,
+          emissiveIntensity: 0.15
+        });
+        ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = -0.1;
+        scene.add(ground);
+        
+        // Add lights
+        const ambientLight = new THREE.AmbientLight(0x333344, 0.8);
+        scene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0x8888aa, 0.8);
+        directionalLight.position.set(config.gridSize, config.gridSize, config.gridSize);
+        scene.add(directionalLight);
+        
+        // Add point lights for glass effect
+        const blueLight = new THREE.PointLight(0x4466aa, 0.8, config.gridSize * 2);
+        blueLight.position.set(config.gridSize/2, config.gridSize/2, config.gridSize/2);
+        scene.add(blueLight);
+        
+        const purpleLight = new THREE.PointLight(0x445588, 0.5, config.gridSize * 3);
+        purpleLight.position.set(-config.gridSize/3, config.gridSize/4, -config.gridSize/3);
+        scene.add(purpleLight);
+        
+        // Create city
+        createCity();
+        
+        // Setup clock
+        clock = new THREE.Clock();
+        
+        // Initialize audio
+        initAudio();
+        setupAudioVisualizer();
+        
+        // Add event listeners
+        window.addEventListener('resize', onWindowResize);
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('click', onClick);
+        
+        // Add button event listeners with error checking
+        const resetBtn = document.getElementById('resetBtn');
+        const musicBtn = document.getElementById('musicBtn');
+        const ambulanceBtn = document.getElementById('ambulanceBtn');
+        
+        if (resetBtn) {
+          resetBtn.addEventListener('click', resetBreathing);
+          console.log('Reset button listener added');
+        }
+        
+        if (musicBtn) {
+          musicBtn.addEventListener('click', toggleMusic);
+          console.log('Music button listener added');
+        }
+        
+        if (ambulanceBtn) {
+          ambulanceBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Ambulance button clicked!');
+            toggleAmbulanceAudio();
+          });
+          console.log('Ambulance button listener added');
+        }
+        
+        // Hide loading screen
+        document.getElementById('loading').style.display = 'none';
+        
+        // Test button functionality
+        console.log('Page loaded successfully');
+        console.log('Ambulance button:', document.getElementById('ambulanceBtn'));
+        
+        // Add visual feedback for button clicks
+        document.querySelectorAll('.control-btn').forEach(btn => {
+          btn.addEventListener('mousedown', function() {
+            this.style.transform = 'scale(0.95)';
+          });
+          btn.addEventListener('mouseup', function() {
+            this.style.transform = 'scale(1)';
+          });
+          btn.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+          });
+        });
+      }
+      
+      function initAudio() {
+        try {
+          // Create audio context
+          window.AudioContext = window.AudioContext || window.webkitAudioContext;
+          audioContext = new AudioContext();
+          
+          // Get ambulance audio element
+          ambulanceAudio = document.getElementById('ambulanceAudio');
+          
+          // Setup audio analysis
+          setupAudioAnalysis();
+          
+          // Create master gain
+          const masterGain = audioContext.createGain();
+          masterGain.gain.value = 0.4;
+          masterGain.connect(audioContext.destination);
+          
+          // Setup background music
+          if (config.music.enabled) {
+            loadBackgroundMusic();
+          }
+          
+        } catch (e) {
+          console.error("Web Audio API is not supported in this browser");
+        }
+      }
+      
+      function setupAudioAnalysis() {
+        if (!audioContext || !ambulanceAudio) return;
+        
+        try {
+          // Create analyser
+          audioAnalyser = audioContext.createAnalyser();
+          audioAnalyser.fftSize = 512; // 增加分析精度
+          audioAnalyser.smoothingTimeConstant = 0.3; // 减少平滑，增加响应速度
+          audioAnalyser.minDecibels = -90;
+          audioAnalyser.maxDecibels = -10;
+          
+          // Create frequency data array
+          frequencyData = new Uint8Array(audioAnalyser.frequencyBinCount);
+          
+          // Connect audio source to analyser
+          if (!audioSource) {
+            audioSource = audioContext.createMediaElementSource(ambulanceAudio);
+          }
+          audioSource.connect(audioAnalyser);
+          audioAnalyser.connect(audioContext.destination);
+          
+          console.log('Audio analysis setup complete');
+        } catch (error) {
+          console.error('Error setting up audio analysis:', error);
+        }
+      }
+      
+      function setupAudioVisualizer() {
+        const container = document.getElementById('frequencyBars');
+        
+        // Create frequency bars
+        for (let i = 0; i < config.frequencyBands; i++) {
+          const bar = document.createElement('div');
+          bar.className = 'freq-bar';
+          bar.style.height = '2px';
+          container.appendChild(bar);
+          audioVisualizerBars.push(bar);
+        }
+      }
+      
+      function toggleAmbulanceAudio() {
+        console.log('toggleAmbulanceAudio called');
+        if (!ambulanceAudio) {
+          console.error('ambulanceAudio element not found');
+          return;
+        }
+        
+        if (isAudioPlaying) {
+          // Stop audio
+          ambulanceAudio.pause();
+          ambulanceAudio.currentTime = 0;
+          isAudioPlaying = false;
+          document.getElementById('ambulanceBtn').textContent = 'Ambulance';
+          document.getElementById('ambulanceBtn').classList.remove('playing');
+          document.getElementById('audioVisualizer').style.display = 'none';
+          console.log('Audio stopped');
+        } else {
+          // Initialize audio context if needed
+          if (!audioContext) {
+            console.log('Initializing audio context...');
+            initAudio();
+          }
+          
+          // Resume audio context if suspended
+          if (audioContext && audioContext.state === 'suspended') {
+            console.log('Resuming audio context...');
+            audioContext.resume();
+          }
+          
+          // Set volume and load audio
+          ambulanceAudio.volume = 1.0;
+          ambulanceAudio.load(); // 强制重新加载
+          
+          console.log('Attempting to play audio...');
+          console.log('Audio src:', ambulanceAudio.src);
+          console.log('Audio readyState:', ambulanceAudio.readyState);
+          
+          // Play audio
+          const playPromise = ambulanceAudio.play();
+          
+          if (playPromise !== undefined) {
+            playPromise.then(() => {
+              isAudioPlaying = true;
+              document.getElementById('ambulanceBtn').textContent = 'Stop';
+              document.getElementById('ambulanceBtn').classList.add('playing');
+              document.getElementById('audioVisualizer').style.display = 'block';
+              console.log('Audio started playing successfully');
+              
+              // Setup audio analysis if not already done
+              if (!audioSource) {
+                console.log('Setting up audio analysis...');
+                setupAudioAnalysis();
+              }
+            }).catch(error => {
+              console.error('Error playing audio:', error);
+              alert('播放失败: ' + error.message + '\n请尝试直接点击音频控件播放');
+            });
+          }
+        }
+        
+        // Handle audio events
+        ambulanceAudio.onended = () => {
+          isAudioPlaying = false;
+          document.getElementById('ambulanceBtn').textContent = 'Ambulance';
+          document.getElementById('ambulanceBtn').classList.remove('playing');
+          document.getElementById('audioVisualizer').style.display = 'none';
+          console.log('Audio ended');
+        };
+        
+        ambulanceAudio.onerror = (error) => {
+          console.error('Audio error:', error);
+          isAudioPlaying = false;
+          document.getElementById('ambulanceBtn').textContent = 'Ambulance';
+          document.getElementById('ambulanceBtn').classList.remove('playing');
+          document.getElementById('audioVisualizer').style.display = 'none';
+        };
+        
+        // Add loading event listeners
+        ambulanceAudio.onloadstart = () => console.log('Audio loading started');
+        ambulanceAudio.oncanplay = () => console.log('Audio can play');
+        ambulanceAudio.onplay = () => console.log('Audio play event fired');
+      }
+      
+      function getAudioData() {
+        if (!audioAnalyser || !frequencyData || !isAudioPlaying) {
+          return {
+            bass: 0,
+            mid: 0,
+            treble: 0,
+            overall: 0,
+            frequencies: new Array(config.frequencyBands).fill(0),
+            rawFrequencies: new Array(128).fill(0)
+          };
+        }
+        
+        // Get frequency data
+        audioAnalyser.getByteFrequencyData(frequencyData);
+        
+        // Calculate frequency bands with better sensitivity
+        const bassEnd = Math.floor(frequencyData.length * 0.15); // 增加低频范围
+        const midEnd = Math.floor(frequencyData.length * 0.5);   // 调整中频范围
+        
+        let bass = 0, mid = 0, treble = 0, overall = 0;
+        let maxValue = 0;
+        
+        // Find max value for normalization
+        for (let i = 0; i < frequencyData.length; i++) {
+          maxValue = Math.max(maxValue, frequencyData[i]);
+        }
+        
+        // Calculate bass (0-15%) - 救护车低频很强
+        for (let i = 0; i < bassEnd; i++) {
+          bass += frequencyData[i];
+        }
+        bass = Math.pow(bass / bassEnd / 255, 0.7) * config.bassBoost; // 使用幂函数增强响应
+        
+        // Calculate mid (15-50%) - 救护车警报声主要在中频
+        for (let i = bassEnd; i < midEnd; i++) {
+          mid += frequencyData[i];
+        }
+        mid = Math.pow(mid / (midEnd - bassEnd) / 255, 0.6) * config.midBoost;
+        
+        // Calculate treble (50-100%)
+        for (let i = midEnd; i < frequencyData.length; i++) {
+          treble += frequencyData[i];
+        }
+        treble = Math.pow(treble / (frequencyData.length - midEnd) / 255, 0.8) * config.trebleBoost;
+        
+        // Calculate overall with emphasis on active frequencies
+        let activeCount = 0;
+        for (let i = 0; i < frequencyData.length; i++) {
+          if (frequencyData[i] > 10) { // 只计算有活动的频率
+            overall += frequencyData[i];
+            activeCount++;
+          }
+        }
+        overall = activeCount > 0 ? Math.pow(overall / activeCount / 255, 0.5) : 0;
+        
+        // Calculate frequency bands for visualization
+        const frequencies = [];
+        const bandSize = Math.floor(frequencyData.length / config.frequencyBands);
+        
+        for (let i = 0; i < config.frequencyBands; i++) {
+          let bandValue = 0;
+          const start = i * bandSize;
+          const end = Math.min(start + bandSize, frequencyData.length);
+          
+          for (let j = start; j < end; j++) {
+            bandValue += frequencyData[j];
+          }
+          
+          frequencies.push(Math.pow(bandValue / (end - start) / 255, 0.6));
+        }
+        
+        // Raw frequencies for detailed analysis
+        const rawFrequencies = [];
+        for (let i = 0; i < Math.min(128, frequencyData.length); i++) {
+          rawFrequencies.push(frequencyData[i] / 255);
+        }
+        
+        return { bass, mid, treble, overall, frequencies, rawFrequencies };
+      }
+      
+      function updateAudioVisualizer(audioData) {
+        if (!isAudioPlaying) return;
+        
+        // Update frequency bars
+        audioData.frequencies.forEach((value, index) => {
+          if (audioVisualizerBars[index]) {
+            const height = Math.max(2, value * 40);
+            audioVisualizerBars[index].style.height = height + 'px';
+          }
+        });
+      }
+      
+      function loadBackgroundMusic() {
+        if (!audioContext) return;
+        
+        backgroundMusic = {
+          oscillators: [],
+          gains: [],
+          isPlaying: false
+        };
+        
+        const baseFrequencies = [220, 293.66, 349.23, 440];
+        
+        for (let i = 0; i < baseFrequencies.length; i++) {
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          
+          oscillator.type = 'sine';
+          oscillator.frequency.value = baseFrequencies[i];
+          gainNode.gain.value = 0;
+          
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          oscillator.start();
+          
+          backgroundMusic.oscillators.push(oscillator);
+          backgroundMusic.gains.push(gainNode);
+        }
+        
+        if (config.music.enabled) {
+          startMusic();
+        }
+      }
+      
+      function startMusic() {
+        if (!audioContext || !backgroundMusic) return;
+        
+        if (audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
+        
+        backgroundMusic.gains.forEach((gainNode, i) => {
+          gainNode.gain.cancelScheduledValues(audioContext.currentTime);
+          gainNode.gain.setValueAtTime(gainNode.gain.value, audioContext.currentTime);
+          gainNode.gain.linearRampToValueAtTime(0.03 / backgroundMusic.gains.length, audioContext.currentTime + 3);
+        });
+        
+        backgroundMusic.isPlaying = true;
+      }
+      
+      function stopMusic() {
+        if (!audioContext || !backgroundMusic) return;
+        
+        backgroundMusic.gains.forEach((gainNode) => {
+          gainNode.gain.cancelScheduledValues(audioContext.currentTime);
+          gainNode.gain.setValueAtTime(gainNode.gain.value, audioContext.currentTime);
+          gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 2);
+        });
+        
+        backgroundMusic.isPlaying = false;
+      }
+      
+      function toggleMusic() {
+        if (!audioContext) {
+          initAudio();
+        }
+        
+        config.music.enabled = !config.music.enabled;
+        localStorage.setItem('musicEnabled', config.music.enabled);
+        
+        if (config.music.enabled) {
+          if (!backgroundMusic) {
+            loadBackgroundMusic();
+          } else {
+            startMusic();
+          }
+          document.getElementById('musicBtn').textContent = "Music: On";
+        } else {
+          stopMusic();
+          document.getElementById('musicBtn').textContent = "Music: Off";
+        }
+      }
+      
+      function updateMusic(elapsedTime, heartbeatLevel, anxietyLevel) {
+        if (!config.music.enabled || !backgroundMusic || !backgroundMusic.isPlaying) return;
+        
+        const breathePhase = Math.sin(elapsedTime * config.breatheSpeed);
+        
+        backgroundMusic.oscillators.forEach((osc, i) => {
+          const detune = breathePhase * 3 + heartbeatLevel * 5 + anxietyLevel * 10;
+          osc.detune.value = detune;
+          
+          const gain = backgroundMusic.gains[i];
+          const targetVolume = 0.03 / backgroundMusic.gains.length * (1 - anxietyLevel * 0.3);
+          gain.gain.setTargetAtTime(targetVolume, audioContext.currentTime, 0.2);
+        });
+      }
+      
+      function playHeartbeat(intensity = 0.5) {
+        if (!audioContext || !config.sfx.heartbeat.enabled) return;
+        
+        const currentTime = clock.getElapsedTime();
+        if (currentTime - lastHeartbeatTime < config.sfx.minInterval) {
+          return;
+        }
+        lastHeartbeatTime = currentTime;
+        
+        if (audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
+        
+        const t0 = audioContext.currentTime;
+        const g = audioContext.createGain();
+        g.connect(audioContext.destination);
+        
+        const o = audioContext.createOscillator();
+        o.type = 'sine';
+        o.connect(g);
+        
+        const base = 50;
+        const vol = 0.15 + 0.5 * intensity;
+        const pitch = base * (1 + 0.2 * intensity);
+        
+        g.gain.setValueAtTime(0, t0);
+        g.gain.linearRampToValueAtTime(vol, t0 + 0.03);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.25);
+        
+        o.frequency.setValueAtTime(pitch, t0);
+        o.start(t0);
+        o.stop(t0 + 0.3);
+        
+        setTimeout(() => {
+          const o2 = audioContext.createOscillator();
+          const g2 = audioContext.createGain();
+          
+          o2.type = 'sine';
+          o2.connect(g2);
+          g2.connect(audioContext.destination);
+          
+          g2.gain.setValueAtTime(0, audioContext.currentTime);
+          g2.gain.linearRampToValueAtTime(vol * 0.8, audioContext.currentTime + 0.03);
+          g2.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.25);
+          
+          o2.frequency.setValueAtTime(pitch * 0.9, audioContext.currentTime);
+          o2.start();
+          o2.stop(audioContext.currentTime + 0.3);
+        }, 180);
+      }
+      
+      function createCity() {
+        const geometry = new THREE.BoxGeometry(
+          config.cellSize * 0.8, 
+          1, 
+          config.cellSize * 0.8
+        );
+        geometry.translate(0, 0.5, 0);
+        
+        const material = new THREE.MeshPhongMaterial({
+          color: 0x6688cc, // 使用原本的蓝紫色
+          emissive: 0x2233aa, // 使用原本的发光色
+          emissiveIntensity: config.emissiveIntensity,
+          specular: 0xaaaaff, // 蓝色调的高光
+          shininess: config.glassShininess,
+          transparent: true,
+          opacity: config.glassOpacity,
+          reflectivity: 1
+        });
+        
+        const totalBuildings = config.gridSize * config.gridSize;
+        instancedMesh = new THREE.InstancedMesh(geometry, material, totalBuildings);
+        scene.add(instancedMesh);
+        
+        dummy = new THREE.Object3D();
+        const centerX = config.gridSize / 2;
+        const centerZ = config.gridSize / 2;
+        const offset = (config.gridSize * config.cellSize) / 2 - config.cellSize / 2;
+        
+        for (let i = 0; i < config.gridSize; i++) {
+          for (let j = 0; j < config.gridSize; j++) {
+            const index = i * config.gridSize + j;
+            
+            const x = i * config.cellSize - offset;
+            const z = j * config.cellSize - offset;
+            
+            const dx = i - centerX;
+            const dz = j - centerZ;
+            const distanceToCenter = Math.sqrt(dx * dx + dz * dz);
+            
+            buildings.push({
+              position: new THREE.Vector3(x, 0, z),
+              currentHeight: config.baseHeight,
+              targetHeight: config.baseHeight,
+              index,
+              i,
+              j,
+              distanceToCenter,
+              natureEffect: 0,
+              rippleEffect: 0,
+              audioEffect: 0,
+              colorShift: (Math.sin(i * 0.2) * 0.5 + 0.5) * (Math.cos(j * 0.3) * 0.5 + 0.5) * 0.05
+            });
+            
+            dummy.position.set(x, 0, z);
+            dummy.scale.set(1, config.baseHeight, 1);
+            dummy.updateMatrix();
+            instancedMesh.setMatrixAt(index, dummy.matrix);
+          }
+        }
+        
+        instancedMesh.instanceMatrix.needsUpdate = true;
+      }
+      
+      function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+      
+      function onMouseMove(event) {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+      }
+      
+      function onClick() {
+        const currentTime = clock.getElapsedTime();
+        
+        heartbeatLevel = Math.min(1, heartbeatLevel + 0.2);
+        
+        if (currentTime - lastClickTime < 0.5) {
+          clickCount++;
+          if (clickCount > 3) {
+            anxietyLevel = Math.min(1, anxietyLevel + 0.2);
+          }
+        } else {
+          clickCount = Math.max(0, clickCount - 1);
+        }
+        
+        lastClickTime = currentTime;
+        
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObject(ground);
+        
+        if (intersects.length > 0) {
+          const point = intersects[0].point;
+          
+          const gridX = (point.x + (config.gridSize * config.cellSize) / 2) / config.cellSize;
+          const gridZ = (point.z + (config.gridSize * config.cellSize) / 2) / config.cellSize;
+          
+          clickPoints.push({
+            position: new THREE.Vector2(gridX, gridZ),
+            time: currentTime,
+            intensity: 1.0
+          });
+        }
+        
+        playHeartbeat(0.3 + anxietyLevel * 0.7);
+      }
+      
+      function resetBreathing() {
+        heartbeatLevel = 0;
+        anxietyLevel = 0;
+        clickCount = 0;
+        clickPoints = [];
+      }
+      
+      function animate() {
+        requestAnimationFrame(animate);
+        
+        const deltaTime = clock.getDelta();
+        const elapsedTime = clock.getElapsedTime();
+        
+        controls.update();
+        
+        // Get audio data
+        const audioData = getAudioData();
+        updateAudioVisualizer(audioData);
+        
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObject(ground);
+        let hoverPoint = null;
+        
+        if (intersects.length > 0) {
+          const point = intersects[0].point;
+          const gridX = (point.x + (config.gridSize * config.cellSize) / 2) / config.cellSize;
+          const gridZ = (point.z + (config.gridSize * config.cellSize) / 2) / config.cellSize;
+          hoverPoint = new THREE.Vector2(gridX, gridZ);
+        }
+        
+        heartbeatLevel = Math.max(0, heartbeatLevel - deltaTime * 0.1);
+        anxietyLevel = Math.max(0, anxietyLevel - deltaTime * 0.05);
+        
+        updateBuildings(deltaTime, elapsedTime, hoverPoint, audioData);
+        updateCityMood(elapsedTime, audioData);
+        updateMusic(elapsedTime, heartbeatLevel, anxietyLevel);
+        
+        renderer.render(scene, camera);
+      }
+      
+      function updateBuildings(deltaTime, elapsedTime, hoverPoint, audioData) {
+        const smooth = 0.15;
+        const dt60 = deltaTime * 60;
+        const smoothFactor = 1 - Math.pow(1 - smooth, dt60);
+        
+        // Calculate breathing parameters with audio influence
+        const audioInfluence = audioData.overall * config.audioSensitivity;
+        const breatheSpeed = config.breatheSpeed * (1 + heartbeatLevel * 3 + audioInfluence);
+        
+        // Reset effects on all buildings
+        for (const building of buildings) {
+          building.natureEffect = 0;
+          building.rippleEffect = 0;
+          building.audioEffect = 0;
+        }
+        
+        // Apply nature effect to buildings near hover point
+        if (hoverPoint) {
+          for (const building of buildings) {
+            const dx = building.i - hoverPoint.x;
+            const dz = building.j - hoverPoint.y;
+            const distanceToHover = Math.sqrt(dx * dx + dz * dz);
+            
+            if (distanceToHover < config.hoverRadius) {
+              building.natureEffect = 1 - distanceToHover / config.hoverRadius;
+            }
+          }
+        }
+        
+        // Apply audio effect to buildings
+        if (isAudioPlaying && audioData.overall > 0.05) {
+          const centerX = config.gridSize / 2;
+          const centerZ = config.gridSize / 2;
+          
+          for (const building of buildings) {
+            // Different frequency bands affect different areas
+            const dx = building.i - centerX;
+            const dz = building.j - centerZ;
+            const angle = Math.atan2(dz, dx);
+            const distance = Math.sqrt(dx * dx + dz * dz);
+            const normalizedDistance = distance / (config.gridSize / 2);
+            
+            let audioEffect = 0;
+            
+            // 低频效果 - 影响所有建筑物，产生整体脉动（减少强度）
+            const bassEffect = audioData.bass * 1.0;
+            audioEffect += bassEffect;
+            
+            // 中频效果 - 救护车警报声，创建从中心扩散的波纹（减少强度）
+            const wavePhase = distance * 0.2 - elapsedTime * 12;
+            const midWave = audioData.mid * Math.sin(wavePhase) * 1.5;
+            audioEffect += Math.max(0, midWave);
+            
+            // 高频效果 - 创建方向性闪烁效果（减少强度）
+            const trebleFlicker = audioData.treble * (Math.sin(elapsedTime * 20 + angle * 8) * 0.5 + 0.5) * 0.8;
+            audioEffect += trebleFlicker;
+            
+            // 整体音频强度 - 基础响应（减少强度）
+            audioEffect += audioData.overall * 1.0;
+            
+            // 根据频谱条同步效果（减少强度）
+            const frequencyIndex = Math.floor((building.i + building.j) % audioData.frequencies.length);
+            const frequencyResponse = audioData.frequencies[frequencyIndex] * 0.8;
+            audioEffect += frequencyResponse;
+            
+            // 应用敏感度并限制最大值
+            building.audioEffect = Math.max(0, Math.min(audioEffect * config.audioSensitivity, 2.0));
+            
+            // Debug: log max audio effect for first building
+            if (building.index === 0 && audioEffect > 0) {
+              console.log('Audio effect:', audioEffect, 'Bass:', audioData.bass, 'Mid:', audioData.mid, 'Overall:', audioData.overall);
+            }
+          }
+        }
+        
+        // Apply ripple effect from click points
+        const activeClickPoints = [];
+        
+        for (const clickPoint of clickPoints) {
+          const age = elapsedTime - clickPoint.time;
+          
+          if (age < 5) {
+            activeClickPoints.push(clickPoint);
+            
+            const waveFront = config.waveSpeed * age;
+            
+            for (const building of buildings) {
+              const dx = building.i - clickPoint.position.x;
+              const dz = building.j - clickPoint.position.y;
+              const distanceToClick = Math.sqrt(dx * dx + dz * dz);
+              
+              const envelope = Math.exp(-age * config.waveDamping) * 
+                              Math.exp(-Math.abs(distanceToClick - waveFront) * config.ringWidthDamping);
+              
+              const waveDelta = Math.sin(distanceToClick * 0.5 - age * 3) * 
+                               config.waveAmplitude * envelope;
+              
+              if (waveDelta > 0) {
+                building.rippleEffect = Math.max(building.rippleEffect, waveDelta);
+              }
+            }
+          }
+        }
+        
+        clickPoints = activeClickPoints;
+        
+        // Update each building
+        for (const building of buildings) {
+          const localPhase = building.distanceToCenter * config.phaseOffset;
+          const localAmplitude = config.baseAmplitude * Math.exp(-building.distanceToCenter * config.amplitudeFalloff);
+          
+          let targetHeight = config.baseHeight + 
+            Math.sin(elapsedTime * breatheSpeed + localPhase) * localAmplitude;
+          
+          // Add anxiety jitter
+          if (anxietyLevel > 0) {
+            targetHeight += (Math.random() - 0.5) * anxietyLevel * 0.5;
+          }
+          
+          // Add nature effect
+          if (building.natureEffect > 0) {
+            targetHeight += building.natureEffect * 1.5;
+          }
+          
+          // Add ripple effect
+          if (building.rippleEffect > 0) {
+            targetHeight += building.rippleEffect;
+          }
+          
+          // Add audio effect with reasonable limits
+          if (building.audioEffect > 0) {
+            targetHeight += Math.min(building.audioEffect * 0.5, 3.0); // 限制最大音频效果为3个单位
+          }
+          
+          // 限制建筑物总高度在合理范围内
+          targetHeight = Math.max(0.1, Math.min(targetHeight, 8.0));
+          
+          building.targetHeight = targetHeight;
+          building.currentHeight += (building.targetHeight - building.currentHeight) * smoothFactor;
+          
+          // 保持建筑物在原位，只改变缩放和轻微抖动
+          const baseY = building.currentHeight / 2;
+          
+          // 添加音频驱动的抖动效果（减少强度）
+          let shakeX = 0, shakeY = 0, shakeZ = 0;
+          if (building.audioEffect > 0) {
+            const shakeIntensity = building.audioEffect * 0.02; // 大幅减少抖动强度
+            shakeX = (Math.random() - 0.5) * shakeIntensity;
+            shakeY = (Math.random() - 0.5) * shakeIntensity * 0.2; // 进一步减少垂直抖动
+            shakeZ = (Math.random() - 0.5) * shakeIntensity;
+          }
+          
+          dummy.position.set(
+            building.position.x + shakeX,
+            baseY + shakeY,
+            building.position.z + shakeZ
+          );
+          
+          // 音频驱动的缩放效果
+          let scaleMultiplier = 1.0;
+          if (building.audioEffect > 0) {
+            scaleMultiplier = 1.0 + building.audioEffect * 0.3; // 水平扩散
+          }
+          
+          dummy.scale.set(
+            scaleMultiplier, 
+            building.currentHeight, 
+            scaleMultiplier
+          );
+          
+          dummy.updateMatrix();
+          instancedMesh.setMatrixAt(building.index, dummy.matrix);
+        }
+        
+        instancedMesh.instanceMatrix.needsUpdate = true;
+      }
+      
+      function updateCityMood(elapsedTime, audioData) {
+        const calmColor = new THREE.Color(config.calmPalette.base);
+        const calmEmissive = new THREE.Color(config.calmPalette.emissive);
+        
+        const rippleColor = new THREE.Color(config.calmPalette.ripple);
+        const rippleHighlightColor = new THREE.Color(config.calmPalette.rippleHighlight);
+        
+        // Audio colors
+        const audioLowColor = new THREE.Color(config.calmPalette.audioLow);
+        const audioMidColor = new THREE.Color(config.calmPalette.audioMid);
+        const audioHighColor = new THREE.Color(config.calmPalette.audioHigh);
+        
+        const anxiousColor = new THREE.Color('#A57C6C');
+        const anxiousEmissive = new THREE.Color('#332A24');
+        
+        let finalColor = calmColor.clone();
+        let finalEmissive = calmEmissive.clone();
+        
+        // Blend with anxious color based on anxiety level
+        if (anxietyLevel > 0) {
+          finalColor.lerp(anxiousColor, anxietyLevel);
+          finalEmissive.lerp(anxiousEmissive, anxietyLevel);
+        }
+        
+        // 使用原本的颜色系统 - 音频强度影响焦虑程度
+        if (isAudioPlaying && audioData.overall > 0.1) {
+          // 将音频强度映射为焦虑程度
+          const audioAnxiety = Math.min(audioData.overall * 1.5, 1.0);
+          
+          // 使用原本的焦虑颜色系统
+          const anxiousColor = new THREE.Color(0xff5500); // 原本的橙红色
+          finalColor.lerp(anxiousColor, audioAnxiety);
+          
+          const anxiousEmissive = new THREE.Color(0x550000);
+          finalEmissive.lerp(anxiousEmissive, audioAnxiety);
+        }
+        
+        let hasRippleEffect = false;
+        let hasAudioEffect = false;
+        let maxRippleEffect = 0;
+        let maxAudioEffect = 0;
+        
+        for (const building of buildings) {
+          if (building.rippleEffect > 0) {
+            hasRippleEffect = true;
+            maxRippleEffect = Math.max(maxRippleEffect, building.rippleEffect);
+          }
+          
+          if (building.audioEffect > 0) {
+            hasAudioEffect = true;
+            maxAudioEffect = Math.max(maxAudioEffect, building.audioEffect);
+          }
+        }
+        
+        const pulseAmount = Math.sin(elapsedTime * 0.5) * 0.03 + 0.97;
+        finalColor.multiplyScalar(pulseAmount);
+        
+        const breathePhase = Math.sin(elapsedTime * config.breatheSpeed);
+        const hueShift = breathePhase * 0.02;
+        
+        const hsl = {};
+        finalColor.getHSL(hsl);
+        
+        finalColor.setHSL(
+          hsl.h + hueShift, 
+          hsl.s, 
+          hsl.l + breathePhase * 0.03
+        );
+        
+        instancedMesh.material.color.copy(finalColor);
+        instancedMesh.material.emissive.copy(finalEmissive);
+        
+        // Create color attribute for individual building colors
+        if ((hasRippleEffect || hasAudioEffect) && !instancedMesh.geometry.attributes.instanceColor) {
+          const colorArray = new Float32Array(buildings.length * 3);
+          instancedMesh.geometry.setAttribute(
+            'instanceColor',
+            new THREE.InstancedBufferAttribute(colorArray, 3)
+          );
+        }
+        
+        // Update individual building colors
+        if ((hasRippleEffect || hasAudioEffect) && instancedMesh.geometry.attributes.instanceColor) {
+          const colorAttribute = instancedMesh.geometry.attributes.instanceColor;
+          
+          for (let i = 0; i < buildings.length; i++) {
+            const building = buildings[i];
+            let color = finalColor.clone();
+            
+            // Apply ripple effect color
+            if (building.rippleEffect > 0) {
+              const rippleBlendColor = rippleColor.clone().lerp(
+                rippleHighlightColor, 
+                building.rippleEffect / maxRippleEffect
+              );
+              color.lerp(rippleBlendColor, building.rippleEffect);
+            }
+            
+            // 使用原本的颜色系统 - 音频效果作为焦虑程度
+            if (building.audioEffect > 0) {
+              const audioIntensity = Math.min(building.audioEffect / maxAudioEffect, 1.0);
+              
+              // 使用原本的焦虑颜色 (橙红色)
+              const anxiousColor = new THREE.Color(0xff5500);
+              color.lerp(anxiousColor, audioIntensity * 0.8);
+            }
+            
+            colorAttribute.setXYZ(i, color.r, color.g, color.b);
+          }
+          
+          colorAttribute.needsUpdate = true;
+        }
+      }
+    }
+    
+    // Start when page loads
+    window.addEventListener('load', initWhenReady);
+    
+    // Fallback: start after a delay if load event doesn't fire
+    setTimeout(() => {
+      if (document.getElementById('loading').style.display !== 'none') {
+        console.log('Fallback initialization');
+        initWhenReady();
+      }
+    }, 3000);
+  </script>
+</body>
+</html>
