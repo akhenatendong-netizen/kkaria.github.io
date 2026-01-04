@@ -198,3 +198,39 @@ canvas {
   pointer-events: auto;
   z-index: 10;
 }
+
+@media (max-width: 768px) {
+  .ui-overlay {
+    justify-content: flex-end;
+    align-items: flex-start;
+    padding: 1rem 1rem 2.75rem;
+  }
+
+  .nav-links,
+  .info-card,
+  .footer,
+  .gesture-btn,
+  .gesture-status,
+  .title-block .credit {
+    display: none;
+  }
+
+  .title-block {
+    max-width: 90vw;
+    padding: 0.5rem 0.75rem;
+    background: transparent;
+    backdrop-filter: none;
+    border-radius: 0;
+    border: none;
+  }
+
+  .title-block h1 {
+    font-size: 1.75rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .title-block .subtitle {
+    font-size: 0.76rem;
+    line-height: 1.5;
+  }
+}
