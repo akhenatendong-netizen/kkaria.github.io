@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>One thousandth of Elsinore</title>
+    <!-- Import Three.js and WebGPU renderer modules from a CDN.  -->
+    <!-- Three.js includes experimental WebGPU support via the examples folder.  -->
+    <script type="module">
+      // Preload Three.js modules.  The actual application logic lives in app.js.  
+      import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.154.0/build/three.module.js';
+    </script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <iframe id="luma-embed" src="https://lumalabs.ai/embed/e632ea5b-ddf6-4960-8ca5-872583424f9e?mode=sparkles&background=%23ffffff&color=%23000000&showTitle=true&loadBg=true&logoPosition=bottom-left&infoPosition=bottom-right&cinematicVideo=undefined&showMenu=false" frameborder="0" title="luma embed"></iframe>
+    <canvas id="webgpu-canvas"></canvas>
+    <!-- Overlay container that holds navigation, title, description and links.  -->
+    <div class="ui-overlay">
+      <nav class="nav-links">
+        <a href="#" class="nav-link">( HOME )</a>
+        <a href="#" class="nav-link">( ABOUT )</a>
+        <a href="#" class="nav-link">( PROJECTS )</a>
+      </nav>
+      <div class="title-block">
+        <h1>One thousandth of Elsinore</h1>
+        <p class="subtitle">
+          长廊深处的烛火忽明忽暗，把每个人的影子都拉得过长，仿佛连人的意图也被拖出了形状。于是复仇与怀疑同时开场，爱与忠诚在暗处改写面目，祈祷室里或许藏着罪，帘幕后或许躲着耳，寝宫里或许流着无声的泪
+        </p>
+        <p class="credit">Created by ariake</p>
+      </div>
+      <!-- A small info card in the lower right corner similar to the original
+           "World Labs" card.  It shows a tiny preview of the scene and some
+           meta information. -->
+      <div class="info-card">
+        <img src="assets/preview.png" alt="Castle preview" />
+        <div class="info-text">
+          <span class="card-title">Castle</span>
+          <span class="card-subtitle">500k splats</span>
+        </div>
+      </div>
+      <footer class="footer">© 2026</footer>
+      <!-- Button for toggling gesture control via the webcam.  When pressed the
+           app will ask for camera permission and attempt to track your hand. -->
+      <button id="gesture-toggle" class="gesture-btn">Enable Hand Control</button>
+      <div id="gesture-status" class="gesture-status" style="display: none;"></div>
+    </div>
+    <!-- Application logic - using simplified version that works with file:// protocol -->
+    <script src="app-simple.js"></script>
+  </body>
+</html>
