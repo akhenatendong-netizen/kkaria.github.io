@@ -5,11 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CrazyBee - Merchant</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        .app,
+        .page {
+            background: #f8fafc !important;
+        }
+
+        .card,
+        .card-pad,
+        .list-item {
+            background: #fff !important;
+            background-image: none !important;
+        }
+    </style>
 </head>
 <body>
     <div class="app">
@@ -25,6 +35,7 @@
         <main class="page">
             <section style="position: relative;">
                 <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1000&q=80" alt="restaurant interior" style="width:100%;height:254px;object-fit:cover;">
+                <div style="position:absolute;left:0;right:0;bottom:0;height:86px;background:linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.9) 72%, #ffffff 100%);pointer-events:none;"></div>
                 <div class="row" style="position:absolute;left:16px;right:16px;top:14px;justify-content:space-between;">
                     <div class="back-icon" data-back><i class="fa-solid fa-arrow-left"></i></div>
                     <div class="row">
@@ -121,11 +132,11 @@
         </main>
 
         <nav class="tab-bar">
-            <div class="tab-item"><i class="fa-solid fa-house"></i>Home</div>
-            <div class="tab-item"><i class="fa-solid fa-magnifying-glass"></i>Search</div>
-            <div class="tab-item"><i class="fa-solid fa-receipt"></i>Orders</div>
-            <div class="tab-item"><i class="fa-regular fa-heart"></i>Saved</div>
-            <div class="tab-item"><i class="fa-regular fa-user"></i>Profile</div>
+            <div class="tab-item"><i class="fa-solid fa-house"></i></div>
+            <div class="tab-item"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <div class="tab-item"><i class="fa-solid fa-receipt"></i></div>
+            <div class="tab-item"><i class="fa-regular fa-heart"></i></div>
+            <div class="tab-item"><i class="fa-regular fa-user"></i></div>
         </nav>
     </div>
 

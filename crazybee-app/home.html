@@ -5,13 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CrazyBee - Home</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <style>
-        .app, .page { background: #fff; }
+        body,
+        .status-bar,
+        .home-nav,
+        .tab-bar {
+            background: #fff !important;
+        }
+
+        .app,
+        .page {
+            background:
+                radial-gradient(260px 180px at 50% 34%, rgba(255, 116, 116, 0.1) 0%, rgba(255, 116, 116, 0) 72%),
+                linear-gradient(180deg, #ffffff 0%, #ffffff 18%, #fff6f6 56%, #ffffff 100%) !important;
+        }
+
+        .home-content {
+            background: #fff !important;
+        }
 
         .home-nav {
             position: sticky;
@@ -45,10 +58,10 @@
         }
 
         .search-trigger {
-            height: 34px;
-            border: 1px solid #fca5a5;
+            height: 32px;
+            border: 0;
             border-radius: 10px;
-            background: #fff;
+            background: #f4f6fa;
             padding: 0 11px;
             display: flex;
             align-items: center;
@@ -60,30 +73,39 @@
 
         .segment-wrap {
             margin-top: 10px;
-            background: #f3f4f6;
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            padding: 3px;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 4px;
+            display: flex;
+            gap: 26px;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 2px;
         }
+
+        .segment-wrap::-webkit-scrollbar { display: none; }
 
         .seg-btn {
             border: 0;
             background: transparent;
             color: #6b7280;
-            border-radius: 8px;
             font-size: 12px;
-            font-weight: 800;
-            padding: 7px 0;
+            font-weight: 600;
+            padding: 0 0 8px;
             cursor: pointer;
+            position: relative;
         }
 
         .seg-btn.active {
-            background: #fff;
             color: #111827;
-            box-shadow: 0 1px 2px rgba(17, 24, 39, 0.08);
+        }
+
+        .seg-btn.active::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 3px;
+            border-radius: 999px;
+            background: #ff3535;
         }
 
         .home-content {
@@ -158,12 +180,18 @@
             justify-content: space-between;
             align-items: flex-end;
             gap: 6px;
+            padding-right: 2px;
+        }
+
+        .deal-price > div {
+            flex: 1;
+            min-width: 0;
         }
 
         .tag {
             display: inline-block;
-            background: #fef3c7;
-            color: #b45309;
+            background: #f1f5f9;
+            color: #475569;
             border-radius: 999px;
             font-size: 8px;
             font-weight: 700;
@@ -192,29 +220,23 @@
 
         .cta {
             border: 0;
-            border-radius: 6px;
+            border-radius: 5px;
             background: #ff3535;
             color: #fff;
-            font-size: 9px;
+            font-size: 11px;
             font-weight: 800;
             padding: 4px 8px;
+            min-width: 62px;
+            height: 26px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            white-space: nowrap;
+            flex-shrink: 0;
+            margin-left: 6px;
         }
 
-        .tab-bar .tab-item {
-            font-size: 0;
-            width: 34px;
-        }
-
-        .tab-bar .tab-item i {
-            margin-bottom: 0;
-            font-size: 19px;
-        }
-
-        .tab-bar {
-            height: 62px;
-            padding: 4px 40px 7px;
-            justify-content: space-between;
-        }
     </style>
 </head>
 <body>
@@ -248,9 +270,9 @@
             <section class="home-content">
                 <div class="grid-deals">
                     <article class="deal-card fade-in" data-nav="dealDetail">
-                        <img src="https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=900&q=80" alt="Din Tai Fung">
+                        <img src="https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=900&q=80" alt="Golden Spoon Bistro">
                         <div class="deal-body">
-                            <h3 class="deal-name">Din Tai Fung</h3>
+                            <h3 class="deal-name">Golden Spoon Bistro</h3>
                             <p class="deal-line">South Coast Plaza, Costa Mesa</p>
                             <div class="deal-stats">
                                 <span class="score"><i class="fa-solid fa-star"></i>4.8</span>

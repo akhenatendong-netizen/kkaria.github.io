@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrazyBee - Order Detail</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .app,
+        .page,
+        .detail-wrap,
+        .detail-body {
+            background: #fff !important;
+        }
+
+        .status-bar,
+        .detail-top {
+            background: #fff !important;
+        }
+
+        .detail-wrap {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-top {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            padding: 12px 16px 10px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detail-title {
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 1.2;
+            color: #0f172a;
+        }
+
+        .detail-top .back-icon {
+            border: 0;
+            background: transparent;
+            box-shadow: none;
+            border-radius: 0;
+            width: 22px;
+            height: 22px;
+            padding: 0;
+        }
+
+        .detail-body {
+            padding: 14px 16px 10px;
+        }
+
+        .merchant-card {
+            border: 0;
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+            padding: 12px;
+            display: grid;
+            grid-template-columns: 60px 1fr auto;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .merchant-card img {
+            width: 60px;
+            height: 60px;
+            aspect-ratio: 1 / 1;
+            border-radius: 12px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .merchant-name {
+            font-size: 17px;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+
+        .merchant-sub {
+            margin-top: 2px;
+            font-size: 11px;
+            color: #9ca3af;
+            line-height: 1.3;
+        }
+
+        .merchant-time {
+            margin-top: 2px;
+            font-size: 11px;
+            color: #9ca3af;
+            line-height: 1.3;
+        }
+
+        .merchant-status {
+            font-size: 12px;
+            font-weight: 800;
+            color: #2563eb;
+        }
+
+        .meta-lines {
+            margin-top: 14px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .meta-line {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: #475569;
+            line-height: 1.35;
+        }
+
+        .meta-line i {
+            width: 20px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .status-card {
+            margin-top: 14px;
+            border: 0;
+            border-radius: 12px;
+            background: #f8fafc;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+            color: #475569;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.4;
+            padding: 10px 12px;
+        }
+
+        .order-info {
+            margin-top: 14px;
+            border: 0;
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+            padding: 12px;
+        }
+
+        .order-info h3 {
+            font-size: 13px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+
+        .order-info p {
+            font-size: 11px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <div class="detail-wrap">
+            <main class="page">
+                <header class="detail-top">
+                    <button class="back-icon" data-back><i class="fa-solid fa-arrow-left"></i></button>
+                    <h1 class="detail-title">Order Details</h1>
+                </header>
+
+                <section class="detail-body">
+                    <article class="merchant-card">
+                        <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=300&q=80" alt="order">
+                        <div>
+                            <h2 class="merchant-name">Cheddar's Scratch Kitchen</h2>
+                            <p class="merchant-sub">60% off (up to US$15)</p>
+                            <p class="merchant-time">Order time: Aug 14, 2025 7:31 PM</p>
+                        </div>
+                        <span class="merchant-status">Refunded</span>
+                    </article>
+
+                    <div class="meta-lines">
+                        <div class="meta-line"><i class="fa-solid fa-phone"></i> +1 (818) 651-5561</div>
+                        <div class="meta-line"><i class="fa-solid fa-location-dot"></i> South Coast Plaza, Costa Mesa, CA</div>
+                    </div>
+
+                    <div class="status-card">
+                        <i class="fa-solid fa-circle-info"></i> This order is in after-sales flow and does not provide a redeemable voucher code.
+                    </div>
+
+                    <div class="order-info">
+                        <h3>Order Information</h3>
+                        <p>Order Time: 2025-08-14 19:31:11</p>
+                        <p>Payment Time: 2025-08-14 19:33:04</p>
+                        <p>After-sales Status: Refunded</p>
+                        <p>Refund Completed: 2025-08-15 09:26:17</p>
+                        <p>Order Number: 2024081419533982741</p>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <nav class="tab-bar">
+            <div class="tab-item"><i class="fa-solid fa-house"></i></div>
+            <div class="tab-item"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <div class="tab-item active"><i class="fa-solid fa-receipt"></i></div>
+            <div class="tab-item"><i class="fa-regular fa-heart"></i></div>
+            <div class="tab-item"><i class="fa-regular fa-user"></i></div>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrazyBee - Write a Review</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .review-top {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            padding: 12px 14px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .review-body {
+            padding: 12px;
+        }
+
+        .deal-mini {
+            border: 0;
+            border-radius: 12px;
+            background: #fff;
+            padding: 10px;
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+            display: grid;
+            grid-template-columns: 50px 1fr auto;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .deal-mini img {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .review-label {
+            margin-top: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .stars {
+            margin-top: 8px;
+            display: flex;
+            gap: 10px;
+            font-size: 24px;
+            color: #d1d5db;
+            cursor: pointer;
+        }
+
+        .stars .active {
+            color: #f59e0b;
+        }
+
+        .review-box {
+            margin-top: 8px;
+            border: 0;
+            border-radius: 10px;
+            background: #fff;
+            min-height: 110px;
+            width: 100%;
+            padding: 10px;
+            resize: none;
+            font-size: 13px;
+            color: #374151;
+            outline: none;
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+        }
+
+        .upload-box {
+            margin-top: 8px;
+            border: 0;
+            border-radius: 10px;
+            height: 68px;
+            background: #fff;
+            color: #9ca3af;
+            display: grid;
+            place-items: center;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <main class="page with-bottom-cta">
+            <header class="review-top">
+                <button class="back-icon" data-back><i class="fa-solid fa-arrow-left"></i></button>
+                <h1 style="font-size:24px;font-weight:800;">Write a Review</h1>
+            </header>
+
+            <section class="review-body">
+                <article class="deal-mini">
+                    <img src="https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=300&q=80" alt="deal">
+                    <div>
+                        <h3 style="font-size:14px;font-weight:800;">Din Tai Fung</h3>
+                        <p style="font-size:10px;color:#9ca3af;">60% off (up to US$15)</p>
+                        <p style="font-size:10px;color:#9ca3af;">Order time: Aug 24, 2025 11:34 AM</p>
+                    </div>
+                    <span style="font-size:12px;font-weight:800;color:#f59e0b;">Completed</span>
+                </article>
+
+                <div class="review-label">Rating</div>
+                <div class="stars" id="starRow">
+                    <i class="fa-regular fa-star" data-score="1"></i>
+                    <i class="fa-regular fa-star" data-score="2"></i>
+                    <i class="fa-regular fa-star" data-score="3"></i>
+                    <i class="fa-regular fa-star" data-score="4"></i>
+                    <i class="fa-regular fa-star" data-score="5"></i>
+                </div>
+
+                <div class="review-label">Review</div>
+                <textarea class="review-box" placeholder="Tell us about your experience..."></textarea>
+
+                <div class="review-label">Add Photos</div>
+                <div class="upload-box"><i class="fa-regular fa-image"></i> Upload photos</div>
+            </section>
+        </main>
+
+        <div class="bottom-cta">
+            <button class="btn btn-main" style="width:100%; background:#111827; box-shadow:none;" data-toast="Review submitted">Submit Review</button>
+        </div>
+
+        <nav class="tab-bar">
+            <div class="tab-item"><i class="fa-solid fa-house"></i></div>
+            <div class="tab-item"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <div class="tab-item active"><i class="fa-solid fa-receipt"></i></div>
+            <div class="tab-item"><i class="fa-regular fa-heart"></i></div>
+            <div class="tab-item"><i class="fa-regular fa-user"></i></div>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        const stars = document.querySelectorAll('#starRow i');
+        stars.forEach((star) => {
+            star.addEventListener('click', () => {
+                const score = Number(star.dataset.score);
+                stars.forEach((s, idx) => {
+                    const active = idx < score;
+                    s.classList.toggle('fa-solid', active);
+                    s.classList.toggle('fa-regular', !active);
+                    s.classList.toggle('active', active);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

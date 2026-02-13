@@ -5,11 +5,169 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CrazyBee - Orders</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        .orders-top {
+            padding: 16px 16px 12px;
+            background: #fff;
+            border-bottom: 1px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .search-mini {
+            margin-top: 8px;
+            height: 34px;
+            border: 1px solid #e5e7eb;
+            border-radius: 9px;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 11px;
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        .order-tabs {
+            margin-top: 10px;
+            display: flex;
+            gap: 22px;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 2px;
+        }
+
+        .order-tabs::-webkit-scrollbar { display: none; }
+
+        .order-tab {
+            border: 0;
+            background: transparent;
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 0 0 8px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .order-tab.active {
+            color: #111827;
+        }
+
+        .order-tab.active::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 2px;
+            border-radius: 999px;
+            background: #ff3535;
+        }
+
+        .orders-list {
+            padding: 14px 14px 8px;
+        }
+
+        .order-pane {
+            display: none;
+        }
+
+        .order-pane.active {
+            display: block;
+        }
+
+        .order-item {
+            border: 0;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .order-head {
+            display: grid;
+            grid-template-columns: 60px 1fr auto;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .order-cover {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 0;
+            display: block;
+        }
+
+        .order-name {
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.2;
+            color: #111827;
+        }
+
+        .order-sub {
+            margin-top: 2px;
+            font-size: 12px;
+            line-height: 1.25;
+            color: #9ca3af;
+        }
+
+        .order-time {
+            margin-top: 2px;
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .status {
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .status.available { color: #16a34a; }
+        .status.completed { color: #f59e0b; }
+        .status.unpaid { color: #ef4444; }
+        .status.refunded { color: #2563eb; }
+        .status.closed { color: #9ca3af; }
+
+        .order-foot {
+            margin-top: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            padding-left: 6px;
+        }
+
+        .money-amount {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+            font-size: 18px;
+            line-height: 1;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.01em;
+        }
+
+        .order-action {
+            border: 0;
+            border-radius: 6px;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 4px 8px;
+            cursor: pointer;
+        }
+
+        .order-action.use { background: #111827; color: #fff; }
+        .order-action.pay { background: #ff3535; color: #fff; }
+        .order-action.review { background: #111827; color: #fff; }
+        .order-action.after { background: #e5e7eb; color: #374151; }
+    </style>
 </head>
 <body>
     <div class="app">
@@ -23,89 +181,281 @@
         </div>
 
         <main class="page">
-            <header class="top-nav space-12">
-                <h1 class="title-xl" style="font-size: 26px;">My Orders</h1>
-                <div class="segment">
-                    <button class="segment-btn active">Active</button>
-                    <button class="segment-btn">Completed</button>
-                    <button class="segment-btn">Expired</button>
+            <header class="orders-top">
+                <h1 class="title-xl" style="font-size: 24px; font-weight: 700;">My Orders</h1>
+                <div class="search-mini">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span>Search my orders</span>
+                </div>
+                <div class="order-tabs">
+                    <button class="order-tab active" data-pane="couponPane">Coupon</button>
+                    <button class="order-tab" data-pane="allPane">All Orders</button>
+                    <button class="order-tab" data-pane="toPayPane">To Pay</button>
+                    <button class="order-tab" data-pane="afterPane">After-sales</button>
                 </div>
             </header>
 
-            <section class="section">
-                <div class="space-12">
-                    <article class="card card-pad fade-in space-12" data-nav="dealDetail">
-                        <div class="row" style="align-items:flex-start;">
-                            <img class="thumb" src="https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=500&q=80" alt="order1" style="width:82px;height:82px;">
-                            <div class="space-8" style="flex:1;">
-                                <h4 style="font-size:16px;font-weight:800;">Lumiere Bistro Date-Night Set</h4>
-                                <p class="meta">Order #CB220931</p>
-                                <span class="badge badge-ok">Ready to redeem</span>
-                            </div>
-                        </div>
-                        <div class="row" style="justify-content:space-between;">
+            <section class="orders-list">
+                <div id="couponPane" class="order-pane active">
+                    <article class="order-item" data-nav="orderDetail">
+                        <div class="order-head">
+                            <img class="order-cover" src="https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=300&q=80" alt="order">
                             <div>
-                                <p class="note">Purchased</p>
-                                <p style="font-size:13px;font-weight:700;">Feb 10, 2026  |  8:16 PM</p>
+                                <h3 class="order-name">Golden Spoon Bistro</h3>
+                                <p class="order-sub">60% off (up to US$15)</p>
+                                <p class="order-time">Order time: Aug 24, 2025 11:34 AM</p>
                             </div>
-                            <div style="text-align:right;">
-                                <p class="note">Paid</p>
-                                <p style="font-size:20px;font-weight:800;">$39</p>
-                            </div>
+                            <span class="status available">Available</span>
                         </div>
-                        <div class="row">
-                            <button class="btn btn-light" style="flex:1;">View Voucher</button>
-                            <button class="btn btn-main" style="flex:1;" data-toast="Redemption QR opened">Use Now</button>
+                        <div class="order-foot">
+                            <span class="money-amount">$12.00</span>
+                            <button class="order-action use" data-nav="orderConfirmation">Use now</button>
                         </div>
                     </article>
 
-                    <article class="card card-pad fade-in space-12" data-nav="dealDetail">
-                        <div class="row" style="align-items:flex-start;">
-                            <img class="thumb" src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=500&q=80" alt="order2" style="width:82px;height:82px;">
-                            <div class="space-8" style="flex:1;">
-                                <h4 style="font-size:16px;font-weight:800;">Northwell Hot-Stone Therapy Set</h4>
-                                <p class="meta">Order #CB220870</p>
-                                <span class="badge badge-ok">Reschedulable</span>
-                            </div>
-                        </div>
-                        <div class="row" style="justify-content:space-between;">
+                    <article class="order-item" data-nav="orderConfirmation">
+                        <div class="order-head">
+                            <img class="order-cover" src="https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=300&q=80" alt="order">
                             <div>
-                                <p class="note">Purchased</p>
-                                <p style="font-size:13px;font-weight:700;">Feb 7, 2026  |  2:05 PM</p>
+                                <h3 class="order-name">Toshi Ramen</h3>
+                                <p class="order-sub">Night combo (2 people)</p>
+                                <p class="order-time">Order time: Aug 21, 2025 8:12 PM</p>
                             </div>
-                            <div style="text-align:right;">
-                                <p class="note">Paid</p>
-                                <p style="font-size:20px;font-weight:800;">$82</p>
-                            </div>
+                            <span class="status available">Available</span>
                         </div>
-                        <div class="row">
-                            <button class="btn btn-light" style="flex:1;">Request Refund</button>
-                            <button class="btn btn-main" style="flex:1;" data-toast="Reschedule request sent">Reschedule</button>
+                        <div class="order-foot">
+                            <span class="money-amount">$19.90</span>
+                            <button class="order-action use" data-nav="orderConfirmation">Use now</button>
                         </div>
                     </article>
 
-                    <article class="card card-pad fade-in space-12" data-nav="dealDetail" style="opacity: .8;">
-                        <div class="row" style="align-items:flex-start;">
-                            <img class="thumb" src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=500&q=80" alt="order3" style="width:82px;height:82px;">
-                            <div class="space-8" style="flex:1;">
-                                <h4 style="font-size:16px;font-weight:800;">Sora Sushi Lab for Two</h4>
-                                <p class="meta">Order #CB220655</p>
-                                <span class="badge badge-muted">Completed</span>
-                            </div>
-                        </div>
-                        <div class="row" style="justify-content:space-between;">
+                    <article class="order-item" data-nav="orderConfirmation">
+                        <div class="order-head">
+                            <img class="order-cover" src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=300&q=80" alt="order">
                             <div>
-                                <p class="note">Redeemed</p>
-                                <p style="font-size:13px;font-weight:700;">Jan 26, 2026  |  7:40 PM</p>
+                                <h3 class="order-name">Spicy House</h3>
+                                <p class="order-sub">Family lunch bundle</p>
+                                <p class="order-time">Order time: Aug 20, 2025 12:18 PM</p>
                             </div>
-                            <div style="text-align:right;">
-                                <p class="note">Paid</p>
-                                <p style="font-size:20px;font-weight:800;">$46</p>
-                            </div>
+                            <span class="status available">Available</span>
                         </div>
-                        <div class="row">
-                            <button class="btn btn-light" style="flex:1;">View Details</button>
-                            <button class="btn btn-light" style="flex:1;" data-toast="Thanks for your feedback">Write Review</button>
+                        <div class="order-foot">
+                            <span class="money-amount">$22.00</span>
+                            <button class="order-action use" data-nav="orderConfirmation">Use now</button>
+                        </div>
+                    </article>
+
+                    <article class="order-item" data-nav="orderDetail">
+                        <div class="order-head">
+                            <img class="order-cover" src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=300&q=80" alt="order">
+                            <div>
+                                <h3 class="order-name">Harbor Grill</h3>
+                                <p class="order-sub">Steak set for two</p>
+                                <p class="order-time">Order time: Aug 18, 2025 6:05 PM</p>
+                            </div>
+                            <span class="status available">Available</span>
+                        </div>
+                        <div class="order-foot">
+                            <span class="money-amount">$58.00</span>
+                            <button class="order-action use" data-nav="orderConfirmation">Use now</button>
+                        </div>
+                    </article>
+
+                    <article class="order-item" data-nav="orderConfirmation">
+                        <div class="order-head">
+                            <img class="order-cover" src="https://images.unsplash.com/photo-1544148103-0773bf10d330?auto=format&fit=crop&w=300&q=80" alt="order">
+                            <div>
+                                <h3 class="order-name">Luna Spa</h3>
+                                <p class="order-sub">Deep care 90 min</p>
+                                <p class="order-time">Order time: Aug 15, 2025 1:02 PM</p>
+                            </div>
+                            <span class="status available">Available</span>
+                        </div>
+                        <div class="order-foot">
+                            <span class="money-amount">$76.00</span>
+                            <button class="order-action use" data-nav="orderConfirmation">Use now</button>
+                        </div>
+                    </article>
+                </div>
+
+                <div id="allPane" class="order-pane">
+                    <article class="order-item" data-nav="orderConfirmation">
+                        <div class="order-head">
+                            <img class="order-cover" src="https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=300&q=80" alt="order">
+                            <div>
+                                <h3 class="order-name">Golden Spoon Bistro</h3>
+                                <p class="order-sub">60% off (up to US$15)</p>
+                                <p class="order-time">Order time: Aug 24, 2025 11:34 AM</p>
+                            </div>
+                            <span class="status available">Available</span>
+                        </div>
+                        <div class="order-foot">
+                            <span class="money-amount">$12.00</span>
+                            <button class="order-action use" data-nav="orderConfirmation">Use now</button>
+                        </div>
+                    </article>
+
+                    <article class="order-item" data-nav="writeReview">
+                        <div class="order-head">
+                            <img class="order-cover" src="https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=300&q=80" alt="order">
+                            <div>
+                                <h3 class="order-name">P.F Chang's</h3>
+                                <p class="order-sub">60% off (up to US$15)</p>
+                                <p class="order-time">Order time: Aug 22, 2025 11:40 AM</p>
+                            </div>
+                            <span class="status completed">Completed</span>
+                        </div>
+                        <div class="order-foot">
+                            <span class="money-amount">$12.00</span>
+                            <button class="order-action review" data-nav="writeReview">Write review</button>
+                        </div>
+                    </article>
+
+                    <article class="order-item" data-nav="orderConfirmation">
+                        <div class="order-head">
+                            <img class="order-cover" src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=300&q=80" alt="order">
+                            <div>
+                                <h3 class="order-name">Master Hu</h3>
+                                <p class="order-sub">60% off (up to US$15)</p>
+                                <p class="order-time">Order time: Aug 20, 2025 3:14 PM</p>
+                            </div>
+                            <span class="status unpaid">Unpaid</span>
+                        </div>
+                        <div class="order-foot">
+                            <span class="money-amount">$12.00</span>
+                            <button class="order-action pay" data-nav="orderConfirmation">Pay now</button>
+                        </div>
+                    </article>
+
+                    <article class="order-item" data-nav="orderConfirmation">
+                        <div class="order-head">
+                            <img class="order-cover" src="https://images.unsplash.com/photo-1481833761820-0509d3217039?auto=format&fit=crop&w=300&q=80" alt="order">
+                            <div>
+                                <h3 class="order-name">Kuan Zhai Alley</h3>
+                                <p class="order-sub">60% off (up to US$15)</p>
+                                <p class="order-time">Order time: Aug 17, 2025 8:03 PM</p>
+                            </div>
+                            <span class="status closed">Closed</span>
+                        </div>
+                        <div class="order-foot">
+                            <span class="money-amount">$12.00</span>
+                            <button class="order-action after" data-nav="orderDetail">Details</button>
+                        </div>
+                    </article>
+
+                    <article class="order-item" data-nav="orderDetail">
+                        <div class="order-head">
+                            <img class="order-cover" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=300&q=80" alt="order">
+                            <div>
+                                <h3 class="order-name">Cheddar's Scratch Kitchen</h3>
+                                <p class="order-sub">60% off (up to US$15)</p>
+                                <p class="order-time">Order time: Aug 14, 2025 7:31 PM</p>
+                            </div>
+                            <span class="status refunded">Refunded</span>
+                        </div>
+                        <div class="order-foot">
+                            <span class="money-amount">$12.00</span>
+                            <button class="order-action after" data-nav="orderDetail">After-sales</button>
+                        </div>
+                    </article>
+                </div>
+
+                <div id="toPayPane" class="order-pane">
+                    <article class="order-item" data-nav="orderDetail">
+                        <div class="order-head">
+                            <img class="order-cover" src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=300&q=80" alt="order">
+                            <div>
+                                <h3 class="order-name">Master Hu</h3>
+                                <p class="order-sub">60% off (up to US$15)</p>
+                                <p class="order-time">Order time: Aug 20, 2025 3:14 PM</p>
+                            </div>
+                            <span class="status unpaid">Unpaid</span>
+                        </div>
+                        <div class="order-foot">
+                            <span class="money-amount">$12.00</span>
+                            <button class="order-action pay" data-nav="orderConfirmation">Pay now</button>
+                        </div>
+                    </article>
+
+                    <article class="order-item" data-nav="orderConfirmation">
+                        <div class="order-head">
+                            <img class="order-cover" src="https://images.unsplash.com/photo-1528712306091-ed0763094c98?auto=format&fit=crop&w=300&q=80" alt="order">
+                            <div>
+                                <h3 class="order-name">Master Hu Noodles</h3>
+                                <p class="order-sub">New user instant deal</p>
+                                <p class="order-time">Order time: Aug 19, 2025 1:07 PM</p>
+                            </div>
+                            <span class="status unpaid">Unpaid</span>
+                        </div>
+                        <div class="order-foot">
+                            <span class="money-amount">$0.01</span>
+                            <button class="order-action pay" data-nav="orderConfirmation">Pay now</button>
+                        </div>
+                    </article>
+
+                    <article class="order-item" data-nav="orderConfirmation">
+                        <div class="order-head">
+                            <img class="order-cover" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=300&q=80" alt="order">
+                            <div>
+                                <h3 class="order-name">Cafe Loft</h3>
+                                <p class="order-sub">Set menu for two</p>
+                                <p class="order-time">Order time: Aug 18, 2025 10:56 AM</p>
+                            </div>
+                            <span class="status unpaid">Unpaid</span>
+                        </div>
+                        <div class="order-foot">
+                            <span class="money-amount">$28.00</span>
+                            <button class="order-action pay" data-nav="orderConfirmation">Pay now</button>
+                        </div>
+                    </article>
+                </div>
+
+                <div id="afterPane" class="order-pane">
+                    <article class="order-item" data-nav="orderConfirmation">
+                        <div class="order-head">
+                            <img class="order-cover" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=300&q=80" alt="order">
+                            <div>
+                                <h3 class="order-name">Cheddar's Scratch Kitchen</h3>
+                                <p class="order-sub">60% off (up to US$15)</p>
+                                <p class="order-time">Refund requested: Aug 15, 2025</p>
+                            </div>
+                            <span class="status refunded">Refunded</span>
+                        </div>
+                        <div class="order-foot">
+                            <span class="money-amount">$12.00</span>
+                            <button class="order-action after" data-nav="orderDetail">Details</button>
+                        </div>
+                    </article>
+
+                    <article class="order-item" data-nav="writeReview">
+                        <div class="order-head">
+                            <img class="order-cover" src="https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=300&q=80" alt="order">
+                            <div>
+                                <h3 class="order-name">P.F Chang's</h3>
+                                <p class="order-sub">Completed order, pending review</p>
+                                <p class="order-time">Completed: Aug 22, 2025</p>
+                            </div>
+                            <span class="status completed">Completed</span>
+                        </div>
+                        <div class="order-foot">
+                            <span class="money-amount">$12.00</span>
+                            <button class="order-action review" data-nav="writeReview">Write review</button>
+                        </div>
+                    </article>
+
+                    <article class="order-item" data-nav="orderDetail">
+                        <div class="order-head">
+                            <img class="order-cover" src="https://images.unsplash.com/photo-1481833761820-0509d3217039?auto=format&fit=crop&w=300&q=80" alt="order">
+                            <div>
+                                <h3 class="order-name">Kuan Zhai Alley</h3>
+                                <p class="order-sub">Order closed after no-show</p>
+                                <p class="order-time">Closed: Aug 17, 2025</p>
+                            </div>
+                            <span class="status closed">Closed</span>
+                        </div>
+                        <div class="order-foot">
+                            <span class="money-amount">$12.00</span>
+                            <button class="order-action after" data-nav="orderDetail">Details</button>
                         </div>
                     </article>
                 </div>
@@ -113,14 +463,41 @@
         </main>
 
         <nav class="tab-bar">
-            <div class="tab-item"><i class="fa-solid fa-house"></i>Home</div>
-            <div class="tab-item"><i class="fa-solid fa-magnifying-glass"></i>Search</div>
-            <div class="tab-item active"><i class="fa-solid fa-receipt"></i>Orders</div>
-            <div class="tab-item"><i class="fa-regular fa-heart"></i>Saved</div>
-            <div class="tab-item"><i class="fa-regular fa-user"></i>Profile</div>
+            <div class="tab-item"><i class="fa-solid fa-house"></i></div>
+            <div class="tab-item"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <div class="tab-item active"><i class="fa-solid fa-receipt"></i></div>
+            <div class="tab-item"><i class="fa-regular fa-heart"></i></div>
+            <div class="tab-item"><i class="fa-regular fa-user"></i></div>
         </nav>
     </div>
 
     <script src="app.js"></script>
+    <script>
+        const panes = {
+            couponPane: document.getElementById('couponPane'),
+            allPane: document.getElementById('allPane'),
+            toPayPane: document.getElementById('toPayPane'),
+            afterPane: document.getElementById('afterPane')
+        };
+
+        function activateOrderPane(targetPane) {
+            document.querySelectorAll('.order-tab').forEach((tab) => {
+                tab.classList.toggle('active', tab.dataset.pane === targetPane);
+            });
+            Object.values(panes).forEach((pane) => pane && pane.classList.remove('active'));
+            if (targetPane && panes[targetPane]) {
+                panes[targetPane].classList.add('active');
+            }
+        }
+
+        document.querySelectorAll('.order-tab').forEach((tab) => {
+            tab.addEventListener('click', () => {
+                activateOrderPane(tab.dataset.pane);
+            });
+        });
+
+        const urlTab = new URLSearchParams(window.location.search).get('tab');
+        activateOrderPane(urlTab && panes[urlTab] ? urlTab : 'couponPane');
+    </script>
 </body>
 </html>

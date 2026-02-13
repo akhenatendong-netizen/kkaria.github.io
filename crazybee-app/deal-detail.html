@@ -5,11 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CrazyBee - Deal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        .detail-spec {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .detail-spec:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-icon {
+            width: 22px;
+            height: 22px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            border: 0;
+            background: transparent !important;
+            flex-shrink: 0;
+            margin-top: 1px;
+            color: #ff3535 !important;
+        }
+
+        .detail-title {
+            font-size: 15px;
+            font-weight: 800;
+            line-height: 1.25;
+            color: #111827;
+        }
+
+        .detail-text {
+            margin-top: 5px;
+            font-size: 13px;
+            line-height: 1.45;
+            color: #475569;
+        }
+
+        .card,
+        .list-item,
+        .card-pad {
+            background: #fff !important;
+            background-image: none !important;
+        }
+
+        .app,
+        .page,
+        .bottom-cta {
+            background: #f8fafc !important;
+        }
+    </style>
 </head>
 <body>
     <div class="app">
@@ -25,6 +75,7 @@
         <main class="page with-bottom-cta">
             <section style="position: relative;">
                 <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1000&q=80" alt="deal food" style="width:100%;height:262px;object-fit:cover;">
+                <div style="position:absolute;left:0;right:0;bottom:0;height:78px;background:linear-gradient(to bottom, rgba(248,250,252,0) 0%, rgba(248,250,252,0.9) 70%, #f8fafc 100%);pointer-events:none;"></div>
                 <div class="row" style="position:absolute;left:16px;right:16px;top:14px;justify-content:space-between;">
                     <div class="back-icon" data-back><i class="fa-solid fa-arrow-left"></i></div>
                     <div class="row">
@@ -71,33 +122,44 @@
 
             <section class="section">
                 <h3 class="title-lg" style="margin-bottom: 10px;">Deal Details</h3>
-                <div class="card card-pad space-12">
-                    <div class="row">
-                        <div class="user-chip" style="background:#fef2f2;color:#ef4444;"><i class="fa-regular fa-calendar"></i></div>
+                <div class="card card-pad">
+                    <div class="detail-spec">
+                        <div class="detail-icon" style="color:#ff3535;">
+                            <i class="fa-regular fa-calendar"></i>
+                        </div>
                         <div>
-                            <p style="font-size:14px;font-weight:800;">Validity</p>
-                            <p class="meta">Valid through Mar 31, 2026</p>
+                            <p class="detail-title">Validity</p>
+                            <p class="detail-text">Valid through Mar 31, 2026</p>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="user-chip" style="background:#eff6ff;color:#3b82f6;"><i class="fa-regular fa-clock"></i></div>
+
+                    <div class="detail-spec">
+                        <div class="detail-icon" style="color:#ff3535;">
+                            <i class="fa-regular fa-clock"></i>
+                        </div>
                         <div>
-                            <p style="font-size:14px;font-weight:800;">Available Hours</p>
-                            <p class="meta">Mon - Sun, 5:30 PM - 10:00 PM</p>
+                            <p class="detail-title">Available Hours</p>
+                            <p class="detail-text">Mon - Sun, 5:30 PM - 10:00 PM</p>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="user-chip" style="background:#f0fdf4;color:#22c55e;"><i class="fa-solid fa-users"></i></div>
+
+                    <div class="detail-spec">
+                        <div class="detail-icon" style="color:#ff3535;">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
                         <div>
-                            <p style="font-size:14px;font-weight:800;">Party Size</p>
-                            <p class="meta">Package for 2, cannot split</p>
+                            <p class="detail-title">Party Size</p>
+                            <p class="detail-text">Package for 2, cannot split</p>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="user-chip" style="background:#f8fafc;color:#475569;"><i class="fa-solid fa-circle-info"></i></div>
+
+                    <div class="detail-spec">
+                        <div class="detail-icon" style="color:#ff3535;">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </div>
                         <div>
-                            <p style="font-size:14px;font-weight:800;">Terms</p>
-                            <p class="meta">Not valid on holidays. Reservation required 2 hours in advance.</p>
+                            <p class="detail-title">Terms</p>
+                            <p class="detail-text">Not valid on holidays. Reservation required 2 hours in advance.</p>
                         </div>
                     </div>
                 </div>
@@ -117,16 +179,16 @@
                     <p class="note">Final Price</p>
                     <p style="font-size:24px;font-weight:800;line-height:1;">$39</p>
                 </div>
-                <button class="btn btn-main" style="min-width: 170px;" data-toast="Order placed. Check Orders tab.">Buy Now</button>
+                <button class="btn btn-main" style="min-width: 170px;" onclick="window.location.href='orders.html?tab=couponPane'">Buy Now</button>
             </div>
         </div>
 
         <nav class="tab-bar">
-            <div class="tab-item"><i class="fa-solid fa-house"></i>Home</div>
-            <div class="tab-item"><i class="fa-solid fa-magnifying-glass"></i>Search</div>
-            <div class="tab-item"><i class="fa-solid fa-receipt"></i>Orders</div>
-            <div class="tab-item"><i class="fa-regular fa-heart"></i>Saved</div>
-            <div class="tab-item"><i class="fa-regular fa-user"></i>Profile</div>
+            <div class="tab-item"><i class="fa-solid fa-house"></i></div>
+            <div class="tab-item"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <div class="tab-item"><i class="fa-solid fa-receipt"></i></div>
+            <div class="tab-item"><i class="fa-regular fa-heart"></i></div>
+            <div class="tab-item"><i class="fa-regular fa-user"></i></div>
         </nav>
     </div>
 

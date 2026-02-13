@@ -6,7 +6,10 @@ const APP_CONFIG = {
         favorites: 'favorites.html',
         profile: 'profile.html',
         restaurantDetail: 'restaurant-detail.html',
-        dealDetail: 'deal-detail.html'
+        dealDetail: 'deal-detail.html',
+        orderConfirmation: 'order-confirmation.html',
+        orderDetail: 'order-detail.html',
+        writeReview: 'write-review.html'
     }
 };
 
@@ -21,7 +24,7 @@ function currentPageKey() {
     const file = (window.location.pathname.split('/').pop() || 'home.html').toLowerCase();
     if (file.includes('home')) return 'home';
     if (file.includes('search')) return 'search';
-    if (file.includes('orders')) return 'orders';
+    if (file.includes('orders') || file.includes('order-confirmation') || file.includes('order-detail') || file.includes('write-review')) return 'orders';
     if (file.includes('favorites')) return 'favorites';
     if (file.includes('profile')) return 'profile';
     return '';
@@ -39,6 +42,7 @@ function showToast(message, duration = 2000) {
         'color:#fff',
         'font-size:12px',
         'font-weight:700',
+        'white-space:nowrap',
         'border-radius:999px',
         'padding:10px 14px',
         'z-index:999',
