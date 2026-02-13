@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrazyBee - Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <main class="page">
+            <header class="top-nav" style="border-bottom:0;background:transparent;padding-bottom:0;"></header>
+
+            <section class="section" style="padding-top: 6px;">
+                <div class="profile-hero space-14 fade-in">
+                    <div class="row" style="align-items:flex-start;">
+                        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80" alt="avatar" style="width:72px;height:72px;border-radius:20px;object-fit:cover;border:1px solid #e5e7eb;">
+                        <div style="flex:1;" class="space-8">
+                            <h1 class="title-lg" style="font-size: 24px;">Sarah Johnson</h1>
+                            <p class="meta">sarah.j@email.com</p>
+                            <span class="badge badge-muted">Annual Member  |  North America</span>
+                        </div>
+                        <div class="action-icon"><i class="fa-regular fa-pen-to-square"></i></div>
+                    </div>
+                    <div class="row" style="gap:8px;">
+                        <div class="card" style="flex:1;padding:10px;text-align:center;">
+                            <p style="font-size:22px;font-weight:800;">26</p>
+                            <p class="note">Orders</p>
+                        </div>
+                        <div class="card" style="flex:1;padding:10px;text-align:center;">
+                            <p style="font-size:22px;font-weight:800;">13</p>
+                            <p class="note">Saved</p>
+                        </div>
+                        <div class="card" style="flex:1;padding:10px;text-align:center;">
+                            <p style="font-size:22px;font-weight:800;">$486</p>
+                            <p class="note">Total Saved</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="menu-card">
+                    <div class="menu-line" data-nav="orders">
+                        <div class="menu-left">
+                            <div class="pill-icon" style="background:#eff6ff;color:#2563eb;"><i class="fa-solid fa-receipt"></i></div>
+                            <span>My Orders</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right" style="color:#9ca3af;"></i>
+                    </div>
+                    <div class="menu-line" data-nav="favorites">
+                        <div class="menu-left">
+                            <div class="pill-icon" style="background:#fef2f2;color:#ef4444;"><i class="fa-solid fa-heart"></i></div>
+                            <span>My Saved</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right" style="color:#9ca3af;"></i>
+                    </div>
+                    <div class="menu-line" data-toast="You have 3 available coupons">
+                        <div class="menu-left">
+                            <div class="pill-icon" style="background:#fffbeb;color:#d97706;"><i class="fa-solid fa-ticket"></i></div>
+                            <span>Coupons</span>
+                        </div>
+                        <span class="badge badge-soft">3 available</span>
+                    </div>
+                    <div class="menu-line" data-toast="Points details opened">
+                        <div class="menu-left">
+                            <div class="pill-icon" style="background:#ecfdf3;color:#16a34a;"><i class="fa-solid fa-coins"></i></div>
+                            <span>Rewards</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right" style="color:#9ca3af;"></i>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="menu-card">
+                    <div class="menu-line" data-toast="Address settings opened">
+                        <div class="menu-left">
+                            <div class="pill-icon" style="background:#f8fafc;color:#475569;"><i class="fa-solid fa-location-dot"></i></div>
+                            <span>Addresses</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right" style="color:#9ca3af;"></i>
+                    </div>
+                    <div class="menu-line" data-toast="Payment settings opened">
+                        <div class="menu-left">
+                            <div class="pill-icon" style="background:#f8fafc;color:#475569;"><i class="fa-regular fa-credit-card"></i></div>
+                            <span>Payment Methods</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right" style="color:#9ca3af;"></i>
+                    </div>
+                    <div class="menu-line" data-toast="Notification settings opened">
+                        <div class="menu-left">
+                            <div class="pill-icon" style="background:#f8fafc;color:#475569;"><i class="fa-regular fa-bell"></i></div>
+                            <span>Notifications</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right" style="color:#9ca3af;"></i>
+                    </div>
+                    <div class="menu-line" data-toast="Privacy settings opened">
+                        <div class="menu-left">
+                            <div class="pill-icon" style="background:#f8fafc;color:#475569;"><i class="fa-solid fa-shield-halved"></i></div>
+                            <span>Privacy & Security</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right" style="color:#9ca3af;"></i>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" style="padding-bottom:8px;">
+                <button class="btn btn-light" style="width:100%;color:#ef4444;border-color:#fecaca;" data-toast="Signed out">Sign Out</button>
+            </section>
+        </main>
+
+        <nav class="tab-bar">
+            <div class="tab-item"><i class="fa-solid fa-house"></i>Home</div>
+            <div class="tab-item"><i class="fa-solid fa-magnifying-glass"></i>Search</div>
+            <div class="tab-item"><i class="fa-solid fa-receipt"></i>Orders</div>
+            <div class="tab-item"><i class="fa-regular fa-heart"></i>Saved</div>
+            <div class="tab-item active"><i class="fa-solid fa-user"></i>Profile</div>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrazyBee - Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .app, .page { background: #fff; }
+
+        .home-nav {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: #fff;
+            border-bottom: 1px solid #edf0f3;
+            padding: 10px 12px 8px;
+        }
+
+        .search-row {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .city-trigger {
+            height: 34px;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            padding: 0 2px 0 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 800;
+            color: #111827;
+            cursor: pointer;
+        }
+
+        .search-trigger {
+            height: 34px;
+            border: 1px solid #fca5a5;
+            border-radius: 10px;
+            background: #fff;
+            padding: 0 11px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #9ca3af;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .segment-wrap {
+            margin-top: 10px;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 3px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+        }
+
+        .seg-btn {
+            border: 0;
+            background: transparent;
+            color: #6b7280;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 800;
+            padding: 7px 0;
+            cursor: pointer;
+        }
+
+        .seg-btn.active {
+            background: #fff;
+            color: #111827;
+            box-shadow: 0 1px 2px rgba(17, 24, 39, 0.08);
+        }
+
+        .home-content {
+            padding: 10px 10px 6px;
+        }
+
+        .grid-deals {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 9px;
+        }
+
+        .deal-card {
+            border: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.07);
+            cursor: pointer;
+        }
+
+        .deal-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .deal-body {
+            padding: 7px 8px 8px;
+        }
+
+        .deal-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #111827;
+            line-height: 1.15;
+        }
+
+        .deal-line {
+            margin-top: 3px;
+            font-size: 9px;
+            color: #6b7280;
+            line-height: 1.2;
+        }
+
+        .deal-stats {
+            margin-top: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 9px;
+        }
+
+        .score {
+            color: #111827;
+            font-weight: 700;
+        }
+
+        .score i {
+            color: #f59e0b;
+            margin-right: 3px;
+        }
+
+        .sold {
+            color: #9ca3af;
+        }
+
+        .deal-price {
+            margin-top: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 6px;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #fef3c7;
+            color: #b45309;
+            border-radius: 999px;
+            font-size: 8px;
+            font-weight: 700;
+            padding: 2px 6px;
+            margin-bottom: 4px;
+            line-height: 1.15;
+            white-space: nowrap;
+            max-width: 118px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .now {
+            color: #ef4444;
+            font-size: 17px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .old {
+            color: #9ca3af;
+            font-size: 8px;
+            text-decoration: line-through;
+            margin-left: 3px;
+        }
+
+        .cta {
+            border: 0;
+            border-radius: 6px;
+            background: #ff3535;
+            color: #fff;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 4px 8px;
+        }
+
+        .tab-bar .tab-item {
+            font-size: 0;
+            width: 34px;
+        }
+
+        .tab-bar .tab-item i {
+            margin-bottom: 0;
+            font-size: 19px;
+        }
+
+        .tab-bar {
+            height: 62px;
+            padding: 4px 40px 7px;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <main class="page">
+            <header class="home-nav">
+                <div class="search-row">
+                    <button class="city-trigger">Irvine <i class="fa-solid fa-chevron-down" style="font-size:10px;color:#6b7280;"></i></button>
+                    <div class="search-trigger" data-nav="search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <span>What's the deal today?</span>
+                    </div>
+                </div>
+
+                <div class="segment-wrap">
+                    <button class="seg-btn active">Top Select</button>
+                    <button class="seg-btn">Best Deals</button>
+                    <button class="seg-btn">Nearby</button>
+                </div>
+            </header>
+
+            <section class="home-content">
+                <div class="grid-deals">
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=900&q=80" alt="Din Tai Fung">
+                        <div class="deal-body">
+                            <h3 class="deal-name">Din Tai Fung</h3>
+                            <p class="deal-line">South Coast Plaza, Costa Mesa</p>
+                            <div class="deal-stats">
+                                <span class="score"><i class="fa-solid fa-star"></i>4.8</span>
+                                <span class="sold">2.4 mi | 384 reviews</span>
+                            </div>
+                            <div class="deal-price">
+                                <div>
+                                    <span class="tag">60% off | up to US$15</span><br>
+                                    <span class="now">$9.99</span><span class="old">$30.00</span>
+                                </div>
+                                <button class="cta">Get now</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80" alt="Cafe Loft">
+                        <div class="deal-body">
+                            <h3 class="deal-name">Cafe Loft</h3>
+                            <p class="deal-line">Irvine Spectrum Center</p>
+                            <div class="deal-stats">
+                                <span class="score"><i class="fa-solid fa-star"></i>4.7</span>
+                                <span class="sold">1.0 mi | 216 reviews</span>
+                            </div>
+                            <div class="deal-price">
+                                <div>
+                                    <span class="tag">Set menu for two</span><br>
+                                    <span class="now">$28.00</span><span class="old">$49.00</span>
+                                </div>
+                                <button class="cta">Get now</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1528712306091-ed0763094c98?auto=format&fit=crop&w=900&q=80" alt="Master Hu">
+                        <div class="deal-body">
+                            <h3 class="deal-name">Master Hu Noodles</h3>
+                            <p class="deal-line">Diamond Jamboree Plaza</p>
+                            <div class="deal-stats">
+                                <span class="score"><i class="fa-solid fa-star"></i>4.6</span>
+                                <span class="sold">3.6 mi | 509 reviews</span>
+                            </div>
+                            <div class="deal-price">
+                                <div>
+                                    <span class="tag">New user instant deal</span><br>
+                                    <span class="now">$0.01</span><span class="old">$15.00</span>
+                                </div>
+                                <button class="cta">Get now</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=900&q=80" alt="Spicy House">
+                        <div class="deal-body">
+                            <h3 class="deal-name">Spicy House</h3>
+                            <p class="deal-line">Culver Plaza | Szechuan</p>
+                            <div class="deal-stats">
+                                <span class="score"><i class="fa-solid fa-star"></i>4.5</span>
+                                <span class="sold">2.1 mi | 271 reviews</span>
+                            </div>
+                            <div class="deal-price">
+                                <div>
+                                    <span class="tag">Family lunch bundle</span><br>
+                                    <span class="now">$22.00</span><span class="old">$39.00</span>
+                                </div>
+                                <button class="cta">Get now</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=900&q=80" alt="Maple Roast Cafe">
+                        <div class="deal-body">
+                            <h3 class="deal-name">Maple Roast Cafe</h3>
+                            <p class="deal-line">University Town Center</p>
+                            <div class="deal-stats">
+                                <span class="score"><i class="fa-solid fa-star"></i>4.8</span>
+                                <span class="sold">0.8 mi | 402 reviews</span>
+                            </div>
+                            <div class="deal-price">
+                                <div>
+                                    <span class="tag">Brunch combo</span><br>
+                                    <span class="now">$19.00</span><span class="old">$32.00</span>
+                                </div>
+                                <button class="cta">Get now</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1481833761820-0509d3217039?auto=format&fit=crop&w=900&q=80" alt="Sora Sushi Lab">
+                        <div class="deal-body">
+                            <h3 class="deal-name">Sora Sushi Lab</h3>
+                            <p class="deal-line">Irvine Blvd | Omakase</p>
+                            <div class="deal-stats">
+                                <span class="score"><i class="fa-solid fa-star"></i>4.9</span>
+                                <span class="sold">2.9 mi | 523 reviews</span>
+                            </div>
+                            <div class="deal-price">
+                                <div>
+                                    <span class="tag">Chef special set</span><br>
+                                    <span class="now">$45.00</span><span class="old">$78.00</span>
+                                </div>
+                                <button class="cta">Get now</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1544148103-0773bf10d330?auto=format&fit=crop&w=900&q=80" alt="Luna Spa">
+                        <div class="deal-body">
+                            <h3 class="deal-name">Luna Spa</h3>
+                            <p class="deal-line">Spectrum South | Wellness</p>
+                            <div class="deal-stats">
+                                <span class="score"><i class="fa-solid fa-star"></i>4.7</span>
+                                <span class="sold">4.1 mi | 189 reviews</span>
+                            </div>
+                            <div class="deal-price">
+                                <div>
+                                    <span class="tag">90-min deep care</span><br>
+                                    <span class="now">$76.00</span><span class="old">$139.00</span>
+                                </div>
+                                <button class="cta">Get now</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?auto=format&fit=crop&w=900&q=80" alt="Harbor Grill">
+                        <div class="deal-body">
+                            <h3 class="deal-name">Harbor Grill</h3>
+                            <p class="deal-line">Newport Coast | Steak</p>
+                            <div class="deal-stats">
+                                <span class="score"><i class="fa-solid fa-star"></i>4.6</span>
+                                <span class="sold">5.0 mi | 330 reviews</span>
+                            </div>
+                            <div class="deal-price">
+                                <div>
+                                    <span class="tag">Date-night set</span><br>
+                                    <span class="now">$58.00</span><span class="old">$108.00</span>
+                                </div>
+                                <button class="cta">Get now</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=900&q=80" alt="Lumiere Bistro">
+                        <div class="deal-body">
+                            <h3 class="deal-name">Lumiere Bistro</h3>
+                            <p class="deal-line">Downtown | French-Italian</p>
+                            <div class="deal-stats">
+                                <span class="score"><i class="fa-solid fa-star"></i>4.9</span>
+                                <span class="sold">6.2 mi | 1,204 reviews</span>
+                            </div>
+                            <div class="deal-price">
+                                <div>
+                                    <span class="tag">3-course dinner</span><br>
+                                    <span class="now">$39.00</span><span class="old">$78.00</span>
+                                </div>
+                                <button class="cta">Get now</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=900&q=80" alt="Gallery Mall Pass">
+                        <div class="deal-body">
+                            <h3 class="deal-name">Gallery Mall Pass</h3>
+                            <p class="deal-line">Fashion Island | Shopping</p>
+                            <div class="deal-stats">
+                                <span class="score"><i class="fa-solid fa-star"></i>4.5</span>
+                                <span class="sold">3.2 mi | 142 reviews</span>
+                            </div>
+                            <div class="deal-price">
+                                <div>
+                                    <span class="tag">Voucher bundle</span><br>
+                                    <span class="now">$15.00</span><span class="old">$25.00</span>
+                                </div>
+                                <button class="cta">Get now</button>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </main>
+
+        <nav class="tab-bar">
+            <div class="tab-item active"><i class="fa-solid fa-house"></i></div>
+            <div class="tab-item"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <div class="tab-item"><i class="fa-solid fa-receipt"></i></div>
+            <div class="tab-item"><i class="fa-regular fa-heart"></i></div>
+            <div class="tab-item"><i class="fa-regular fa-user"></i></div>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        document.querySelectorAll('.seg-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.seg-btn').forEach((b) => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

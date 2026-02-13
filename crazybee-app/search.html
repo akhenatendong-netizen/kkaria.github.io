@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrazyBee - Search</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <main class="page">
+            <header class="top-nav space-12">
+                <div class="row">
+                    <div class="back-icon" data-back><i class="fa-solid fa-arrow-left"></i></div>
+                    <div class="input-shell" style="flex: 1;">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" placeholder="Search sushi, spa, brunch..." value="sushi">
+                        <i class="fa-solid fa-sliders"></i>
+                    </div>
+                </div>
+                <div class="chips">
+                    <button class="chip active">Best Match</button>
+                    <button class="chip">Nearest</button>
+                    <button class="chip">Top Rated</button>
+                    <button class="chip">Lowest Price</button>
+                    <button class="chip">Bookable</button>
+                </div>
+            </header>
+
+            <section class="section">
+                <h3 style="font-size: 13px; font-weight: 800; color: #6b7280; margin-bottom: 10px;">Recent Searches</h3>
+                <div class="chips">
+                    <button class="chip"><i class="fa-regular fa-clock"></i> Omakase</button>
+                    <button class="chip"><i class="fa-regular fa-clock"></i> korean bbq</button>
+                    <button class="chip"><i class="fa-regular fa-clock"></i> facial</button>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="section-head">
+                    <h3 class="title-lg">Results</h3>
+                    <a href="javascript:void(0)">24 items</a>
+                </div>
+
+                <div class="space-12">
+                    <article class="list-item fade-in" data-nav="dealDetail">
+                        <div class="row">
+                            <img class="thumb" src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=500&q=80" alt="sushi set">
+                            <div style="flex:1;" class="space-8">
+                                <h4 style="font-size:16px;font-weight:800;">Mori Omakase for Two</h4>
+                                <p class="meta">Japanese  |  0.6 mi  |  Dine-in</p>
+                                <div class="rating"><i class="fa-solid fa-star"></i><span style="color:#111827;font-weight:800;">4.9</span><span style="color:#9ca3af;">(520)</span></div>
+                                <div class="row" style="justify-content: space-between; align-items: end;">
+                                    <div><span class="price small">$68</span><span class="price-cut">$120</span></div>
+                                    <span class="badge badge-soft">Trending</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="list-item fade-in" data-nav="dealDetail">
+                        <div class="row">
+                            <img class="thumb" src="https://images.unsplash.com/photo-1625944525533-473f1b7d54e7?auto=format&fit=crop&w=500&q=80" alt="ramen">
+                            <div style="flex:1;" class="space-8">
+                                <h4 style="font-size:16px;font-weight:800;">Toshi Ramen Night Combo</h4>
+                                <p class="meta">Ramen  |  1.1 mi  |  15 min away</p>
+                                <div class="rating"><i class="fa-solid fa-star"></i><span style="color:#111827;font-weight:800;">4.7</span><span style="color:#9ca3af;">(369)</span></div>
+                                <div class="row" style="justify-content: space-between; align-items: end;">
+                                    <div><span class="price small">$31</span><span class="price-cut">$58</span></div>
+                                    <span class="badge badge-muted">All-day</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="list-item fade-in" data-nav="restaurantDetail">
+                        <div class="row">
+                            <img class="thumb" src="https://images.unsplash.com/photo-1565299585323-38174c4a6c4b?auto=format&fit=crop&w=500&q=80" alt="fusion food">
+                            <div style="flex:1;" class="space-8">
+                                <h4 style="font-size:16px;font-weight:800;">Yuzu Urban Kitchen</h4>
+                                <p class="meta">Asian Fusion  |  0.7 mi  |  Verified</p>
+                                <div class="rating"><i class="fa-solid fa-star"></i><span style="color:#111827;font-weight:800;">4.8</span><span style="color:#9ca3af;">(982)</span></div>
+                                <div class="row" style="justify-content: space-between; align-items: end;">
+                                    <span class="badge badge-ok">Free cancellation</span>
+                                    <i class="fa-solid fa-chevron-right" style="color:#9ca3af;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </main>
+
+        <nav class="tab-bar">
+            <div class="tab-item"><i class="fa-solid fa-house"></i>Home</div>
+            <div class="tab-item active"><i class="fa-solid fa-magnifying-glass"></i>Search</div>
+            <div class="tab-item"><i class="fa-solid fa-receipt"></i>Orders</div>
+            <div class="tab-item"><i class="fa-regular fa-heart"></i>Saved</div>
+            <div class="tab-item"><i class="fa-regular fa-user"></i>Profile</div>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

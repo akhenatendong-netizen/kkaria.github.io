@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrazyBee - High-Fidelity Prototype Overview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: radial-gradient(circle at 20% -20%, #ffffff 0%, #edf0f5 48%, #e7ebf1 100%);
+            color: #111827;
+        }
+        .phone {
+            width: 393px;
+            height: 852px;
+            border-radius: 42px;
+            background: #000;
+            padding: 8px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, .22);
+            border: 1px solid #d1d5db;
+        }
+        .screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 34px;
+            overflow: hidden;
+            background: #fff;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="max-w-[1700px] mx-auto px-6 py-10">
+        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight">CrazyBee North America Local Deals Prototype</h1>
+        <p class="text-gray-600 mt-3 text-sm md:text-base">Primary color #FF3535 is used only for key actions. Light-gray base, white surfaces, iPhone 15 Pro dimensions.</p>
+
+        <div class="mt-8 grid md:grid-cols-3 gap-4">
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+                <p class="text-xs font-bold text-gray-500">UX Direction</p>
+                <p class="font-bold mt-2">Discover fast, buy confidently, redeem smoothly.</p>
+                <p class="text-sm text-gray-600 mt-2">Home emphasizes nearby and discount density; detail pages emphasize refund validity and booking terms.</p>
+            </div>
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+                <p class="text-xs font-bold text-gray-500">Information Architecture</p>
+                <p class="font-bold mt-2">Home / Search / Detail / Orders / Saved / Profile</p>
+                <p class="text-sm text-gray-600 mt-2">Persistent tab navigation, strong detail to checkout flow, direct access to orders and saved items.</p>
+            </div>
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+                <p class="text-xs font-bold text-gray-500">Visual Strategy</p>
+                <p class="font-bold mt-2">Rounded cards + subtle borders + soft shadows</p>
+                <p class="text-sm text-gray-600 mt-2">Controlled red usage, spacious layout, clear hierarchy, modern iconography and typography.</p>
+            </div>
+        </div>
+
+        <div class="mt-10 grid xl:grid-cols-3 lg:grid-cols-2 gap-x-6 gap-y-10">
+            <div class="text-center"><div class="phone mx-auto"><div class="screen"><iframe src="home.html"></iframe></div></div><p class="font-semibold mt-3">Home</p></div>
+            <div class="text-center"><div class="phone mx-auto"><div class="screen"><iframe src="search.html"></iframe></div></div><p class="font-semibold mt-3">Search</p></div>
+            <div class="text-center"><div class="phone mx-auto"><div class="screen"><iframe src="restaurant-detail.html"></iframe></div></div><p class="font-semibold mt-3">Merchant Detail</p></div>
+            <div class="text-center"><div class="phone mx-auto"><div class="screen"><iframe src="deal-detail.html"></iframe></div></div><p class="font-semibold mt-3">Deal Detail</p></div>
+            <div class="text-center"><div class="phone mx-auto"><div class="screen"><iframe src="orders.html"></iframe></div></div><p class="font-semibold mt-3">Orders</p></div>
+            <div class="text-center"><div class="phone mx-auto"><div class="screen"><iframe src="favorites.html"></iframe></div></div><p class="font-semibold mt-3">Saved</p></div>
+            <div class="text-center"><div class="phone mx-auto"><div class="screen"><iframe src="profile.html"></iframe></div></div><p class="font-semibold mt-3">Profile</p></div>
+        </div>
+    </div>
+</body>
+</html>

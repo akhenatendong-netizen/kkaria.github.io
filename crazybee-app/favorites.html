@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrazyBee - Saved</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <main class="page">
+            <header class="top-nav space-12">
+                <div>
+                    <h1 class="title-xl" style="font-size: 26px;">Saved</h1>
+                </div>
+                <div class="segment two">
+                    <button class="segment-btn active">Deals</button>
+                    <button class="segment-btn">Merchants</button>
+                </div>
+            </header>
+
+            <section class="section">
+                <div class="space-12">
+                    <article class="card fade-in" data-nav="dealDetail">
+                        <div style="position:relative;">
+                            <img class="deal-cover" src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=900&q=80" alt="deal 1">
+                            <button class="favorite-btn action-icon active" style="position:absolute;right:10px;top:10px;"><i class="fa-solid fa-heart" style="color:#ef4444;"></i></button>
+                        </div>
+                        <div class="card-pad space-10">
+                            <div>
+                                <h4 style="font-size: 18px; font-weight: 800;">Harbor Grill Steak Set for Two</h4>
+                                <p class="meta">Fisherman's Wharf  |  1.4 mi</p>
+                            </div>
+                            <div class="row" style="justify-content: space-between;">
+                                <div><span class="price">$58</span><span class="price-cut">$108</span></div>
+                                <button class="btn btn-main" data-nav="dealDetail">Buy Now</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="card fade-in" data-nav="dealDetail">
+                        <div style="position:relative;">
+                            <img class="deal-cover" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=80" alt="deal 2">
+                            <button class="favorite-btn action-icon active" style="position:absolute;right:10px;top:10px;"><i class="fa-solid fa-heart" style="color:#ef4444;"></i></button>
+                        </div>
+                        <div class="card-pad space-10">
+                            <div>
+                                <h4 style="font-size: 18px; font-weight: 800;">Oro Pasta Three-Course Set</h4>
+                                <p class="meta">Mission District  |  0.8 mi</p>
+                            </div>
+                            <div class="row" style="justify-content: space-between;">
+                                <div><span class="price">$33</span><span class="price-cut">$62</span></div>
+                                <button class="btn btn-main" data-nav="dealDetail">Buy Now</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="card fade-in" data-nav="dealDetail">
+                        <div style="position:relative;">
+                            <img class="deal-cover" src="https://images.unsplash.com/photo-1544148103-0773bf10d330?auto=format&fit=crop&w=900&q=80" alt="deal 3">
+                            <button class="favorite-btn action-icon active" style="position:absolute;right:10px;top:10px;"><i class="fa-solid fa-heart" style="color:#ef4444;"></i></button>
+                        </div>
+                        <div class="card-pad space-10">
+                            <div>
+                                <h4 style="font-size: 18px; font-weight: 800;">Luna Spa Deep Care (90 min)</h4>
+                                <p class="meta">Union Square  |  1.0 mi</p>
+                            </div>
+                            <div class="row" style="justify-content: space-between;">
+                                <div><span class="price">$76</span><span class="price-cut">$139</span></div>
+                                <button class="btn btn-main" data-nav="dealDetail">Buy Now</button>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </main>
+
+        <nav class="tab-bar">
+            <div class="tab-item"><i class="fa-solid fa-house"></i>Home</div>
+            <div class="tab-item"><i class="fa-solid fa-magnifying-glass"></i>Search</div>
+            <div class="tab-item"><i class="fa-solid fa-receipt"></i>Orders</div>
+            <div class="tab-item active"><i class="fa-solid fa-heart"></i>Saved</div>
+            <div class="tab-item"><i class="fa-regular fa-user"></i>Profile</div>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

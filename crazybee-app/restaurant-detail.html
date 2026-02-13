@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrazyBee - Merchant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <main class="page">
+            <section style="position: relative;">
+                <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1000&q=80" alt="restaurant interior" style="width:100%;height:254px;object-fit:cover;">
+                <div class="row" style="position:absolute;left:16px;right:16px;top:14px;justify-content:space-between;">
+                    <div class="back-icon" data-back><i class="fa-solid fa-arrow-left"></i></div>
+                    <div class="row">
+                        <div class="action-icon"><i class="fa-solid fa-share-nodes"></i></div>
+                        <div class="action-icon favorite-btn"><i class="fa-regular fa-heart"></i></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" style="margin-top:-24px; position: relative; z-index: 5;">
+                <div class="card" style="border-radius:22px;">
+                    <div class="card-pad space-12">
+                        <div class="space-8">
+                            <h1 class="title-lg" style="font-size: 26px;">Maple Roast Cafe</h1>
+                            <p class="meta">Brunch  |  Coffee  |  Downtown San Francisco</p>
+                            <div class="row" style="justify-content: space-between;">
+                                <div class="rating"><i class="fa-solid fa-star"></i><span style="color:#111827;font-weight:800;">4.8</span><span style="color:#9ca3af;">(1,032)</span></div>
+                                <span class="badge badge-ok">Open Now  |  Until 10:00 PM</span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <button class="btn btn-main" style="flex:1;" data-nav="dealDetail">View Deals</button>
+                            <button class="btn btn-light" style="width: 84px;" data-toast="Directions opened"><i class="fa-solid fa-location-arrow"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="section-head">
+                    <h3 class="title-lg">Merchant Deals</h3>
+                    <a href="javascript:void(0)">2 available</a>
+                </div>
+                <div class="space-12">
+                    <article class="card fade-in" data-nav="dealDetail">
+                        <img class="deal-cover" src="https://images.unsplash.com/photo-1484723091739-30a097e8f929?auto=format&fit=crop&w=900&q=80" alt="brunch set">
+                        <div class="card-pad space-10">
+                            <h4 style="font-size:17px;font-weight:800;">Brunch for Two + Coffee</h4>
+                            <p class="meta">Valid all week  |  Signature French toast + hand drip</p>
+                            <div class="row" style="justify-content: space-between;">
+                                <div><span class="price small">$29</span><span class="price-cut">$54</span></div>
+                                <button class="btn btn-main" data-nav="dealDetail">Get Deal</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="card fade-in" data-nav="dealDetail">
+                        <img class="deal-cover" src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=900&q=80" alt="dessert and coffee">
+                        <div class="card-pad space-10">
+                            <h4 style="font-size:17px;font-weight:800;">Afternoon Tea Dessert Set</h4>
+                            <p class="meta">Available 2:00 PM - 6:00 PM  |  Bookable</p>
+                            <div class="row" style="justify-content: space-between;">
+                                <div><span class="price small">$22</span><span class="price-cut">$39</span></div>
+                                <button class="btn btn-main" data-nav="dealDetail">Get Deal</button>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section class="section">
+                <h3 class="title-lg" style="margin-bottom: 10px;">Reviews</h3>
+                <div class="space-12">
+                    <div class="list-item fade-in space-10">
+                        <div class="row" style="align-items:flex-start;">
+                            <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=120&q=80" alt="user1" style="width:42px;height:42px;border-radius:12px;object-fit:cover;">
+                            <div style="flex:1;" class="space-8">
+                                <div class="row" style="justify-content:space-between;">
+                                    <strong style="font-size:14px;">Olivia M.</strong>
+                                    <span class="note">2 days ago</span>
+                                </div>
+                                <div class="rating"><i class="fa-solid fa-star"></i><span style="color:#111827;font-weight:800;">5.0</span></div>
+                                <p class="meta" style="font-size:13px;line-height:1.5;">Very relaxed vibe, redemption was fast, and staff clearly explained the bundle. Better than expected.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="list-item fade-in space-10">
+                        <div class="row" style="align-items:flex-start;">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80" alt="user2" style="width:42px;height:42px;border-radius:12px;object-fit:cover;">
+                            <div style="flex:1;" class="space-8">
+                                <div class="row" style="justify-content:space-between;">
+                                    <strong style="font-size:14px;">James W.</strong>
+                                    <span class="note">1 week ago</span>
+                                </div>
+                                <div class="rating"><i class="fa-solid fa-star"></i><span style="color:#111827;font-weight:800;">4.7</span></div>
+                                <p class="meta" style="font-size:13px;line-height:1.5;">Great value and good portions. Solid choice if you are new to downtown brunch spots.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <nav class="tab-bar">
+            <div class="tab-item"><i class="fa-solid fa-house"></i>Home</div>
+            <div class="tab-item"><i class="fa-solid fa-magnifying-glass"></i>Search</div>
+            <div class="tab-item"><i class="fa-solid fa-receipt"></i>Orders</div>
+            <div class="tab-item"><i class="fa-regular fa-heart"></i>Saved</div>
+            <div class="tab-item"><i class="fa-regular fa-user"></i>Profile</div>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrazyBee - Orders</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <main class="page">
+            <header class="top-nav space-12">
+                <h1 class="title-xl" style="font-size: 26px;">My Orders</h1>
+                <div class="segment">
+                    <button class="segment-btn active">Active</button>
+                    <button class="segment-btn">Completed</button>
+                    <button class="segment-btn">Expired</button>
+                </div>
+            </header>
+
+            <section class="section">
+                <div class="space-12">
+                    <article class="card card-pad fade-in space-12" data-nav="dealDetail">
+                        <div class="row" style="align-items:flex-start;">
+                            <img class="thumb" src="https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=500&q=80" alt="order1" style="width:82px;height:82px;">
+                            <div class="space-8" style="flex:1;">
+                                <h4 style="font-size:16px;font-weight:800;">Lumiere Bistro Date-Night Set</h4>
+                                <p class="meta">Order #CB220931</p>
+                                <span class="badge badge-ok">Ready to redeem</span>
+                            </div>
+                        </div>
+                        <div class="row" style="justify-content:space-between;">
+                            <div>
+                                <p class="note">Purchased</p>
+                                <p style="font-size:13px;font-weight:700;">Feb 10, 2026  |  8:16 PM</p>
+                            </div>
+                            <div style="text-align:right;">
+                                <p class="note">Paid</p>
+                                <p style="font-size:20px;font-weight:800;">$39</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <button class="btn btn-light" style="flex:1;">View Voucher</button>
+                            <button class="btn btn-main" style="flex:1;" data-toast="Redemption QR opened">Use Now</button>
+                        </div>
+                    </article>
+
+                    <article class="card card-pad fade-in space-12" data-nav="dealDetail">
+                        <div class="row" style="align-items:flex-start;">
+                            <img class="thumb" src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=500&q=80" alt="order2" style="width:82px;height:82px;">
+                            <div class="space-8" style="flex:1;">
+                                <h4 style="font-size:16px;font-weight:800;">Northwell Hot-Stone Therapy Set</h4>
+                                <p class="meta">Order #CB220870</p>
+                                <span class="badge badge-ok">Reschedulable</span>
+                            </div>
+                        </div>
+                        <div class="row" style="justify-content:space-between;">
+                            <div>
+                                <p class="note">Purchased</p>
+                                <p style="font-size:13px;font-weight:700;">Feb 7, 2026  |  2:05 PM</p>
+                            </div>
+                            <div style="text-align:right;">
+                                <p class="note">Paid</p>
+                                <p style="font-size:20px;font-weight:800;">$82</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <button class="btn btn-light" style="flex:1;">Request Refund</button>
+                            <button class="btn btn-main" style="flex:1;" data-toast="Reschedule request sent">Reschedule</button>
+                        </div>
+                    </article>
+
+                    <article class="card card-pad fade-in space-12" data-nav="dealDetail" style="opacity: .8;">
+                        <div class="row" style="align-items:flex-start;">
+                            <img class="thumb" src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=500&q=80" alt="order3" style="width:82px;height:82px;">
+                            <div class="space-8" style="flex:1;">
+                                <h4 style="font-size:16px;font-weight:800;">Sora Sushi Lab for Two</h4>
+                                <p class="meta">Order #CB220655</p>
+                                <span class="badge badge-muted">Completed</span>
+                            </div>
+                        </div>
+                        <div class="row" style="justify-content:space-between;">
+                            <div>
+                                <p class="note">Redeemed</p>
+                                <p style="font-size:13px;font-weight:700;">Jan 26, 2026  |  7:40 PM</p>
+                            </div>
+                            <div style="text-align:right;">
+                                <p class="note">Paid</p>
+                                <p style="font-size:20px;font-weight:800;">$46</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <button class="btn btn-light" style="flex:1;">View Details</button>
+                            <button class="btn btn-light" style="flex:1;" data-toast="Thanks for your feedback">Write Review</button>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </main>
+
+        <nav class="tab-bar">
+            <div class="tab-item"><i class="fa-solid fa-house"></i>Home</div>
+            <div class="tab-item"><i class="fa-solid fa-magnifying-glass"></i>Search</div>
+            <div class="tab-item active"><i class="fa-solid fa-receipt"></i>Orders</div>
+            <div class="tab-item"><i class="fa-regular fa-heart"></i>Saved</div>
+            <div class="tab-item"><i class="fa-regular fa-user"></i>Profile</div>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
