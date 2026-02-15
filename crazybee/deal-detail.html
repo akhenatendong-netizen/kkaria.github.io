@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrazyBee - Deal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .detail-spec {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .detail-spec:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-icon {
+            width: 22px;
+            height: 22px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            border: 0;
+            background: transparent !important;
+            flex-shrink: 0;
+            margin-top: 1px;
+            color: #ff3535 !important;
+        }
+
+        .detail-title {
+            font-size: 15px;
+            font-weight: 800;
+            line-height: 1.25;
+            color: #111827;
+        }
+
+        .detail-text {
+            margin-top: 5px;
+            font-size: 13px;
+            line-height: 1.45;
+            color: #475569;
+        }
+
+        .card,
+        .list-item,
+        .card-pad {
+            background: #fff !important;
+            background-image: none !important;
+        }
+
+        .app,
+        .page,
+        .bottom-cta {
+            background: #f8fafc !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <main class="page with-bottom-cta">
+            <section style="position: relative;">
+                <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1000&q=80" alt="deal food" style="width:100%;height:262px;object-fit:cover;">
+                <div style="position:absolute;left:0;right:0;bottom:0;height:78px;background:linear-gradient(to bottom, rgba(248,250,252,0) 0%, rgba(248,250,252,0.9) 70%, #f8fafc 100%);pointer-events:none;"></div>
+                <div class="row" style="position:absolute;left:16px;right:16px;top:14px;justify-content:space-between;">
+                    <div class="back-icon" data-back><i class="fa-solid fa-arrow-left"></i></div>
+                    <div class="row">
+                        <div class="action-icon"><i class="fa-solid fa-share-nodes"></i></div>
+                        <div class="action-icon favorite-btn"><i class="fa-regular fa-heart"></i></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" style="margin-top:-20px; position: relative; z-index: 3;">
+                <div class="card" style="border-radius:22px;">
+                    <div class="card-pad space-12">
+                        <div class="row" style="justify-content: space-between;">
+                            <span class="badge badge-soft"><i class="fa-solid fa-bolt"></i>48h Flash Deal</span>
+                            <span class="note">2,381 sold</span>
+                        </div>
+
+                        <div class="space-8">
+                            <h1 class="title-lg" style="font-size:25px;">Lumiere Bistro Date-Night Set</h1>
+                            <p class="meta">Starter + main + dessert + one house wine</p>
+                        </div>
+
+                        <div class="row" style="justify-content: space-between; align-items: end;">
+                            <div><span class="price">$39</span><span class="price-cut">$78</span></div>
+                            <span class="badge badge-ok">Free cancellation</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="list-item" data-nav="restaurantDetail">
+                    <div class="row">
+                        <img class="thumb" src="https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=400&q=80" alt="restaurant card" style="width:74px;height:74px;">
+                        <div class="space-8" style="flex:1;">
+                            <h4 style="font-size:16px;font-weight:800;">Lumiere Bistro</h4>
+                            <p class="meta">French-Italian  |  0.9 mi</p>
+                            <div class="rating"><i class="fa-solid fa-star"></i><span style="color:#111827;font-weight:800;">4.9</span><span style="color:#9ca3af;">(1,204)</span></div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right" style="color:#9ca3af;"></i>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h3 class="title-lg" style="margin-bottom: 10px;">Deal Details</h3>
+                <div class="card card-pad">
+                    <div class="detail-spec">
+                        <div class="detail-icon" style="color:#ff3535;">
+                            <i class="fa-regular fa-calendar"></i>
+                        </div>
+                        <div>
+                            <p class="detail-title">Validity</p>
+                            <p class="detail-text">Valid through Mar 31, 2026</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-spec">
+                        <div class="detail-icon" style="color:#ff3535;">
+                            <i class="fa-regular fa-clock"></i>
+                        </div>
+                        <div>
+                            <p class="detail-title">Available Hours</p>
+                            <p class="detail-text">Mon - Sun, 5:30 PM - 10:00 PM</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-spec">
+                        <div class="detail-icon" style="color:#ff3535;">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <div>
+                            <p class="detail-title">Party Size</p>
+                            <p class="detail-text">Package for 2, cannot split</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-spec">
+                        <div class="detail-icon" style="color:#ff3535;">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </div>
+                        <div>
+                            <p class="detail-title">Terms</p>
+                            <p class="detail-text">Not valid on holidays. Reservation required 2 hours in advance.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" style="padding-bottom: 10px;">
+                <h3 class="title-lg" style="margin-bottom: 10px;">Purchase Notes</h3>
+                <div class="card card-pad space-10">
+                    <p class="meta" style="line-height:1.55;">A digital voucher is generated after checkout and can be redeemed in store. If seats are full, you can reschedule or request a refund.</p>
+                </div>
+            </section>
+        </main>
+
+        <div class="bottom-cta">
+            <div class="row" style="justify-content: space-between;">
+                <div>
+                    <p class="note">Final Price</p>
+                    <p style="font-size:24px;font-weight:800;line-height:1;">$39</p>
+                </div>
+                <button class="btn btn-main" style="min-width: 170px;" onclick="window.location.href='orders.html?tab=couponPane'">Buy Now</button>
+            </div>
+        </div>
+
+        <nav class="tab-bar">
+            <div class="tab-item"><i class="fa-solid fa-house"></i></div>
+            <div class="tab-item"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <div class="tab-item"><i class="fa-solid fa-receipt"></i></div>
+            <div class="tab-item"><i class="fa-regular fa-heart"></i></div>
+            <div class="tab-item"><i class="fa-regular fa-user"></i></div>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
