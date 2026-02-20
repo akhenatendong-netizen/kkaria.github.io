@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrazyBee - Notifications</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .notice-card {
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+            padding: 12px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .notice-dot {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            font-size: 14px;
+            color: #fff;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .notice-time {
+            margin-top: 4px;
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .switch-line {
+            margin-top: 14px;
+            padding: 12px;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mini-switch {
+            width: 44px;
+            height: 26px;
+            border-radius: 999px;
+            border: 0;
+            background: #cbd5e1;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .mini-switch::after {
+            content: "";
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #fff;
+            position: absolute;
+            left: 3px;
+            top: 3px;
+            transition: all .2s ease;
+        }
+
+        .mini-switch.active {
+            background: #ef4444;
+        }
+
+        .mini-switch.active::after {
+            left: 21px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <main class="page">
+            <header class="top-nav space-12">
+                <div class="row">
+                    <button class="back-icon" data-back><i class="fa-solid fa-arrow-left"></i></button>
+                    <div>
+                        <h1 class="title-lg">Notifications</h1>
+                        <p class="subtitle">Recent updates from your account</p>
+                    </div>
+                </div>
+                <div class="chips">
+                    <button class="chip active">All</button>
+                    <button class="chip">Orders</button>
+                    <button class="chip">Promotions</button>
+                    <button class="chip">System</button>
+                </div>
+            </header>
+
+            <section class="section space-12">
+                <article class="notice-card fade-in" data-nav="orderConfirmation">
+                    <div class="notice-dot" style="background:#16a34a;"><i class="fa-solid fa-circle-check"></i></div>
+                    <div style="flex:1;">
+                        <h3 style="font-size:14px;font-weight:800;">Voucher ready to use</h3>
+                        <p class="meta">Golden Spoon Bistro order is confirmed. Tap to open your code.</p>
+                        <p class="notice-time">Today · 09:21 AM</p>
+                    </div>
+                </article>
+
+                <article class="notice-card fade-in" data-nav="coupons">
+                    <div class="notice-dot" style="background:#ef4444;"><i class="fa-solid fa-ticket"></i></div>
+                    <div style="flex:1;">
+                        <h3 style="font-size:14px;font-weight:800;">New coupon unlocked</h3>
+                        <p class="meta">You got a $15 dining coupon. Expires in 2 days.</p>
+                        <p class="notice-time">Today · 08:02 AM</p>
+                    </div>
+                </article>
+
+                <article class="notice-card fade-in" data-nav="rewards">
+                    <div class="notice-dot" style="background:#f59e0b;"><i class="fa-solid fa-coins"></i></div>
+                    <div style="flex:1;">
+                        <h3 style="font-size:14px;font-weight:800;">Points updated</h3>
+                        <p class="meta">+120 points from your latest order. Redeem now in rewards.</p>
+                        <p class="notice-time">Yesterday · 07:38 PM</p>
+                    </div>
+                </article>
+
+                <div class="switch-line fade-in">
+                    <div>
+                        <h4 style="font-size:14px;font-weight:800;">Promotion Push</h4>
+                        <p class="meta">Receive flash deals and limited-time discounts</p>
+                    </div>
+                    <button class="mini-switch active" data-toggle-target="#promoTarget" data-toast="Notification setting saved"></button>
+                    <div id="promoTarget" class="active" style="display:none;"></div>
+                </div>
+            </section>
+        </main>
+
+        <nav class="tab-bar">
+            <div class="tab-item"><i class="fa-solid fa-house"></i></div>
+            <div class="tab-item"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <div class="tab-item"><i class="fa-solid fa-receipt"></i></div>
+            <div class="tab-item"><i class="fa-regular fa-heart"></i></div>
+            <div class="tab-item active"><i class="fa-solid fa-user"></i></div>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

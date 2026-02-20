@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrazyBee - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body,
+        .app,
+        .page {
+            background: #fff !important;
+        }
+
+        .page {
+            padding: 54px 18px 98px;
+            height: calc(100% - 44px);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            background:
+                radial-gradient(240px 150px at 8% 6%, rgba(255, 203, 214, 0.55) 0%, rgba(255, 203, 214, 0) 72%),
+                radial-gradient(220px 160px at 88% 12%, rgba(255, 234, 196, 0.48) 0%, rgba(255, 234, 196, 0) 72%),
+                radial-gradient(220px 140px at 62% 30%, rgba(194, 243, 233, 0.35) 0%, rgba(194, 243, 233, 0) 74%),
+                linear-gradient(180deg, #fff7fb 0%, #fff6f3 18%, #f7fbff 34%, #f7fffc 48%, #ffffff 62%, #ffffff 100%) !important;
+        }
+
+        .auth-head {
+            margin-top: 0;
+            padding: 12px 2px;
+            background: transparent;
+            border: 0;
+            border-radius: 0;
+        }
+
+        .auth-head .title-lg {
+            color: #1f2937;
+            text-shadow: none;
+            font-weight: 700;
+        }
+
+        .auth-head .subtitle {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .auth-tabs {
+            margin-top: 16px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 3px;
+            gap: 4px;
+            border: 0;
+        }
+
+        .auth-tab {
+            border: 0;
+            background: transparent;
+            border-radius: 10px;
+            color: #6b7280;
+            font-size: 13px;
+            font-weight: 600;
+            height: 34px;
+            cursor: pointer;
+        }
+
+        .auth-tab.active {
+            background: #fff;
+            color: #111827;
+            box-shadow: 0 3px 8px rgba(15, 23, 42, 0.08);
+            border: 0;
+        }
+
+        .auth-pane {
+            display: none;
+            margin-top: 24px;
+        }
+
+        .auth-pane.active {
+            display: block;
+        }
+
+        .auth-body {
+            margin-top: 42px;
+        }
+
+        .field {
+            margin-top: 16px;
+            border-radius: 12px;
+            border: 0;
+            background: #f3f4f6;
+            padding: 11px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: none;
+        }
+
+        .auth-pane .field:first-child {
+            margin-top: 0;
+        }
+
+        .auth-pane .btn-main {
+            margin-top: 24px !important;
+        }
+
+        .field input {
+            width: 100%;
+            min-width: 0;
+            border: 0;
+            outline: 0;
+            font-size: 14px;
+            font-weight: 400;
+            color: #475569;
+            background: transparent;
+        }
+
+        .field input::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        .field i {
+            color: #94a3b8;
+        }
+
+        .tiny-action {
+            border: 0;
+            background: transparent;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            flex-shrink: 0;
+            min-width: 42px;
+            text-align: right;
+        }
+
+        .social-grid {
+            margin-top: 22px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .social-btn {
+            border: 0;
+            border-radius: 12px;
+            background: #fff;
+            height: 42px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #1f2937;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+        }
+
+        .auth-foot {
+            margin-top: 22px;
+            text-align: center;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .auth-foot button {
+            border: 0;
+            background: transparent;
+            color: #ef4444;
+            font-weight: 700;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <main class="page">
+            <section class="auth-head fade-in">
+                <h1 class="title-lg" style="font-size:28px;">Welcome Back</h1>
+                <p class="subtitle">Login to track coupons, rewards and real-time order updates.</p>
+            </section>
+
+            <section class="fade-in auth-body">
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-auth-pane="phonePane">Phone</button>
+                    <button class="auth-tab" data-auth-pane="emailPane">Email</button>
+                </div>
+
+                <div id="phonePane" class="auth-pane active">
+                    <div class="field"><i class="fa-solid fa-phone"></i><input type="text" placeholder="Phone number"></div>
+                    <div class="field"><i class="fa-solid fa-shield-halved"></i><input type="text" placeholder="Verification code"><button class="tiny-action" data-toast="Code sent">Send</button></div>
+                    <button class="btn btn-main" style="width:100%;" data-nav="home">Continue</button>
+                </div>
+
+                <div id="emailPane" class="auth-pane">
+                    <div class="field"><i class="fa-regular fa-envelope"></i><input type="email" placeholder="Email address"></div>
+                    <div class="field"><i class="fa-solid fa-lock"></i><input id="pwdInput" type="password" placeholder="Password"><button class="tiny-action" id="togglePwd">Show</button></div>
+                    <button class="btn btn-main" style="width:100%;" data-nav="home">Sign In</button>
+                </div>
+
+                <div class="social-grid">
+                    <button class="social-btn" data-toast="Google login connected"><i class="fa-brands fa-google"></i>Google</button>
+                    <button class="social-btn" data-toast="Apple login connected"><i class="fa-brands fa-apple"></i>Apple</button>
+                </div>
+
+                <div class="auth-foot">
+                    <span>New here?</span>
+                    <button data-toast="Registration flow opened">Create account</button>
+                    <span> · </span>
+                    <button data-nav="home">Skip for now</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        const authTabs = document.querySelectorAll('.auth-tab');
+        authTabs.forEach((tab) => {
+            tab.addEventListener('click', () => {
+                authTabs.forEach((t) => t.classList.remove('active'));
+                tab.classList.add('active');
+                const pane = tab.dataset.authPane;
+                document.querySelectorAll('.auth-pane').forEach((item) => item.classList.remove('active'));
+                const target = document.getElementById(pane);
+                if (target) target.classList.add('active');
+            });
+        });
+
+        const togglePwd = document.getElementById('togglePwd');
+        const pwdInput = document.getElementById('pwdInput');
+        if (togglePwd && pwdInput) {
+            togglePwd.addEventListener('click', () => {
+                const asText = pwdInput.type === 'password';
+                pwdInput.type = asText ? 'text' : 'password';
+                togglePwd.textContent = asText ? 'Hide' : 'Show';
+            });
+        }
+    </script>
+</body>
+</html>

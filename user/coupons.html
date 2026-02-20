@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrazyBee - Coupons</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .coupon-filters {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 2px;
+            margin-top: 12px;
+            justify-content: flex-start;
+        }
+
+        .coupon-filters::-webkit-scrollbar { display: none; }
+
+        .coupon-filter {
+            border: 0;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 8px 10px;
+            white-space: nowrap;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .coupon-filter.active {
+            background: #ffe8e8;
+            color: #ef4444;
+        }
+
+        .coupon-card {
+            border-radius: 16px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+            border: 1px solid #f1f5f9;
+        }
+
+        .coupon-card.hidden {
+            display: none;
+        }
+
+        .coupon-main {
+            padding: 14px;
+            display: grid;
+            grid-template-columns: 92px 1fr auto;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .coupon-price {
+            font-size: 28px;
+            font-weight: 800;
+            color: #ef4444;
+            line-height: 1;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding-left: 6px;
+            white-space: nowrap;
+        }
+
+        .coupon-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            border-radius: 999px;
+            background: #fff1f2;
+            color: #e11d48;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 8px;
+        }
+
+        .coupon-meta {
+            color: #64748b;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .coupon-action {
+            border: 0;
+            border-radius: 10px;
+            padding: 9px 12px;
+            background: #111827;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .coupon-bottom {
+            border-top: 1px dashed #e2e8f0;
+            padding: 9px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .copy-btn-mini {
+            border: 0;
+            background: transparent;
+            color: #ef4444;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .back-icon {
+            border: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            width: 30px;
+            height: 30px;
+            border-radius: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <main class="page">
+            <header class="top-nav space-12">
+                <div class="row">
+                    <button class="back-icon" data-back><i class="fa-solid fa-arrow-left"></i></button>
+                    <div>
+                        <h1 class="title-lg">My Coupons</h1>
+                        <p id="couponCount" class="subtitle" style="margin-top:2px;">5 available</p>
+                    </div>
+                </div>
+                <div class="coupon-filters">
+                    <button class="coupon-filter active" data-filter="all">All</button>
+                    <button class="coupon-filter" data-filter="spend">Spend & Save</button>
+                    <button class="coupon-filter" data-filter="dish">Dish Discount</button>
+                    <button class="coupon-filter" data-filter="free">Free Dish</button>
+                    <button class="coupon-filter" data-filter="bogo">BOGO</button>
+                </div>
+            </header>
+
+            <section class="section space-12">
+                <article class="coupon-card fade-in" data-type="spend">
+                    <div class="coupon-main">
+                        <div class="coupon-price">$12</div>
+                        <div>
+                            <span class="coupon-type"><i class="fa-solid fa-tag"></i>Spend & Save</span>
+                            <h3 style="font-size:15px;font-weight:800;margin-top:6px;">$12 Off on $40+</h3>
+                        </div>
+                        <button class="coupon-action" data-nav="search">Use</button>
+                    </div>
+                    <div class="coupon-bottom">
+                        <span>Expires in 2 days</span>
+                        <button class="copy-btn-mini" data-copy="BEE-MJ-12" data-toast="Code copied">Copy code</button>
+                    </div>
+                </article>
+
+                <article class="coupon-card fade-in" data-type="dish">
+                    <div class="coupon-main">
+                        <div class="coupon-price">30%</div>
+                        <div>
+                            <span class="coupon-type"><i class="fa-solid fa-utensils"></i>Dish Discount</span>
+                            <h3 style="font-size:15px;font-weight:800;margin-top:6px;">Signature Sushi Platter</h3>
+                        </div>
+                        <button class="coupon-action" data-nav="home">Browse</button>
+                    </div>
+                    <div class="coupon-bottom">
+                        <span>Expires Feb 28, 2026</span>
+                        <span>1 per day</span>
+                    </div>
+                </article>
+
+                <article class="coupon-card fade-in" data-type="free">
+                    <div class="coupon-main">
+                        <div class="coupon-price">FREE</div>
+                        <div>
+                            <span class="coupon-type"><i class="fa-solid fa-gift"></i>Free Dish</span>
+                            <h3 style="font-size:15px;font-weight:800;margin-top:6px;">Free Fried Chicken Platter</h3>
+                        </div>
+                        <button class="coupon-action" data-nav="search">Explore</button>
+                    </div>
+                    <div class="coupon-bottom">
+                        <span>Need min spend $58</span>
+                        <span>Auto applied</span>
+                    </div>
+                </article>
+
+                <article class="coupon-card fade-in" data-type="bogo">
+                    <div class="coupon-main">
+                        <div class="coupon-price">1+1</div>
+                        <div>
+                            <span class="coupon-type"><i class="fa-solid fa-people-arrows"></i>Buy 1 Get 1</span>
+                            <h3 style="font-size:15px;font-weight:800;margin-top:6px;">Coffee BOGO</h3>
+                        </div>
+                        <button class="coupon-action" data-nav="search">Use</button>
+                    </div>
+                    <div class="coupon-bottom">
+                        <span>Limited to 120 uses/day</span>
+                        <span>Weekday only</span>
+                    </div>
+                </article>
+
+                <article class="coupon-card fade-in" data-type="setmenu">
+                    <div class="coupon-main">
+                        <div class="coupon-price">$39</div>
+                        <div>
+                            <span class="coupon-type"><i class="fa-solid fa-bowl-food"></i>Set Menu</span>
+                            <h3 style="font-size:15px;font-weight:800;margin-top:6px;">2-Person Set Menu</h3>
+                        </div>
+                        <button class="coupon-action" data-nav="home">Pick</button>
+                    </div>
+                    <div class="coupon-bottom">
+                        <span>Book 1 day in advance</span>
+                        <span>Refundable</span>
+                    </div>
+                </article>
+            </section>
+        </main>
+
+        <nav class="tab-bar">
+            <div class="tab-item"><i class="fa-solid fa-house"></i></div>
+            <div class="tab-item"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <div class="tab-item"><i class="fa-solid fa-receipt"></i></div>
+            <div class="tab-item"><i class="fa-regular fa-heart"></i></div>
+            <div class="tab-item active"><i class="fa-solid fa-user"></i></div>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        const couponCards = Array.from(document.querySelectorAll('.coupon-card'));
+        const couponCount = document.getElementById('couponCount');
+
+        function applyCouponFilter(filter) {
+            let shown = 0;
+            couponCards.forEach((card) => {
+                const show = filter === 'all' || card.dataset.type === filter;
+                card.classList.toggle('hidden', !show);
+                if (show) shown += 1;
+            });
+            if (couponCount) {
+                couponCount.textContent = `${shown} available`;
+            }
+        }
+
+        document.querySelectorAll('.coupon-filter').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.coupon-filter').forEach((el) => el.classList.remove('active'));
+                btn.classList.add('active');
+                applyCouponFilter(btn.dataset.filter || 'all');
+            });
+        });
+    </script>
+</body>
+</html>

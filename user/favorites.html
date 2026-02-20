@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrazyBee - Saved</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .saved-tabs {
+            margin-top: 16px;
+            display: flex;
+            gap: 24px;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 2px;
+        }
+
+        .saved-tabs::-webkit-scrollbar { display: none; }
+
+        .saved-tab {
+            border: 0;
+            background: transparent;
+            color: #6b7280;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 0 0 8px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .saved-tab.active { color: #111827; }
+
+        .saved-tab.active::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 3px;
+            border-radius: 999px;
+            background: #ff3535;
+        }
+
+        .tab-item.active {
+            color: #ff6d84;
+        }
+
+        .price {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: #0f172a;
+        }
+
+        .price-cut {
+            font-size: 11px;
+            color: #9ca3af;
+            font-weight: 500;
+        }
+
+        .saved-pane {
+            display: none;
+        }
+
+        .saved-pane.active {
+            display: block;
+        }
+
+        .merchant-card {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding: 14px;
+            border-radius: 18px;
+            background: #fff;
+            box-shadow: 0 8px 24px rgba(17, 24, 39, 0.07);
+        }
+
+        .merchant-logo {
+            width: 62px;
+            height: 62px;
+            border-radius: 16px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .merchant-name {
+            font-size: 17px;
+            font-weight: 800;
+            line-height: 1.2;
+            color: #111827;
+        }
+
+        .merchant-meta {
+            margin-top: 3px;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .merchant-follow {
+            border: 0;
+            border-radius: 999px;
+            background: #ff3535;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 7px 12px;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <main class="page">
+            <header class="top-nav space-12">
+                <div>
+                    <h1 class="title-xl" style="font-size: 26px; font-weight: 700;">Saved</h1>
+                </div>
+                <div class="saved-tabs">
+                    <button class="saved-tab active">Deals</button>
+                    <button class="saved-tab">Merchants</button>
+                </div>
+            </header>
+
+            <section id="savedDeals" class="section saved-pane active">
+                <div class="space-12">
+                    <article class="card fade-in" data-nav="dealDetail">
+                        <div style="position:relative;">
+                            <img class="deal-cover" src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=900&q=80" alt="deal 1">
+                            <button class="favorite-btn action-icon active" style="position:absolute;right:10px;top:10px;"><i class="fa-solid fa-heart" style="color:#ef4444;"></i></button>
+                        </div>
+                        <div class="card-pad space-10">
+                            <div>
+                                <h4 style="font-size: 18px; font-weight: 800;">Harbor Grill Steak Set for Two</h4>
+                                <p class="meta">Fisherman's Wharf  |  1.4 mi</p>
+                            </div>
+                            <div class="row" style="justify-content: space-between;">
+                                <div><span class="price">$58</span><span class="price-cut">$108</span></div>
+                                <button class="btn btn-main" data-nav="dealDetail">Buy Now</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="card fade-in" data-nav="dealDetail">
+                        <div style="position:relative;">
+                            <img class="deal-cover" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=80" alt="deal 2">
+                            <button class="favorite-btn action-icon active" style="position:absolute;right:10px;top:10px;"><i class="fa-solid fa-heart" style="color:#ef4444;"></i></button>
+                        </div>
+                        <div class="card-pad space-10">
+                            <div>
+                                <h4 style="font-size: 18px; font-weight: 800;">Oro Pasta Three-Course Set</h4>
+                                <p class="meta">Mission District  |  0.8 mi</p>
+                            </div>
+                            <div class="row" style="justify-content: space-between;">
+                                <div><span class="price">$33</span><span class="price-cut">$62</span></div>
+                                <button class="btn btn-main" data-nav="dealDetail">Buy Now</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="card fade-in" data-nav="dealDetail">
+                        <div style="position:relative;">
+                            <img class="deal-cover" src="https://images.unsplash.com/photo-1544148103-0773bf10d330?auto=format&fit=crop&w=900&q=80" alt="deal 3">
+                            <button class="favorite-btn action-icon active" style="position:absolute;right:10px;top:10px;"><i class="fa-solid fa-heart" style="color:#ef4444;"></i></button>
+                        </div>
+                        <div class="card-pad space-10">
+                            <div>
+                                <h4 style="font-size: 18px; font-weight: 800;">Luna Spa Deep Care (90 min)</h4>
+                                <p class="meta">Union Square  |  1.0 mi</p>
+                            </div>
+                            <div class="row" style="justify-content: space-between;">
+                                <div><span class="price">$76</span><span class="price-cut">$139</span></div>
+                                <button class="btn btn-main" data-nav="dealDetail">Buy Now</button>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section id="savedMerchants" class="section saved-pane">
+                <div class="space-12">
+                    <article class="merchant-card fade-in" data-nav="restaurantDetail">
+                        <img class="merchant-logo" src="https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=300&q=80" alt="Din Tai Fung">
+                        <div style="flex:1;">
+                            <h4 class="merchant-name">Din Tai Fung</h4>
+                            <p class="merchant-meta">South Coast Plaza  |  Chinese</p>
+                            <p class="merchant-meta">4.8  |  384 reviews  |  6 saved deals</p>
+                        </div>
+                        <button class="merchant-follow" data-toast="Following Din Tai Fung">Follow</button>
+                    </article>
+
+                    <article class="merchant-card fade-in" data-nav="restaurantDetail">
+                        <img class="merchant-logo" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=300&q=80" alt="Cafe Loft">
+                        <div style="flex:1;">
+                            <h4 class="merchant-name">Cafe Loft</h4>
+                            <p class="merchant-meta">Irvine Spectrum  |  Contemporary</p>
+                            <p class="merchant-meta">4.7  |  216 reviews  |  4 saved deals</p>
+                        </div>
+                        <button class="merchant-follow" data-toast="Following Cafe Loft">Follow</button>
+                    </article>
+
+                    <article class="merchant-card fade-in" data-nav="restaurantDetail">
+                        <img class="merchant-logo" src="https://images.unsplash.com/photo-1528712306091-ed0763094c98?auto=format&fit=crop&w=300&q=80" alt="Master Hu Noodles">
+                        <div style="flex:1;">
+                            <h4 class="merchant-name">Master Hu Noodles</h4>
+                            <p class="merchant-meta">Diamond Jamboree  |  Noodles</p>
+                            <p class="merchant-meta">4.6  |  509 reviews  |  3 saved deals</p>
+                        </div>
+                        <button class="merchant-follow" data-toast="Following Master Hu Noodles">Follow</button>
+                    </article>
+
+                    <article class="merchant-card fade-in" data-nav="restaurantDetail">
+                        <img class="merchant-logo" src="https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=300&q=80" alt="Lumiere Bistro">
+                        <div style="flex:1;">
+                            <h4 class="merchant-name">Lumiere Bistro</h4>
+                            <p class="merchant-meta">Downtown  |  Bistro</p>
+                            <p class="merchant-meta">4.9  |  1,204 reviews  |  2 saved deals</p>
+                        </div>
+                        <button class="merchant-follow" data-toast="Following Lumiere Bistro">Follow</button>
+                    </article>
+                </div>
+            </section>
+        </main>
+
+        <nav class="tab-bar">
+            <div class="tab-item"><i class="fa-solid fa-house"></i></div>
+            <div class="tab-item"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <div class="tab-item"><i class="fa-solid fa-receipt"></i></div>
+            <div class="tab-item active"><i class="fa-solid fa-heart"></i></div>
+            <div class="tab-item"><i class="fa-regular fa-user"></i></div>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        const savedDeals = document.getElementById('savedDeals');
+        const savedMerchants = document.getElementById('savedMerchants');
+
+        document.querySelectorAll('.saved-tab').forEach((tab) => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.saved-tab').forEach((t) => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                const key = tab.textContent.trim().toLowerCase();
+                if (savedDeals && savedMerchants) {
+                    const showMerchants = key === 'merchants';
+                    savedDeals.classList.toggle('active', !showMerchants);
+                    savedMerchants.classList.toggle('active', showMerchants);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

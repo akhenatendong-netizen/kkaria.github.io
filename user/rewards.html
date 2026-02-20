@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrazyBee - Rewards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .points-head {
+            border-radius: 18px;
+            background: linear-gradient(120deg, #111827 0%, #1f2937 65%, #374151 100%);
+            color: #fff;
+            padding: 16px;
+        }
+
+        .points-num {
+            font-size: 34px;
+            font-weight: 800;
+            line-height: 1;
+            margin-top: 6px;
+        }
+
+        .reward-item {
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.07);
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .reward-cta {
+            border: 0;
+            border-radius: 10px;
+            background: #ef4444;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 8px 12px;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <main class="page">
+            <header class="top-nav space-12">
+                <div class="row">
+                    <button class="back-icon" data-back><i class="fa-solid fa-arrow-left"></i></button>
+                    <div>
+                        <h1 class="title-lg">Rewards</h1>
+                        <p class="subtitle">Redeem points for instant perks</p>
+                    </div>
+                </div>
+            </header>
+
+            <section class="section space-12">
+                <div class="points-head fade-in">
+                    <p style="font-size:12px;color:rgba(255,255,255,0.74);">Available points</p>
+                    <p class="points-num">3,280</p>
+                    <p style="font-size:12px;color:rgba(255,255,255,0.78);margin-top:8px;">Platinum tier · Next level in 720 points</p>
+                </div>
+
+                <article class="reward-item fade-in">
+                    <div>
+                        <h3 style="font-size:15px;font-weight:800;">$10 Coupon</h3>
+                        <p class="meta">Requires 1,200 points</p>
+                    </div>
+                    <button class="reward-cta" data-toast="Redeemed $10 Coupon">Redeem</button>
+                </article>
+
+                <article class="reward-item fade-in">
+                    <div>
+                        <h3 style="font-size:15px;font-weight:800;">Free Delivery Pass (7 days)</h3>
+                        <p class="meta">Requires 800 points</p>
+                    </div>
+                    <button class="reward-cta" data-toast="Delivery pass redeemed">Redeem</button>
+                </article>
+
+                <article class="reward-item fade-in">
+                    <div>
+                        <h3 style="font-size:15px;font-weight:800;">Priority Support Badge</h3>
+                        <p class="meta">Requires 600 points</p>
+                    </div>
+                    <button class="reward-cta" data-toast="Support badge activated">Redeem</button>
+                </article>
+            </section>
+        </main>
+
+        <nav class="tab-bar">
+            <div class="tab-item"><i class="fa-solid fa-house"></i></div>
+            <div class="tab-item"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <div class="tab-item"><i class="fa-solid fa-receipt"></i></div>
+            <div class="tab-item"><i class="fa-regular fa-heart"></i></div>
+            <div class="tab-item active"><i class="fa-solid fa-user"></i></div>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrazyBee - Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body,
+        .status-bar,
+        .home-nav,
+        .tab-bar {
+            background: #fff !important;
+        }
+
+        .app,
+        .page {
+            background:
+                radial-gradient(260px 180px at 50% 34%, rgba(255, 116, 116, 0.1) 0%, rgba(255, 116, 116, 0) 72%),
+                linear-gradient(180deg, #ffffff 0%, #ffffff 18%, #fff6f6 56%, #ffffff 100%) !important;
+        }
+
+        .home-content {
+            background: #fff !important;
+            padding: 10px 12px 8px;
+        }
+
+        .home-nav {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: #fff;
+            border-bottom: 1px solid #edf0f3;
+            padding: 10px 12px 8px;
+        }
+
+        .search-row {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .city-trigger {
+            height: 34px;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            padding: 0 2px 0 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 800;
+            color: #111827;
+            cursor: pointer;
+        }
+
+        .search-trigger {
+            height: 32px;
+            border: 0;
+            border-radius: 10px;
+            background: #f4f6fa;
+            padding: 0 11px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #9ca3af;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .segment-wrap {
+            margin-top: 10px;
+            display: flex;
+            gap: 26px;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 2px;
+        }
+
+        .segment-wrap::-webkit-scrollbar { display: none; }
+
+        .seg-btn {
+            border: 0;
+            background: transparent;
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 0 0 8px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .seg-btn.active { color: #111827; }
+
+        .seg-btn.active::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 3px;
+            border-radius: 999px;
+            background: #ff3535;
+        }
+
+        .coupon-type-strip {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 2px 0 10px;
+            margin: 0;
+        }
+
+        .coupon-type-strip::-webkit-scrollbar { display: none; }
+
+        .coupon-pill {
+            border: 0;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 8px 10px;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .coupon-pill.active {
+            background: #ffe8e8;
+            color: #ef4444;
+        }
+
+        .feed-title {
+            margin: 14px 2px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .feed-title h3 {
+            font-size: 13px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .feed-title span {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 700;
+        }
+
+        .mixed-feed {
+            column-count: 2;
+            column-gap: 10px;
+        }
+
+        .mixed-feed > article {
+            break-inside: avoid;
+            -webkit-column-break-inside: avoid;
+            margin-bottom: 10px;
+            width: 100%;
+            display: inline-block;
+        }
+
+        .card-hidden {
+            display: none !important;
+        }
+
+        .feed-actions {
+            margin-top: 6px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .load-more {
+            border: 0;
+            border-radius: 999px;
+            background: #111827;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 8px 14px;
+            cursor: pointer;
+        }
+
+        .empty-feed {
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.07);
+            padding: 16px 14px;
+            text-align: center;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .restaurant-card,
+        .deal-card {
+            border: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.07);
+            cursor: pointer;
+        }
+
+        .restaurant-card img,
+        .deal-card img {
+            width: 100%;
+            height: 156px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .restaurant-card {
+            align-self: start;
+            height: auto;
+        }
+
+        .restaurant-body,
+        .deal-body {
+            padding: 8px;
+        }
+
+        .restaurant-name,
+        .deal-name {
+            font-size: 12px;
+            font-weight: 800;
+            color: #111827;
+            line-height: 1.2;
+        }
+
+        .restaurant-meta,
+        .deal-line {
+            margin-top: 4px;
+            font-size: 10px;
+            color: #64748b;
+        }
+
+        .deal-stats {
+            margin-top: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 9px;
+        }
+
+        .score { color: #111827; font-weight: 700; }
+        .score i { color: #f59e0b; margin-right: 3px; }
+        .sold { color: #9ca3af; }
+
+        .tag {
+            display: inline-block;
+            background: #f1f5f9;
+            color: #475569;
+            border-radius: 999px;
+            font-size: 8px;
+            font-weight: 700;
+            padding: 2px 6px;
+            margin-top: 6px;
+            line-height: 1.15;
+            white-space: nowrap;
+            max-width: 130px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .deal-price {
+            margin-top: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 6px;
+        }
+
+        .deal-price > div {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .now {
+            color: #ef4444;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .old {
+            color: #9ca3af;
+            font-size: 8px;
+            text-decoration: line-through;
+            margin-left: 3px;
+        }
+
+        .cta {
+            border: 0;
+            border-radius: 5px;
+            background: #ff3535;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 8px;
+            min-width: 58px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <main class="page">
+            <header class="home-nav">
+                <div class="search-row">
+                    <button class="city-trigger" data-toast="Location switcher opened">Irvine <i class="fa-solid fa-chevron-down" style="font-size:10px;color:#6b7280;"></i></button>
+                    <div class="search-trigger" data-nav="search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <span>What's the deal today?</span>
+                    </div>
+                </div>
+
+                <div class="segment-wrap">
+                    <button class="seg-btn active">Top Picks</button>
+                    <button class="seg-btn">Best Value</button>
+                    <button class="seg-btn">Nearby</button>
+                </div>
+            </header>
+
+            <section class="home-content">
+                <div class="coupon-type-strip fade-in">
+                    <button class="coupon-pill active">All</button>
+                    <button class="coupon-pill">Spend & Save</button>
+                    <button class="coupon-pill">Dish Discount</button>
+                    <button class="coupon-pill">Free Dish</button>
+                    <button class="coupon-pill">Buy 1 Get 1</button>
+                    <button class="coupon-pill">Set Menu</button>
+                </div>
+
+                <div class="mixed-feed">
+                    <article class="restaurant-card fade-in" data-nav="restaurantDetail">
+                        <img src="https://images.unsplash.com/photo-1481833761820-0509d3217039?auto=format&fit=crop&w=900&q=80" alt="Sora Sushi Lab">
+                        <div class="restaurant-body">
+                            <h4 class="restaurant-name">Sora Sushi Lab</h4>
+                            <p class="restaurant-meta">4.9★ · 2.9 mi · Avg $46</p>
+                            <span class="tag">Dish Discount | Sushi Platter 30% Off</span>
+                        </div>
+                    </article>
+
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=900&q=80" alt="Golden Spoon Bistro">
+                        <div class="deal-body">
+                            <h3 class="deal-name">Golden Spoon Bistro</h3>
+                            <p class="deal-line">South Coast Plaza, Costa Mesa</p>
+                            <div class="deal-stats"><span class="score"><i class="fa-solid fa-star"></i>4.8</span><span class="sold">2.4 mi | 384 reviews</span></div>
+                            <span class="tag" style="margin-top:4px;">Set Menu | 2-Person Dinner</span>
+                            <div class="deal-price"><div><span class="now">$39</span><span class="old">$78</span></div><button class="cta">Get</button></div>
+                        </div>
+                    </article>
+
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80" alt="Cafe Loft">
+                        <div class="deal-body">
+                            <h3 class="deal-name">Cafe Loft</h3>
+                            <p class="deal-line">Irvine Spectrum Center</p>
+                            <div class="deal-stats"><span class="score"><i class="fa-solid fa-star"></i>4.7</span><span class="sold">1.0 mi | 216 reviews</span></div>
+                            <span class="tag" style="margin-top:4px;">BOGO | Coffee Hours</span>
+                            <div class="deal-price"><div><span class="now">$28</span><span class="old">$49</span></div><button class="cta">Get</button></div>
+                        </div>
+                    </article>
+
+                    <article class="restaurant-card fade-in" data-nav="restaurantDetail">
+                        <img src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=900&q=80" alt="Spicy House">
+                        <div class="restaurant-body">
+                            <h4 class="restaurant-name">Spicy House</h4>
+                            <p class="restaurant-meta">4.5★ · 2.1 mi · Avg $28</p>
+                            <span class="tag">Free Dish | Spend $58 to unlock</span>
+                        </div>
+                    </article>
+
+                    <article class="restaurant-card fade-in" data-nav="restaurantDetail">
+                        <img src="https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=900&q=80" alt="Lumiere Bistro">
+                        <div class="restaurant-body">
+                            <h4 class="restaurant-name">Lumiere Bistro</h4>
+                            <p class="restaurant-meta">4.9★ · 6.2 mi · Avg $52</p>
+                            <span class="tag">Set Menu | Date Night Bundle</span>
+                        </div>
+                    </article>
+
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1528712306091-ed0763094c98?auto=format&fit=crop&w=900&q=80" alt="Master Hu Noodles">
+                        <div class="deal-body">
+                            <h3 class="deal-name">Master Hu Noodles</h3>
+                            <p class="deal-line">Diamond Jamboree Plaza</p>
+                            <div class="deal-stats"><span class="score"><i class="fa-solid fa-star"></i>4.6</span><span class="sold">3.6 mi | 509 reviews</span></div>
+                            <span class="tag" style="margin-top:4px;">Spend & Save | $12 Off</span>
+                            <div class="deal-price"><div><span class="now">$12</span><span class="old">$21</span></div><button class="cta">Get</button></div>
+                        </div>
+                    </article>
+
+                    <article class="restaurant-card fade-in" data-nav="restaurantDetail">
+                        <img src="https://images.unsplash.com/photo-1544148103-0773bf10d330?auto=format&fit=crop&w=900&q=80" alt="Luna Bistro">
+                        <div class="restaurant-body">
+                            <h4 class="restaurant-name">Luna Bistro</h4>
+                            <p class="restaurant-meta">4.7★ · 4.1 mi · Avg $39</p>
+                            <span class="tag">BOGO | Dessert Window</span>
+                        </div>
+                    </article>
+
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?auto=format&fit=crop&w=900&q=80" alt="Harbor Grill">
+                        <div class="deal-body">
+                            <h3 class="deal-name">Harbor Grill</h3>
+                            <p class="deal-line">Newport Coast</p>
+                            <div class="deal-stats"><span class="score"><i class="fa-solid fa-star"></i>4.6</span><span class="sold">5.0 mi | 330 reviews</span></div>
+                            <span class="tag" style="margin-top:4px;">Set Menu | Steak for Two</span>
+                            <div class="deal-price"><div><span class="now">$58</span><span class="old">$108</span></div><button class="cta">Get</button></div>
+                        </div>
+                    </article>
+
+                    <article class="restaurant-card fade-in" data-nav="restaurantDetail">
+                        <img src="https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?auto=format&fit=crop&w=900&q=80" alt="Mori Table">
+                        <div class="restaurant-body">
+                            <h4 class="restaurant-name">Mori Table</h4>
+                            <p class="restaurant-meta">4.8★ · 1.9 mi · Avg $34</p>
+                            <span class="tag">Dish Discount | Signature Roll 25% Off</span>
+                        </div>
+                    </article>
+
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?auto=format&fit=crop&w=900&q=80" alt="Urban Bowl">
+                        <div class="deal-body">
+                            <h3 class="deal-name">Urban Bowl</h3>
+                            <p class="deal-line">University Town Center</p>
+                            <div class="deal-stats"><span class="score"><i class="fa-solid fa-star"></i>4.7</span><span class="sold">1.6 mi | 188 reviews</span></div>
+                            <span class="tag" style="margin-top:4px;">Free Dish | Spend $50</span>
+                            <div class="deal-price"><div><span class="now">$24</span><span class="old">$36</span></div><button class="cta">Get</button></div>
+                        </div>
+                    </article>
+
+                    <article class="restaurant-card fade-in" data-nav="restaurantDetail">
+                        <img src="https://images.unsplash.com/photo-1515669097368-22e68427d265?auto=format&fit=crop&w=900&q=80" alt="Nori Room">
+                        <div class="restaurant-body">
+                            <h4 class="restaurant-name">Nori Room</h4>
+                            <p class="restaurant-meta">4.6★ · 3.1 mi · Avg $31</p>
+                            <span class="tag">Spend & Save | $10 Off Dinner</span>
+                        </div>
+                    </article>
+
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=900&q=80" alt="Sunset Grill" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80';">
+                        <div class="deal-body">
+                            <h3 class="deal-name">Sunset Grill</h3>
+                            <p class="deal-line">Harbor Point</p>
+                            <div class="deal-stats"><span class="score"><i class="fa-solid fa-star"></i>4.7</span><span class="sold">3.8 mi | 261 reviews</span></div>
+                            <span class="tag" style="margin-top:4px;">Set Menu | Weekend Couple Pack</span>
+                            <div class="deal-price"><div><span class="now">$42</span><span class="old">$66</span></div><button class="cta">Get</button></div>
+                        </div>
+                    </article>
+
+                    <article class="restaurant-card fade-in" data-nav="restaurantDetail">
+                        <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=900&q=80" alt="Brick Oven">
+                        <div class="restaurant-body">
+                            <h4 class="restaurant-name">Brick Oven</h4>
+                            <p class="restaurant-meta">4.8★ · 2.7 mi · Avg $37</p>
+                            <span class="tag">Dish Discount | Pizza 20% Off</span>
+                        </div>
+                    </article>
+
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=900&q=80" alt="Harbor Pasta Bar">
+                        <div class="deal-body">
+                            <h3 class="deal-name">Harbor Pasta Bar</h3>
+                            <p class="deal-line">Pacific Circle</p>
+                            <div class="deal-stats"><span class="score"><i class="fa-solid fa-star"></i>4.5</span><span class="sold">4.4 mi | 145 reviews</span></div>
+                            <span class="tag" style="margin-top:4px;">BOGO | Pasta Lunch Deal</span>
+                            <div class="deal-price"><div><span class="now">$31</span><span class="old">$50</span></div><button class="cta">Get</button></div>
+                        </div>
+                    </article>
+
+                    <article class="restaurant-card fade-in" data-nav="restaurantDetail">
+                        <img src="https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=80" alt="Noodle District">
+                        <div class="restaurant-body">
+                            <h4 class="restaurant-name">Noodle District</h4>
+                            <p class="restaurant-meta">4.7★ · 1.4 mi · Avg $24</p>
+                            <span class="tag">Free Dish | Spend $45 to unlock</span>
+                        </div>
+                    </article>
+
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=900&q=80" alt="Green Leaf Kitchen">
+                        <div class="deal-body">
+                            <h3 class="deal-name">Green Leaf Kitchen</h3>
+                            <p class="deal-line">Campus District</p>
+                            <div class="deal-stats"><span class="score"><i class="fa-solid fa-star"></i>4.8</span><span class="sold">1.2 mi | 409 reviews</span></div>
+                            <span class="tag" style="margin-top:4px;">Spend & Save | $8 Off on $30+</span>
+                            <div class="deal-price"><div><span class="now">$18</span><span class="old">$27</span></div><button class="cta">Get</button></div>
+                        </div>
+                    </article>
+
+                    <article class="restaurant-card fade-in" data-nav="restaurantDetail">
+                        <img src="https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=900&q=80" alt="Flame House">
+                        <div class="restaurant-body">
+                            <h4 class="restaurant-name">Flame House</h4>
+                            <p class="restaurant-meta">4.6★ · 5.3 mi · Avg $44</p>
+                            <span class="tag">Set Menu | Grill Combo Night</span>
+                        </div>
+                    </article>
+
+                    <article class="restaurant-card fade-in" data-nav="restaurantDetail">
+                        <img src="https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&w=900&q=80" alt="Blue Harbor">
+                        <div class="restaurant-body">
+                            <h4 class="restaurant-name">Blue Harbor</h4>
+                            <p class="restaurant-meta">4.8★ · 3.3 mi · Avg $41</p>
+                            <span class="tag">Dish Discount | Seafood Bowl 25% Off</span>
+                        </div>
+                    </article>
+
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=900&q=80" alt="Morning Bite">
+                        <div class="deal-body">
+                            <h3 class="deal-name">Morning Bite</h3>
+                            <p class="deal-line">Eastwood Plaza</p>
+                            <div class="deal-stats"><span class="score"><i class="fa-solid fa-star"></i>4.7</span><span class="sold">2.0 mi | 274 reviews</span></div>
+                            <span class="tag" style="margin-top:4px;">Spend & Save | $10 Off on $35+</span>
+                            <div class="deal-price"><div><span class="now">$21</span><span class="old">$33</span></div><button class="cta">Get</button></div>
+                        </div>
+                    </article>
+
+                    <article class="restaurant-card fade-in" data-nav="restaurantDetail">
+                        <img src="https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=900&q=80" alt="Napa Table">
+                        <div class="restaurant-body">
+                            <h4 class="restaurant-name">Napa Table</h4>
+                            <p class="restaurant-meta">4.9★ · 4.9 mi · Avg $56</p>
+                            <span class="tag">Set Menu | Chef Tasting Night</span>
+                        </div>
+                    </article>
+
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1514326640560-7d063ef2aed5?auto=format&fit=crop&w=900&q=80" alt="Steam Basket House">
+                        <div class="deal-body">
+                            <h3 class="deal-name">Steam Basket House</h3>
+                            <p class="deal-line">North District</p>
+                            <div class="deal-stats"><span class="score"><i class="fa-solid fa-star"></i>4.6</span><span class="sold">2.7 mi | 192 reviews</span></div>
+                            <span class="tag" style="margin-top:4px;">BOGO | Dumpling Lunch</span>
+                            <div class="deal-price"><div><span class="now">$26</span><span class="old">$42</span></div><button class="cta">Get</button></div>
+                        </div>
+                    </article>
+
+                    <article class="restaurant-card fade-in" data-nav="restaurantDetail">
+                        <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=900&q=80" alt="Oak & Fire">
+                        <div class="restaurant-body">
+                            <h4 class="restaurant-name">Oak & Fire</h4>
+                            <p class="restaurant-meta">4.7★ · 3.6 mi · Avg $47</p>
+                            <span class="tag">Free Dish | Spend $60 to unlock</span>
+                        </div>
+                    </article>
+
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1464306076886-da185f6a9d05?auto=format&fit=crop&w=900&q=80" alt="River Noodles">
+                        <div class="deal-body">
+                            <h3 class="deal-name">River Noodles</h3>
+                            <p class="deal-line">Central Market</p>
+                            <div class="deal-stats"><span class="score"><i class="fa-solid fa-star"></i>4.6</span><span class="sold">2.3 mi | 167 reviews</span></div>
+                            <span class="tag" style="margin-top:4px;">Dish Discount | Noodle Bowl 20% Off</span>
+                            <div class="deal-price"><div><span class="now">$19</span><span class="old">$29</span></div><button class="cta">Get</button></div>
+                        </div>
+                    </article>
+
+                    <article class="restaurant-card fade-in" data-nav="restaurantDetail">
+                        <img src="https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?auto=format&fit=crop&w=900&q=80" alt="Harvest Kitchen">
+                        <div class="restaurant-body">
+                            <h4 class="restaurant-name">Harvest Kitchen</h4>
+                            <p class="restaurant-meta">4.8★ · 1.5 mi · Avg $29</p>
+                            <span class="tag">Spend & Save | $8 Off Lunch</span>
+                        </div>
+                    </article>
+
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1529042410759-befb1204b468?auto=format&fit=crop&w=900&q=80" alt="Sakura Bites">
+                        <div class="deal-body">
+                            <h3 class="deal-name">Sakura Bites</h3>
+                            <p class="deal-line">Westgate Commons</p>
+                            <div class="deal-stats"><span class="score"><i class="fa-solid fa-star"></i>4.9</span><span class="sold">2.0 mi | 389 reviews</span></div>
+                            <span class="tag" style="margin-top:4px;">Set Menu | 2-Person Omakase</span>
+                            <div class="deal-price"><div><span class="now">$44</span><span class="old">$72</span></div><button class="cta">Get</button></div>
+                        </div>
+                    </article>
+
+                    <article class="restaurant-card fade-in" data-nav="restaurantDetail">
+                        <img src="https://images.unsplash.com/photo-1457666134378-6b77915bd5f2?auto=format&fit=crop&w=900&q=80" alt="Citrus Table">
+                        <div class="restaurant-body">
+                            <h4 class="restaurant-name">Citrus Table</h4>
+                            <p class="restaurant-meta">4.7★ · 2.6 mi · Avg $32</p>
+                            <span class="tag">BOGO | Afternoon Drinks</span>
+                        </div>
+                    </article>
+
+                    <article class="deal-card fade-in" data-nav="dealDetail">
+                        <img src="https://images.unsplash.com/photo-1516684669134-de6f7c473a2a?auto=format&fit=crop&w=900&q=80" alt="Bamboo Terrace">
+                        <div class="deal-body">
+                            <h3 class="deal-name">Bamboo Terrace</h3>
+                            <p class="deal-line">Harbor Walk</p>
+                            <div class="deal-stats"><span class="score"><i class="fa-solid fa-star"></i>4.5</span><span class="sold">4.1 mi | 142 reviews</span></div>
+                            <span class="tag" style="margin-top:4px;">Free Dish | Spend $55</span>
+                            <div class="deal-price"><div><span class="now">$27</span><span class="old">$41</span></div><button class="cta">Get</button></div>
+                        </div>
+                    </article>
+                </div>
+                <div id="homeEmpty" class="empty-feed">No matching cards. Try another filter.</div>
+                <div class="feed-actions">
+                    <button id="loadMoreBtn" class="load-more">Load More</button>
+                </div>
+            </section>
+        </main>
+
+        <nav class="tab-bar">
+            <div class="tab-item active"><i class="fa-solid fa-house"></i></div>
+            <div class="tab-item"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <div class="tab-item"><i class="fa-solid fa-receipt"></i></div>
+            <div class="tab-item"><i class="fa-regular fa-heart"></i></div>
+            <div class="tab-item"><i class="fa-regular fa-user"></i></div>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        const cards = Array.from(document.querySelectorAll('.mixed-feed > article'));
+        const segBtns = Array.from(document.querySelectorAll('.seg-btn'));
+        const couponBtns = Array.from(document.querySelectorAll('.coupon-pill'));
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+        const emptyBlock = document.getElementById('homeEmpty');
+
+        let visibleLimit = 10;
+        let currentSeg = 'Top Picks';
+        let currentCoupon = 'All';
+
+        function parseDistance(card) {
+            const text = card.textContent || '';
+            const m = text.match(/([0-9]+(?:\.[0-9]+)?)\s*mi/i);
+            return m ? parseFloat(m[1]) : 99;
+        }
+
+        function parseValueScore(card) {
+            const now = card.querySelector('.now');
+            const old = card.querySelector('.old');
+            if (!now || !old) return 0;
+            const nowV = parseFloat((now.textContent || '').replace(/[^0-9.]/g, '')) || 0;
+            const oldV = parseFloat((old.textContent || '').replace(/[^0-9.]/g, '')) || 0;
+            if (!nowV || !oldV || oldV <= nowV) return 0;
+            return (oldV - nowV) / oldV;
+        }
+
+        function cardType(card) {
+            const tag = (card.querySelector('.tag')?.textContent || '').toLowerCase();
+            if (tag.includes('spend')) return 'Spend & Save';
+            if (tag.includes('dish')) return 'Dish Discount';
+            if (tag.includes('free')) return 'Free Dish';
+            if (tag.includes('bogo') || tag.includes('buy 1 get 1')) return 'Buy 1 Get 1';
+            if (tag.includes('set menu')) return 'Set Menu';
+            return '';
+        }
+
+        function matchSeg(card) {
+            if (currentSeg === 'Top Picks') return true;
+            if (currentSeg === 'Nearby') return parseDistance(card) <= 3.0;
+            if (currentSeg === 'Best Value') return parseValueScore(card) >= 0.32;
+            return true;
+        }
+
+        function applyHomeFeed() {
+            const filtered = cards.filter((card) => {
+                const typeOk = currentCoupon === 'All' || cardType(card) === currentCoupon;
+                return typeOk && matchSeg(card);
+            });
+
+            cards.forEach((card) => card.classList.add('card-hidden'));
+            filtered.slice(0, visibleLimit).forEach((card) => card.classList.remove('card-hidden'));
+
+            if (emptyBlock) {
+                emptyBlock.style.display = filtered.length ? 'none' : 'block';
+            }
+            if (loadMoreBtn) {
+                loadMoreBtn.style.display = filtered.length > visibleLimit ? 'inline-flex' : 'none';
+            }
+        }
+
+        segBtns.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                segBtns.forEach((b) => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentSeg = btn.textContent.trim();
+                visibleLimit = 10;
+                applyHomeFeed();
+            });
+        });
+
+        couponBtns.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                couponBtns.forEach((b) => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentCoupon = btn.textContent.trim();
+                visibleLimit = 10;
+                applyHomeFeed();
+            });
+        });
+
+        if (loadMoreBtn) {
+            loadMoreBtn.addEventListener('click', () => {
+                visibleLimit += 6;
+                applyHomeFeed();
+            });
+        }
+
+        applyHomeFeed();
+    </script>
+</body>
+</html>
