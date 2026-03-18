@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>寄旅 AI 存包 · AI 助手</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: "#FF3535",
+              ink: "#141414",
+              mist: "#F4F5F7",
+              lilac: "#7C6CFF",
+              lime: "#A6E35A",
+              peach: "#FFBE98",
+            },
+            fontFamily: {
+              sans: ["Noto Sans SC", "PingFang SC", "sans-serif"],
+              display: ["Outfit", "Noto Sans SC", "sans-serif"],
+            },
+            boxShadow: {
+              soft: "0 14px 30px rgba(17, 24, 39, 0.08)",
+              card: "0 10px 24px rgba(15, 23, 42, 0.06)",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800&family=Outfit:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="min-h-screen bg-[#eef1f5] font-sans text-ink" data-page="assistant">
+    <div id="app"></div>
+    <script src="./app.js"></script>
+  </body>
+</html>
