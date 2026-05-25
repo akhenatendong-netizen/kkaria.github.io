@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>埃尔西诺的千分之一 · 宴会厅</title>
+<style>
+  :root {
+    --gold: #caa15b;
+    --gold-soft: rgba(202, 161, 91, 0.24);
+    --ink: #060606;
+    --text: #efe3c2;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+    color: var(--text);
+    font-family: "Songti SC", "STSong", "SimSun", serif;
+  }
+
+  body {
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #panoramaBg,
+  #maskCanvas,
+  #uiLayer,
+  #fxLayer {
+    position: fixed;
+    inset: 0;
+  }
+
+  #panoramaBg {
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    overflow: hidden;
+  }
+
+  #panoramaInner {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(190vw, 2200px);
+    height: max(125vh, 1100px);
+    transform: translate(-50%, -50%);
+    background-image: url('panorama.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    filter: brightness(0.8) saturate(0.96);
+    transition: filter 0.5s ease;
+    will-change: transform;
+  }
+
+  body.stage-pickup #panoramaBg,
+  body.stage-explore #panoramaBg,
+  body.stage-lit #panoramaBg {
+    opacity: 1;
+  }
+
+  body.stage-lit #panoramaInner {
+    filter: brightness(1) saturate(1.02);
+  }
+
+  #maskCanvas {
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  #fxLayer {
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  #uiLayer {
+    z-index: 4;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+  }
+
+  .screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    padding: 24px;
+    background:
+      radial-gradient(circle at center, rgba(34, 28, 18, 0.1), rgba(0, 0, 0, 0.94) 52%),
+      linear-gradient(180deg, rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0.96));
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.45s ease;
+  }
+
+  body.stage-idle #startScreen,
+  body.stage-pickup #pickupScreen {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  body.stage-pickup #pickupScreen {
+    background: transparent;
+  }
+
+  .mark {
+    font-size: 12px;
+    letter-spacing: 0.9em;
+    padding-left: 0.9em;
+    color: rgba(202, 161, 91, 0.78);
+    display: flex;
+    align-items: center;
+    gap: 1.6em;
+  }
+
+  .title {
+    font-size: clamp(46px, 6.8vw, 112px);
+    letter-spacing: 0.16em;
+    padding-left: 0.16em;
+    text-align: center;
+    line-height: 1.06;
+    text-shadow: 0 0 26px rgba(202, 161, 91, 0.14);
+    font-weight: 400;
+  }
+
+  .sub {
+    font-size: 12px;
+    letter-spacing: 0.72em;
+    color: rgba(202, 161, 91, 0.8);
+    padding-left: 0.72em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .divider {
+    width: 88px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(202, 161, 91, 0.72), transparent);
+  }
+
+  .passage {
+    max-width: 980px;
+    font-size: clamp(12px, 0.92vw, 14px);
+    line-height: 2.02;
+    color: rgba(239, 227, 194, 0.72);
+    text-align: center;
+    letter-spacing: 0.12em;
+  }
+
+  .cta {
+    pointer-events: auto;
+    border: 1px solid rgba(202, 161, 91, 0.58);
+    background: rgba(202, 161, 91, 0.08);
+    color: var(--text);
+    padding: 13px 28px;
+    min-width: 290px;
+    border-radius: 2px;
+    font-size: 13px;
+    letter-spacing: 0.72em;
+    padding-left: calc(28px + 0.72em);
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .cta:hover:not(:disabled) {
+    transform: translateY(-1px);
+    background: rgba(202, 161, 91, 0.16);
+    box-shadow: 0 0 28px rgba(202, 161, 91, 0.18);
+  }
+
+  .cta:disabled {
+    opacity: 0.62;
+    cursor: wait;
+  }
+
+  .start-layout {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .hint {
+    margin-top: 2px;
+    font-size: 10px;
+    letter-spacing: 0.52em;
+    padding-left: 0.52em;
+    color: rgba(202, 161, 91, 0.72);
+    text-align: center;
+  }
+
+  .pickup-wrap {
+    position: relative;
+    width: min(48vw, 360px);
+    min-width: 240px;
+    aspect-ratio: 1 / 1;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    border-radius: 24px;
+    background: radial-gradient(circle at center, rgba(16, 10, 6, 0.18), rgba(0, 0, 0, 0) 72%);
+  }
+
+  .pickup-glow {
+    position: absolute;
+    inset: 17% 22% 16%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 222, 162, 0.55), rgba(202, 161, 91, 0.18) 46%, transparent 72%);
+    filter: blur(28px);
+    opacity: 0.72;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .pickup-wrap.active .pickup-glow {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+
+  #lantern {
+    position: relative;
+    width: 68%;
+    max-width: 250px;
+    object-fit: contain;
+    filter: drop-shadow(0 30px 30px rgba(0, 0, 0, 0.45));
+    transition: transform 0.25s ease;
+  }
+
+  .pickup-wrap.active #lantern {
+    transform: translateY(-8px) scale(1.03);
+  }
+
+  #pickupHint {
+    font-size: 14px;
+    letter-spacing: 0.24em;
+    padding-left: 0.24em;
+    text-align: center;
+    line-height: 1.8;
+    color: rgba(239, 227, 194, 0.84);
+    text-shadow: 0 0 18px rgba(0, 0, 0, 0.68);
+  }
+
+  #pickupStatus,
+  #centerHint {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    padding-left: 0.24em;
+    color: rgba(239, 227, 194, 0.82);
+    text-shadow: 0 0 12px rgba(0, 0, 0, 0.65);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+  }
+
+  #pickupStatus { bottom: 56px; z-index: 5; }
+  #centerHint { bottom: 52px; z-index: 5; }
+
+  body.stage-pickup #pickupStatus,
+  body.stage-explore #centerHint,
+  body.stage-lit #centerHint {
+    opacity: 1;
+  }
+
+  #centerProgress {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    width: 184px;
+    height: 184px;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+  }
+
+  body.stage-explore #centerProgress.show {
+    opacity: 1;
+  }
+
+  #centerProgress svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+
+  .progress-bg {
+    fill: rgba(0, 0, 0, 0.12);
+    stroke: rgba(202, 161, 91, 0.26);
+    stroke-width: 5;
+  }
+
+  .progress-ring {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-dasharray: 314.16;
+    stroke-dashoffset: 314.16;
+    filter: drop-shadow(0 0 10px rgba(202, 161, 91, 0.42));
+  }
+
+  .progress-core {
+    fill: rgba(255, 242, 214, 0.1);
+    stroke: rgba(255, 242, 214, 0.24);
+    stroke-width: 1;
+  }
+
+  #errorMsg {
+    position: fixed;
+    left: 50%;
+    bottom: 42px;
+    transform: translateX(-50%);
+    z-index: 10;
+    padding: 12px 18px;
+    border: 1px solid rgba(202, 161, 91, 0.42);
+    background: rgba(18, 10, 6, 0.88);
+    border-radius: 999px;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    color: rgba(239, 227, 194, 0.86);
+    display: none;
+  }
+
+  #roamHelp {
+    position: fixed;
+    left: 18px;
+    top: 18px;
+    z-index: 6;
+    padding: 18px 20px;
+    border-radius: 22px;
+    background: rgba(10, 8, 6, 0.76);
+    border: 1px solid rgba(202, 161, 91, 0.18);
+    color: rgba(255, 248, 230, 0.92);
+    backdrop-filter: blur(12px);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: none;
+  }
+
+  body.stage-explore #roamHelp,
+  body.stage-lit #roamHelp {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .help-grid {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 12px 26px;
+    align-items: center;
+    font-size: 13px;
+    line-height: 1.2;
+  }
+
+  .help-label {
+    color: rgba(255, 248, 230, 0.92);
+    font-weight: 600;
+  }
+
+  .help-keys {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .keycap {
+    min-width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  #followLantern {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    width: min(34vmin, 260px);
+    height: auto;
+    transform: translate(-50%, -50%);
+    z-index: 4;
+    opacity: 0;
+    pointer-events: none;
+    filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.45));
+    transition: opacity 0.28s ease;
+  }
+
+  @media (max-width: 720px) {
+    .pickup-wrap { width: min(72vw, 320px); }
+    #centerProgress { width: 154px; height: 154px; }
+    #followLantern { width: min(42vmin, 220px); }
+    .title { font-size: clamp(38px, 10vw, 68px); letter-spacing: 0.08em; padding-left: 0.08em; }
+    .sub { font-size: 10px; letter-spacing: 0.34em; padding-left: 0.34em; }
+    .passage { font-size: 11px; line-height: 1.88; max-width: 92vw; }
+    .cta { min-width: 220px; }
+    .hint { font-size: 10px; letter-spacing: 0.32em; padding-left: 0.32em; }
+    #roamHelp { left: 10px; top: 10px; padding: 14px; border-radius: 18px; }
+    .help-grid { grid-template-columns: 1fr; gap: 8px; font-size: 12px; }
+    .help-keys { justify-content: flex-start; }
+    .keycap { min-width: 34px; height: 34px; }
+  }
+</style>
+</head>
+<body class="stage-idle">
+<div id="panoramaBg"><div id="panoramaInner"></div></div>
+<canvas id="maskCanvas"></canvas>
+<div id="fxLayer"></div>
+<img id="followLantern" src="assets/lantern.png" alt="跟随灯具">
+
+<div id="uiLayer">
+  <section class="screen" id="startScreen">
+    <div class="start-layout">
+      <div class="mark"><span>—</span><span>序 章</span><span>—</span></div>
+      <h1 class="title">埃尔西诺的千分之一</h1>
+      <div class="sub">ONE THOUSANDTH OF ELSINORE</div>
+      <div class="divider"></div>
+      <p class="passage">长廊深处的烛火忽明忽暗，把每个人的影子都拉得过长，仿佛连人的意图也被拖出了形状。于是复仇与怀疑同时开场，爱与忠诚在暗处改写面目，祈祷室里或许藏着罪，帘幕后或许躲着耳，寝宫里或许流着无声的泪。</p>
+      <button class="cta" id="startBtn">点 燃 烛 火</button>
+      <div class="hint">点击启用摄像头 · 以掌心为光</div>
+    </div>
+  </section>
+
+  <section class="screen" id="pickupScreen">
+    <div class="pickup-wrap" id="pickupTarget">
+      <div class="pickup-glow"></div>
+      <img id="lantern" src="assets/lantern.png" alt="灯具">
+    </div>
+    <p id="pickupHint">请把手放到灯具上方并停留片刻，拿起灯具</p>
+  </section>
+</div>
+
+<div id="pickupStatus">等待识别手部</div>
+<div id="centerHint">把灯移到画面正中并停留 3 秒，点亮整个房间</div>
+<div id="centerProgress">
+  <svg viewBox="0 0 120 120" aria-hidden="true">
+    <circle class="progress-bg" cx="60" cy="60" r="50"></circle>
+    <circle class="progress-core" cx="60" cy="60" r="36"></circle>
+    <circle class="progress-ring" id="progressRing" cx="60" cy="60" r="50"></circle>
+  </svg>
+</div>
+
+<div id="errorMsg"></div>
+<div id="roamHelp">
+  <div class="help-grid">
+    <div class="help-label">方向控制</div>
+    <div class="help-keys"><span class="keycap">W</span><span class="keycap">A</span><span class="keycap">S</span><span class="keycap">D</span></div>
+    <div class="help-label">冲刺 / 加速</div>
+    <div class="help-keys"><span class="keycap">Shift</span></div>
+    <div class="help-label">拾升 / 跳跃</div>
+    <div class="help-keys"><span class="keycap">Space</span></div>
+    <div class="help-label">环顾四周</div>
+    <div class="help-keys"><span class="keycap">拖拽</span></div>
+  </div>
+</div>
+<img id="panoSrc" src="panorama.png" alt="" hidden>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.js" crossorigin="anonymous"></script>
+
+<script>
+const STAGE = {
+  IDLE: 'stage-idle',
+  PICKUP: 'stage-pickup',
+  EXPLORE: 'stage-explore',
+  LIT: 'stage-lit',
+};
+
+let sceneLoaded = false;
+let renderRunning = false;
+let handsReady = false;
+let hands;
+
+const body = document.body;
+const startBtn = document.getElementById('startBtn');
+const panoImg = document.getElementById('panoSrc');
+const panoramaInner = document.getElementById('panoramaInner');
+const followLantern = document.getElementById('followLantern');
+const pickupTarget = document.getElementById('pickupTarget');
+const pickupStatus = document.getElementById('pickupStatus');
+const centerHint = document.getElementById('centerHint');
+const centerProgress = document.getElementById('centerProgress');
+const progressRing = document.getElementById('progressRing');
+const errorMsg = document.getElementById('errorMsg');
+const maskCanvas = document.getElementById('maskCanvas');
+const maskCtx = maskCanvas.getContext('2d');
+
+let stage = STAGE.IDLE;
+let viewX = 0;
+let viewY = 0;
+let targetX = 0;
+let targetY = 0;
+let viewScale = 1;
+let targetScale = 1;
+let dragActive = false;
+let dragStartX = 0;
+let dragStartY = 0;
+let dragStartTargetX = 0;
+let dragStartTargetY = 0;
+let jumpUntil = 0;
+const keyState = { w: false, a: false, s: false, d: false, shift: false };
+
+let handX = null;
+let handY = null;
+let smoothX = innerWidth / 2;
+let smoothY = innerHeight / 2;
+let lastHandTime = 0;
+let lastHandCenterX = null;
+let lastHandCenterY = null;
+let lastHandCenterTime = 0;
+let handSwipeCooldownUntil = 0;
+let pickupStartAt = 0;
+let centerHoldStartAt = 0;
+let roomReveal = 0;
+let roomLit = false;
+let handVisible = false;
+
+const PICKUP_HOLD_MS = 1200;
+const CENTER_HOLD_MS = 3000;
+const INITIAL_VIEW_Y = 64;
+const VIEW_Y_LIMIT = 46;
+const SWIPE_MIN_DELTA_X = 0.11;
+const SWIPE_MAX_DELTA_Y = 0.08;
+const SWIPE_MAX_WINDOW_MS = 260;
+const SWIPE_TURN_STEP = 46;
+const SWIPE_TILT_STEP = 24;
+const PROGRESS_CIRCUMFERENCE = 2 * Math.PI * 50;
+progressRing.style.strokeDasharray = String(PROGRESS_CIRCUMFERENCE);
+progressRing.style.strokeDashoffset = String(PROGRESS_CIRCUMFERENCE);
+
+function setStage(nextStage) {
+  body.className = nextStage;
+  stage = nextStage;
+}
+
+function showError(message) {
+  errorMsg.textContent = message;
+  errorMsg.style.display = 'block';
+}
+
+function clearError() {
+  errorMsg.style.display = 'none';
+}
+
+function initPanorama() {
+  function markReady() {
+    sceneLoaded = true;
+    clearError();
+  }
+
+  if (panoImg.complete && panoImg.naturalWidth > 0) {
+    markReady();
+  } else {
+    panoImg.addEventListener('load', markReady, { once: true });
+    panoImg.addEventListener('error', () => showError('房间背景加载失败'), { once: true });
+  }
+}
+
+function resizeAll() {
+  maskCanvas.width = innerWidth;
+  maskCanvas.height = innerHeight;
+}
+
+function updatePanoramaView(force = false) {
+  if (force) {
+    viewX = targetX;
+    viewY = targetY;
+    viewScale = targetScale;
+  } else {
+    viewX += (targetX - viewX) * 0.12;
+    viewY += (targetY - viewY) * 0.12;
+    viewScale += (targetScale - viewScale) * 0.08;
+  }
+  const jumpOffset = performance.now() < jumpUntil ? -18 * Math.sin(((jumpUntil - performance.now()) / 260) * Math.PI) : 0;
+  panoramaInner.style.transform = `translate(calc(-50% + ${viewX}px), calc(-50% + ${viewY + jumpOffset}px)) scale(${viewScale})`;
+}
+
+function getPointerPoint(event) {
+  if (event.touches && event.touches[0]) {
+    return { x: event.touches[0].clientX, y: event.touches[0].clientY };
+  }
+  return { x: event.clientX, y: event.clientY };
+}
+
+function beginPan(event) {
+  if (stage !== STAGE.LIT) return;
+  const point = getPointerPoint(event);
+  dragActive = true;
+  dragStartX = point.x;
+  dragStartY = point.y;
+  dragStartTargetX = targetX;
+  dragStartTargetY = targetY;
+}
+
+function movePan(event) {
+  if (!dragActive || stage !== STAGE.LIT) return;
+  const point = getPointerPoint(event);
+  const deltaX = point.x - dragStartX;
+  const deltaY = point.y - dragStartY;
+  targetX = Math.max(-320, Math.min(320, dragStartTargetX - deltaX * 0.28));
+  targetY = Math.max(INITIAL_VIEW_Y - VIEW_Y_LIMIT, Math.min(INITIAL_VIEW_Y + VIEW_Y_LIMIT, dragStartTargetY + deltaY * 0.2));
+}
+
+function endPan() {
+  dragActive = false;
+}
+
+function isHandFresh(now) {
+  return handX !== null && handY !== null && now - lastHandTime < 250;
+}
+
+function updatePickup(now) {
+  const rect = pickupTarget.getBoundingClientRect();
+  const inside =
+    isHandFresh(now) &&
+    handX >= rect.left &&
+    handX <= rect.right &&
+    handY >= rect.top &&
+    handY <= rect.bottom;
+
+  pickupTarget.classList.toggle('active', inside);
+
+  if (!inside) {
+    pickupStartAt = 0;
+    pickupStatus.textContent = handVisible ? '手已识别，请放到灯具上' : '等待识别手部';
+    return;
+  }
+
+  if (!pickupStartAt) pickupStartAt = now;
+  const progress = Math.min(1, (now - pickupStartAt) / PICKUP_HOLD_MS);
+  pickupStatus.textContent = progress < 1 ? `正在拿起灯具 ${Math.ceil(progress * 100)}%` : '拿起成功';
+
+  if (progress >= 1) {
+    enterExploreStage();
+  }
+}
+
+function updateCenterProgress(now) {
+  const centerX = innerWidth / 2;
+  const centerY = innerHeight / 2;
+  const distance = Math.hypot(smoothX - centerX, smoothY - centerY);
+  const near = isHandFresh(now) && distance < Math.min(innerWidth, innerHeight) * 0.22;
+  const active = isHandFresh(now) && distance < Math.min(innerWidth, innerHeight) * 0.11;
+
+  centerProgress.classList.toggle('show', near && !roomLit);
+
+  if (!active || roomLit) {
+    centerHoldStartAt = 0;
+    progressRing.style.strokeDashoffset = String(PROGRESS_CIRCUMFERENCE);
+    return;
+  }
+
+  if (!centerHoldStartAt) centerHoldStartAt = now;
+  const ratio = Math.min(1, (now - centerHoldStartAt) / CENTER_HOLD_MS);
+  progressRing.style.strokeDashoffset = String(PROGRESS_CIRCUMFERENCE * (1 - ratio));
+  centerHint.textContent = ratio < 1 ? `灯停在中央 ${Math.ceil((1 - ratio) * 3)} 秒` : '房间已点亮';
+
+  if (ratio >= 1) {
+    roomLit = true;
+    setStage(STAGE.LIT);
+    centerHint.textContent = '房间已点亮';
+  }
+}
+
+function renderMask(now) {
+  const w = maskCanvas.width;
+  const h = maskCanvas.height;
+  maskCtx.clearRect(0, 0, w, h);
+
+  if (!sceneLoaded || (stage !== STAGE.EXPLORE && stage !== STAGE.LIT)) {
+    followLantern.style.opacity = 0;
+    return;
+  }
+
+  roomReveal += ((roomLit ? 1 : 0) - roomReveal) * (roomLit ? 0.05 : 0.12);
+
+  if (roomReveal > 0.995) {
+    followLantern.style.opacity = 0;
+    return;
+  }
+
+  const baseAlpha = 0.7 * (1 - roomReveal);
+  maskCtx.fillStyle = `rgba(0, 0, 0, ${baseAlpha})`;
+  maskCtx.fillRect(0, 0, w, h);
+  const lightRadius = Math.min(w, h) * 0.26;
+  const lightX = isHandFresh(now) ? smoothX : w / 2;
+  const lightY = isHandFresh(now) ? smoothY : h / 2;
+  maskCtx.globalCompositeOperation = 'destination-out';
+  const gradient = maskCtx.createRadialGradient(lightX, lightY, 0, lightX, lightY, lightRadius);
+  gradient.addColorStop(0, 'rgba(0,0,0,1)');
+  gradient.addColorStop(0.58, 'rgba(0,0,0,0.82)');
+  gradient.addColorStop(1, 'rgba(0,0,0,0)');
+  maskCtx.fillStyle = gradient;
+  maskCtx.fillRect(lightX - lightRadius, lightY - lightRadius, lightRadius * 2, lightRadius * 2);
+  maskCtx.globalCompositeOperation = 'source-over';
+
+  followLantern.style.left = `${lightX}px`;
+  followLantern.style.top = `${lightY}px`;
+  followLantern.style.opacity = String(1 - roomReveal * 0.78);
+}
+
+function renderLoop() {
+  if (renderRunning) return;
+  renderRunning = true;
+
+  function tick(now) {
+    requestAnimationFrame(tick);
+
+    if (sceneLoaded) {
+      const speed = keyState.shift ? 2.4 : 1.25;
+      if (stage !== STAGE.LIT) {
+        targetX = 0;
+        targetY = INITIAL_VIEW_Y;
+      }
+      if (stage === STAGE.LIT && keyState.a) targetX = Math.min(320, targetX + speed);
+      if (stage === STAGE.LIT && keyState.d) targetX = Math.max(-320, targetX - speed);
+      if (keyState.w) targetScale = Math.min(1.22, targetScale + 0.0035 * speed);
+      if (keyState.s) targetScale = Math.max(1, targetScale - 0.0035 * speed);
+      updatePanoramaView();
+    }
+
+    if (isHandFresh(now)) {
+      smoothX += (handX - smoothX) * 0.24;
+      smoothY += (handY - smoothY) * 0.24;
+    }
+
+    if (stage === STAGE.PICKUP) updatePickup(now);
+    if (stage === STAGE.EXPLORE || stage === STAGE.LIT) updateCenterProgress(now);
+    renderMask(now);
+  }
+
+  requestAnimationFrame(tick);
+}
+
+function onHandResults(results) {
+  if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+    const landmarks = results.multiHandLandmarks[0];
+    const palm = landmarks[9];
+    handX = (1 - palm.x) * innerWidth;
+    handY = palm.y * innerHeight;
+    lastHandTime = performance.now();
+    handVisible = true;
+
+    const handCenterX =
+      ((1 - landmarks[0].x) +
+        (1 - landmarks[5].x) +
+        (1 - landmarks[9].x) +
+        (1 - landmarks[13].x) +
+        (1 - landmarks[17].x)) / 5;
+    const handCenterY =
+      (landmarks[0].y + landmarks[5].y + landmarks[9].y + landmarks[13].y + landmarks[17].y) / 5;
+
+    if (stage === STAGE.LIT && lastHandCenterX !== null) {
+      const now = performance.now();
+      const deltaX = handCenterX - lastHandCenterX;
+      const deltaY = handCenterY - lastHandCenterY;
+      const deltaTime = now - lastHandCenterTime;
+      const canTriggerHorizontalSwipe =
+        now >= handSwipeCooldownUntil &&
+        deltaTime > 0 &&
+        deltaTime <= SWIPE_MAX_WINDOW_MS &&
+        Math.abs(deltaX) >= SWIPE_MIN_DELTA_X &&
+        Math.abs(deltaY) <= SWIPE_MAX_DELTA_Y;
+      const canTriggerVerticalSwipe =
+        now >= handSwipeCooldownUntil &&
+        deltaTime > 0 &&
+        deltaTime <= SWIPE_MAX_WINDOW_MS &&
+        Math.abs(deltaY) >= SWIPE_MIN_DELTA_X &&
+        Math.abs(deltaX) <= SWIPE_MAX_DELTA_Y;
+
+      if (canTriggerHorizontalSwipe) {
+        targetX = Math.max(-320, Math.min(320, targetX - Math.sign(deltaX) * SWIPE_TURN_STEP));
+        handSwipeCooldownUntil = now + 260;
+      } else if (canTriggerVerticalSwipe) {
+        targetY = Math.max(
+          INITIAL_VIEW_Y - VIEW_Y_LIMIT,
+          Math.min(INITIAL_VIEW_Y + VIEW_Y_LIMIT, targetY + Math.sign(deltaY) * SWIPE_TILT_STEP)
+        );
+        handSwipeCooldownUntil = now + 260;
+      }
+    }
+
+    lastHandCenterX = handCenterX;
+    lastHandCenterY = handCenterY;
+    lastHandCenterTime = performance.now();
+  } else if (performance.now() - lastHandTime > 260) {
+    handVisible = false;
+    lastHandCenterX = null;
+    lastHandCenterY = null;
+    lastHandCenterTime = 0;
+  }
+}
+
+async function initMediaPipe() {
+  if (handsReady) return;
+  hands = new Hands({
+    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/${file}`
+  });
+  hands.setOptions({
+    maxNumHands: 1,
+    modelComplexity: 1,
+    minDetectionConfidence: 0.55,
+    minTrackingConfidence: 0.5,
+  });
+  hands.onResults(onHandResults);
+  if (typeof hands.initialize === 'function') {
+    await hands.initialize();
+  }
+  handsReady = true;
+}
+
+async function startCameraProcessing() {
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video: { width: { ideal: 960 }, height: { ideal: 720 }, facingMode: 'user' },
+    audio: false
+  });
+
+  const webcam = document.createElement('video');
+  webcam.autoplay = true;
+  webcam.muted = true;
+  webcam.playsInline = true;
+  webcam.srcObject = stream;
+  await webcam.play();
+
+  let lastSent = 0;
+  async function processFrame() {
+    requestAnimationFrame(processFrame);
+    if (!hands || webcam.readyState < 2) return;
+    const now = performance.now();
+    if (now - lastSent < 33) return;
+    lastSent = now;
+    try { await hands.send({ image: webcam }); } catch (_) {}
+  }
+  processFrame();
+}
+
+function enterExploreStage() {
+  if (stage === STAGE.EXPLORE || stage === STAGE.LIT) return;
+  setStage(STAGE.EXPLORE);
+  clearError();
+  pickupStatus.textContent = '';
+  centerHint.textContent = '把灯移到画面正中并停留 3 秒，点亮整个房间';
+  smoothX = innerWidth / 2;
+  smoothY = innerHeight / 2;
+  targetX = 0;
+  targetY = INITIAL_VIEW_Y;
+  targetScale = 1.06;
+  updatePanoramaView(true);
+}
+
+async function beginExperience() {
+  startBtn.disabled = true;
+  startBtn.textContent = '启 动 中';
+  clearError();
+
+  try {
+    initPanorama();
+    renderLoop();
+    if (!sceneLoaded) {
+      startBtn.textContent = '加 载 房 间';
+      await new Promise((resolve, reject) => {
+        const started = performance.now();
+        function waitScene() {
+          if (sceneLoaded) return resolve();
+          if (performance.now() - started > 15000) return reject(new Error('scene-timeout'));
+          requestAnimationFrame(waitScene);
+        }
+        waitScene();
+      });
+    }
+    await initMediaPipe();
+    await startCameraProcessing();
+    setStage(STAGE.PICKUP);
+  } catch (error) {
+    startBtn.disabled = false;
+    startBtn.textContent = '点 燃 烛 火';
+    showError(error && error.message === 'scene-timeout' ? '房间背景加载超时' : '需要摄像头权限才能拿起灯具');
+    console.error(error);
+  }
+}
+
+startBtn.addEventListener('click', beginExperience);
+
+window.addEventListener('keydown', (event) => {
+  const key = event.key.toLowerCase();
+  if (key === 'w' || key === 'a' || key === 's' || key === 'd') keyState[key] = true;
+  if (key === 'shift') keyState.shift = true;
+  if (key === ' ') {
+    event.preventDefault();
+    if (stage === STAGE.EXPLORE || stage === STAGE.LIT) jumpUntil = performance.now() + 260;
+  }
+});
+
+window.addEventListener('keyup', (event) => {
+  const key = event.key.toLowerCase();
+  if (key === 'w' || key === 'a' || key === 's' || key === 'd') keyState[key] = false;
+  if (key === 'shift') keyState.shift = false;
+});
+
+window.addEventListener('resize', resizeAll);
+window.addEventListener('mousedown', beginPan);
+window.addEventListener('mousemove', movePan);
+window.addEventListener('mouseup', endPan);
+window.addEventListener('mouseleave', endPan);
+window.addEventListener('touchstart', beginPan, { passive: true });
+window.addEventListener('touchmove', movePan, { passive: true });
+window.addEventListener('touchend', endPan, { passive: true });
+
+function boot() {
+  resizeAll();
+  initPanorama();
+  targetY = INITIAL_VIEW_Y;
+  viewY = INITIAL_VIEW_Y;
+  updatePanoramaView(true);
+  renderLoop();
+}
+
+boot();
+</script>
+</body>
+</html>
