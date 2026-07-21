@@ -424,6 +424,85 @@
   body.design-v2 #cam.preview .shutter:after{display:none}
   body.design-v2 .review-actions{display:flex;gap:12px;margin-top:16px}
   body.design-v2 .review-actions .btn{height:46px;border-radius:4px;font-size:15px}
+  body.design-v2 #cam .cam-top{height:calc(106px + env(safe-area-inset-top));padding:calc(44px + env(safe-area-inset-top)) 20px 0;background:#fff;backdrop-filter:none;border-bottom:1px solid #EEF0F4}
+  body.design-v2 #cam .cam-ti{display:flex;align-items:baseline;gap:8px;flex:1;text-align:left;margin-left:2px}
+  body.design-v2 #cam .cam-ti .n{font-size:21px;font-weight:700;color:#252B36;line-height:34px}
+  body.design-v2 #cam .cam-ti .p{font-size:20px;font-weight:600;color:#8B94A3;line-height:34px;margin-left:0}
+  body.design-v2 #cam .cam-top .cx{width:28px;height:34px;color:#252B36;background:transparent}
+  body.design-v2 #cam .cam-guide{width:auto;height:36px;padding:0 14px;border-radius:18px;background:#F1F3F6;color:#4E5969;font-size:14px;white-space:nowrap}
+  body.design-v2 #cam .cam-guide svg{display:none}
+  body.design-v2 #cam .cam-guide:after{content:'拍摄指南'}
+  body.design-v2 #cam .cam-act{background:rgba(34,34,34,.54);border-top:1px solid rgba(255,255,255,.18)}
+  body.design-v2 #cam .cam-side{font-size:15px}
+  body.design-v2 #cam .angle-hint{font-size:16px}
+  body.design-v2 #cam .thumb{width:46px;height:46px;border-radius:9px}
+  body.design-v2 #cam .cam-strip{bottom:calc(clamp(178px,23vh,238px) - 72px);gap:10px}
+  body.design-v2 #cam .angle-hint{bottom:calc(clamp(178px,23vh,238px) + 20px)}
+  body.design-v2 #cam .cam-top{height:calc(88px + env(safe-area-inset-top));padding:calc(34px + env(safe-area-inset-top)) 18px 0}
+  body.design-v2 #cam .cam-ti{gap:6px}
+  body.design-v2 #cam .cam-ti .n{font-size:16px;line-height:28px}
+  body.design-v2 #cam .cam-ti .p{font-size:15px;line-height:28px}
+  body.design-v2 #cam .cam-top .cx{width:40px;height:40px}
+  body.design-v2 #cam .cam-top .cx svg{width:28px;height:28px}
+  body.design-v2 #cam .cam-guide{height:30px;padding:0 12px;font-size:12px;border-radius:15px}
+  body.design-v2 #cam .cam-act{height:clamp(156px,21vh,196px);padding:78px 28px calc(20px + env(safe-area-inset-bottom))}
+  body.design-v2 #cam .cam-strip{left:22px;right:22px;bottom:calc(clamp(156px,21vh,196px) - 54px);justify-content:flex-start;gap:9px}
+  body.design-v2 #cam .thumb{width:38px;height:38px;border-radius:8px}
+  body.design-v2 #cam .cam-side{width:54px;font-size:12px}
+  body.design-v2 #cam .cam-side .c{width:44px;height:44px}
+  body.design-v2 #cam .cam-side .c svg{width:21px;height:21px}
+  body.design-v2 #cam .shutter{width:66px;height:66px}
+  body.design-v2 #cam .shutter:after{width:52px;height:52px}
+  body.design-v2 #cam .angle-hint{bottom:calc(clamp(156px,21vh,196px) + 18px);font-size:15px}
+  body.design-v2 #cam.preview .shutter{font-size:16px}
+  /* Figma proportion lock: base frame 375 x 812, scaled by JS through --fx. */
+  body.design-v2{--fx:1;--cam-top-h:calc(89px * var(--fx));--cam-panel-h:calc(206px * var(--fx))}
+  body.design-v2 .sbar{height:calc(44px * var(--fx));padding:calc(12px * var(--fx)) calc(18px * var(--fx)) 0;font-size:calc(12px * var(--fx))}
+  body.design-v2 .hbar{bottom:calc(7px * var(--fx));width:calc(132px * var(--fx));height:calc(4px * var(--fx))}
+  body.design-v2 #check .top{height:calc(97px * var(--fx) + env(safe-area-inset-top));padding:calc(44px * var(--fx) + env(safe-area-inset-top)) calc(14px * var(--fx)) 0}
+  body.design-v2 #check .top-nav{height:calc(24px * var(--fx));gap:calc(8px * var(--fx))}
+  body.design-v2 #check .bk2{width:calc(24px * var(--fx));height:calc(24px * var(--fx))}
+  body.design-v2 #check .bk2 svg{width:calc(18px * var(--fx));height:calc(18px * var(--fx))}
+  body.design-v2 #check .cti{font-size:calc(14px * var(--fx));line-height:calc(24px * var(--fx))}
+  body.design-v2 #check .ov{padding:calc(8px * var(--fx)) 0 0}
+  body.design-v2 #check .ov-big,body.design-v2 #check .ov-sub{font-size:calc(12px * var(--fx))}
+  body.design-v2 #check .cbody{padding:calc(15px * var(--fx)) calc(14px * var(--fx)) calc(86px * var(--fx) + env(safe-area-inset-bottom))}
+  body.design-v2 #check .grp{margin-bottom:calc(17px * var(--fx))}
+  body.design-v2 #check .grp-h{padding:0 0 calc(8px * var(--fx))}
+  body.design-v2 #check .grp-h .gt{font-size:calc(13px * var(--fx))}
+  body.design-v2 #check .grp-card{border-radius:calc(7px * var(--fx))}
+  body.design-v2 #check .crow{min-height:calc(51px * var(--fx));padding:calc(10px * var(--fx)) calc(13px * var(--fx));gap:calc(10px * var(--fx))}
+  body.design-v2 #check .st{width:calc(16px * var(--fx));height:calc(16px * var(--fx));font-size:calc(9px * var(--fx))}
+  body.design-v2 #check .crow .nm{font-size:calc(13px * var(--fx));line-height:calc(18px * var(--fx))}
+  body.design-v2 #check .crow .meta{font-size:calc(10px * var(--fx));line-height:calc(14px * var(--fx));margin-top:calc(2px * var(--fx))}
+  body.design-v2 #check .ijb{font-size:calc(11px * var(--fx));padding:calc(5px * var(--fx)) calc(10px * var(--fx))}
+  body.design-v2 #check .cfoot{padding:calc(10px * var(--fx)) calc(14px * var(--fx)) calc(34px * var(--fx) + env(safe-area-inset-bottom));gap:calc(10px * var(--fx))}
+  body.design-v2 #check .cfoot .foot-l,body.design-v2 #check #chk-submit{height:calc(42px * var(--fx));font-size:calc(13px * var(--fx));border-radius:calc(3px * var(--fx))}
+  body.design-v2 #cam .cam-top{height:calc(var(--cam-top-h) + env(safe-area-inset-top));padding:calc(44px * var(--fx) + env(safe-area-inset-top)) calc(22px * var(--fx)) 0 calc(24px * var(--fx));background:#fff;border-bottom:1px solid #EEF0F4;backdrop-filter:none}
+  body.design-v2 #cam .cam-ti{gap:calc(8px * var(--fx));margin-left:calc(2px * var(--fx));min-width:0}
+  body.design-v2 #cam .cam-ti .n{font-size:calc(17px * var(--fx));line-height:calc(28px * var(--fx));font-weight:600;color:#252B36;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  body.design-v2 #cam .cam-ti .p{font-size:calc(16px * var(--fx));line-height:calc(28px * var(--fx));font-weight:600;color:#8B94A3;white-space:nowrap;flex-shrink:0}
+  body.design-v2 #cam .cam-top .cx{width:calc(32px * var(--fx));height:calc(32px * var(--fx));margin-left:calc(-8px * var(--fx));color:#252B36}
+  body.design-v2 #cam .cam-top .cx svg{width:calc(22px * var(--fx));height:calc(22px * var(--fx))}
+  body.design-v2 #cam .cam-guide{height:calc(32px * var(--fx));padding:0 calc(12px * var(--fx));border-radius:calc(16px * var(--fx));font-size:calc(13px * var(--fx));flex-shrink:0}
+  body.design-v2 #cam .vf{inset:0}
+  body.design-v2 #cam .angle-hint{bottom:calc(var(--cam-panel-h) + 18px * var(--fx));font-size:calc(13px * var(--fx));line-height:calc(18px * var(--fx));padding:calc(5px * var(--fx)) calc(12px * var(--fx));border-radius:calc(14px * var(--fx))}
+  body.design-v2 #cam .cam-act{height:calc(var(--cam-panel-h) + env(safe-area-inset-bottom));padding:calc(119px * var(--fx)) calc(28px * var(--fx)) calc(23px * var(--fx) + env(safe-area-inset-bottom));background:rgba(44,44,44,.58);backdrop-filter:blur(calc(28px * var(--fx)));border-top:1px solid rgba(255,255,255,.2)}
+  body.design-v2 #cam .cam-strip{left:calc(20px * var(--fx));right:calc(104px * var(--fx));bottom:calc(var(--cam-panel-h) - 72px * var(--fx));gap:calc(9px * var(--fx));min-height:calc(46px * var(--fx))}
+  body.design-v2 #cam .thumb{width:calc(46px * var(--fx));height:calc(46px * var(--fx));border-radius:calc(8px * var(--fx));border-width:1px}
+  body.design-v2 #cam .thumb.cur{outline:calc(2px * var(--fx)) solid #2B82FF}
+  body.design-v2 #cam .cam-native{position:absolute;right:calc(24px * var(--fx));bottom:calc(var(--cam-panel-h) - 82px * var(--fx));z-index:23;width:calc(64px * var(--fx));height:calc(72px * var(--fx));display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:calc(5px * var(--fx));color:#fff;font-size:calc(11px * var(--fx));line-height:calc(15px * var(--fx));text-shadow:0 1px 3px rgba(0,0,0,.32);cursor:pointer}
+  body.design-v2 #cam .cam-native:before{content:'';position:absolute;left:calc(-18px * var(--fx));top:calc(4px * var(--fx));width:1px;height:calc(52px * var(--fx));background:rgba(255,255,255,.18)}
+  body.design-v2 #cam .cam-native .c{width:calc(58px * var(--fx));height:calc(58px * var(--fx));border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.56)}
+  body.design-v2 #cam .cam-native svg{width:calc(25px * var(--fx));height:calc(25px * var(--fx))}
+  body.design-v2 #cam.preview .cam-native{display:none}
+  body.design-v2 #cam .cam-side{width:calc(60px * var(--fx));font-size:calc(12px * var(--fx));line-height:calc(18px * var(--fx));gap:calc(7px * var(--fx))}
+  body.design-v2 #cam .cam-side .c{width:calc(56px * var(--fx));height:calc(56px * var(--fx));border-radius:50%}
+  body.design-v2 #cam .cam-side .c svg{width:calc(24px * var(--fx));height:calc(24px * var(--fx))}
+  body.design-v2 #cam .shutter{width:calc(72px * var(--fx));height:calc(72px * var(--fx));border-width:calc(4px * var(--fx))}
+  body.design-v2 #cam .shutter:after{width:calc(58px * var(--fx));height:calc(58px * var(--fx))}
+  body.design-v2 #cam.preview .cam-act{padding-top:calc(91px * var(--fx))}
+  body.design-v2 #cam.preview .shutter{font-size:calc(17px * var(--fx))}
   @media(max-width:440px){body{padding:0}.phone{width:100vw;height:100vh;border-radius:0;box-shadow:none}.cap{display:none}}
 </style>
 </head>
@@ -571,6 +650,7 @@
     </div>
     <div class="judge-bar" id="judge"><div class="judge-q" id="judge-q"></div><div class="judge-btns" id="judge-btns"></div></div>
     <div class="cam-strip" id="strip"></div>
+    <div class="cam-native" id="cam-native" onclick="nativeShot()"><div class="c"><svg width="19" height="19"><use href="#i-cam"/></svg></div>原相机</div>
     <div class="cam-act">
       <div class="cam-side" onclick="nativeShot()"><div class="c"><svg width="19" height="19"><use href="#i-cam"/></svg></div>原相机</div>
       <div class="shutter" id="shutter" onclick="shoot()"></div>
@@ -1032,6 +1112,12 @@ function heroPunch(){
 
 /* ============ Figma 还原流程覆盖 ============ */
 document.body.classList.add('design-v2');
+function syncFigmaScale(){
+  const scale=Math.min(window.innerWidth/375,window.innerHeight/812);
+  document.body.style.setProperty('--fx',Math.max(.82,Math.min(1.18,scale)).toFixed(4));
+}
+syncFigmaScale();
+window.addEventListener('resize',syncFigmaScale);
 let dailyPunchDone=false,taskPunchMode='start';
 const DESIGN_STEPS=[
   {k:'开始打卡',d:'开始任务时打卡，自动记录时间地点'},
@@ -1172,9 +1258,10 @@ function renderCam(){
   else{$('angle-t').textContent=n>0?'已拍'+n+'张':'已拍0张';$('angle-tip').textContent=''}
   $('judge').classList.remove('on');
   $('dots').innerHTML=it.need.map((_,i)=>`<div class="adot ${i<n?'shot':''} ${i===n&&!full?'cur':''}"></div>`).join('');
-  $('strip').innerHTML=it.need.map((_,i)=>{
+  $('strip').innerHTML=Array.from({length:Math.max(it.need.length,5)},(_,i)=>{
     const s=camShots[i];
-    return `<div class="thumb ${s?'filled':''} ${camMode==='preview'&&i===previewIdx?'cur':''}" ${s?`onclick="event.stopPropagation();previewCamShot(${i})"`:''} style="${s&&s.src?`background-image:url('${s.src}')`:''}">${s&&s.native?'<span class="rt">原</span>':''}</div>`;
+    const active=i<it.need.length;
+    return `<div class="thumb ${s?'filled':''} ${active?'':'ghost'} ${camMode==='preview'&&i===previewIdx?'cur':''}" ${s?`onclick="event.stopPropagation();previewCamShot(${i})"`:''} style="${s&&s.src?`background-image:url('${s.src}')`:''}">${s&&s.native?'<span class="rt">原</span>':''}</div>`;
   }).join('');
   renderCamActions();
   $('vf').querySelector('.shot-toast')?.remove();
