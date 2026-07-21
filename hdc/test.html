@@ -414,9 +414,14 @@
   body.design-v2 #cam .cam-strip{display:flex;position:absolute;left:18px;right:18px;bottom:calc(clamp(178px,23vh,238px) - 64px);z-index:22;padding:0;min-height:42px;justify-content:center;gap:8px;overflow-x:auto}
   body.design-v2 #cam .thumb{width:38px;height:38px;border-radius:7px;border:1px dashed rgba(255,255,255,.88);background:rgba(255,255,255,.18)}
   body.design-v2 #cam .thumb.filled{border-style:solid;background-size:cover;background-position:center}
+  body.design-v2 #cam .thumb.cur{outline:2px solid #2B82FF;outline-offset:0}
   body.design-v2 #cam .angle-dots{display:none}
   body.design-v2 #cam .angle-hint{bottom:calc(clamp(178px,23vh,238px) + 16px)}
   body.design-v2 #cam .judge-bar{display:none!important}
+  body.design-v2 #cam.preview .cam-act{padding-top:76px}
+  body.design-v2 #cam.preview .cam-side .c{background:rgba(255,255,255,.18)}
+  body.design-v2 #cam.preview .shutter{background:rgba(255,255,255,.8);border:0;color:#858B98;font-size:18px;font-weight:700}
+  body.design-v2 #cam.preview .shutter:after{display:none}
   body.design-v2 .review-actions{display:flex;gap:12px;margin-top:16px}
   body.design-v2 .review-actions .btn{height:46px;border-radius:4px;font-size:15px}
   @media(max-width:440px){body{padding:0}.phone{width:100vw;height:100vh;border-radius:0;box-shadow:none}.cap{display:none}}
@@ -706,7 +711,7 @@ const CHK={
 
 let stage=0,expenses=[],expCat='充电费',expInv=false,flawCount=0;
 let chkMode='out',ALL=[],GROUPS=[],curIdx=0,camShots=[];
-let camStream=null,burstTimer=null,bursting=false,camReady=false;
+let camStream=null,burstTimer=null,bursting=false,camReady=false,camMode='shoot',previewIdx=0;
 
 function $(id){return document.getElementById(id)}
 function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');$('sbar').classList.toggle('light',id==='home'||id==='cam')}
@@ -837,7 +842,7 @@ function submitCheck(){
 }
 
 /* ============ 相机 ============ */
-function enterCam(idx){curIdx=idx;const it=ALL[idx];camShots=it.shots.slice();stopBurst();$('judge').classList.remove('on');$('perm').classList.remove('on');renderCam();go('cam');startCamera()}
+function enterCam(idx){curIdx=idx;camMode='shoot';previewIdx=0;const it=ALL[idx];camShots=it.shots.slice();stopBurst();$('cam').classList.remove('preview');$('judge').classList.remove('on');$('perm').classList.remove('on');renderCam();go('cam');startCamera()}
 function renderCam(){
   const it=ALL[curIdx],n=camShots.length,total=it.need.length,full=n>=total;
   $('cam-n').textContent=it.name;$('cam-p').textContent=`第 ${it.idx+1} / ${ALL.length} 项`;
@@ -865,7 +870,8 @@ async function startCamera(){
       video.srcObject=camStream;
     }
     await video.play();
-    camReady=true;video.classList.remove('off');fallback.classList.add('off');
+    camReady=true;
+    if(camMode!=='preview'){video.classList.remove('off');fallback.classList.add('off')}
   }catch(e){
     camReady=false;video.classList.add('off');fallback.classList.remove('off');fallback.querySelector('span').textContent='相机权限未开启，可点原相机拍摄';
     if(!$('perm').classList.contains('shown')){$('perm').classList.add('on','shown');setTimeout(()=>$('perm').classList.remove('on'),2600)}
@@ -923,7 +929,7 @@ function advanceAfterShot(){
   stopBurst();stopCamera();renderCheck();go('check');toast('拍摄完成，可回看照片或完成检查');
 }
 function camJudge(v){const it=ALL[curIdx];it.shots=camShots;it.judge=v;refresh(it);if(v===it.bad)toast(`「${it.name}」已标记${v}`);autoNext()}
-function skipNext(){const it=ALL[curIdx];it.shots=camShots;refresh(it);autoNext(true)}
+function skipNext(){const it=ALL[curIdx];if(it.na&&camShots.length===0&&!it.judge){it.judge=it.na;it.shots=[];refresh(it)}else{it.shots=camShots;refresh(it)}autoNext(true)}
 function autoNext(){
   stopBurst();
   const nx=ALL.findIndex((x,i)=>i>curIdx&&x.type==='photo'&&!itemDone(x)&&x.judge!==x.na);
@@ -1149,22 +1155,58 @@ function renderCam(){
   $('cam-n').textContent=it.name+' ';
   $('cam-p').textContent=`(${Math.min(n+1,total)}/${total})`;
   $('vf').style.background=`linear-gradient(180deg,#e5e5e5,#cfcfcf)`;
-  $('angle').style.display=full?'none':'flex';
-  if(!full){$('angle-t').textContent=n>0?'已拍'+n+'张':'已拍0张';$('angle-tip').textContent=''}
+  $('cam').classList.toggle('preview',camMode==='preview');
+  const video=$('cam-video'),fallback=$('cam-fallback'),ps=camShots[previewIdx];
+  if(camMode==='preview'&&ps){
+    video.classList.add('off');
+    fallback.classList.remove('off');
+    fallback.innerHTML='';
+    fallback.style.background=ps.src?`url('${ps.src}') center/cover no-repeat`:'linear-gradient(#E5E5E5,#D7D7D7)';
+  }else{
+    fallback.style.background='';
+    if(camReady){video.classList.remove('off');fallback.classList.add('off')}
+    else{fallback.innerHTML='<span>相机权限未开启，可点原相机拍摄</span>'}
+  }
+  $('angle').style.display='flex';
+  if(camMode==='preview'){$('angle-t').textContent=`预览中 ${previewIdx+1}/${Math.max(1,total)}`;$('angle-tip').textContent=''}
+  else{$('angle-t').textContent=n>0?'已拍'+n+'张':'已拍0张';$('angle-tip').textContent=''}
   $('judge').classList.remove('on');
   $('dots').innerHTML=it.need.map((_,i)=>`<div class="adot ${i<n?'shot':''} ${i===n&&!full?'cur':''}"></div>`).join('');
   $('strip').innerHTML=it.need.map((_,i)=>{
     const s=camShots[i];
-    return `<div class="thumb ${s?'filled':''}" ${s?`onclick="event.stopPropagation();previewCamShot(${i})"`:''} style="${s&&s.src?`background-image:url('${s.src}')`:''}">${s&&s.native?'<span class="rt">原</span>':''}</div>`;
+    return `<div class="thumb ${s?'filled':''} ${camMode==='preview'&&i===previewIdx?'cur':''}" ${s?`onclick="event.stopPropagation();previewCamShot(${i})"`:''} style="${s&&s.src?`background-image:url('${s.src}')`:''}">${s&&s.native?'<span class="rt">原</span>':''}</div>`;
   }).join('');
+  renderCamActions();
   $('vf').querySelector('.shot-toast')?.remove();
+}
+function renderCamActions(){
+  const left=document.querySelector('#cam .cam-act .cam-side:first-child');
+  const mid=$('shutter');
+  const right=document.querySelector('#cam .cam-act .cam-side:last-child');
+  if(camMode==='preview'){
+    left.innerHTML='<div class="c"><svg width="22" height="22"><use href="#i-close"/></svg></div>退出预览';
+    left.onclick=exitPhotoPreview;
+    mid.textContent='重拍';mid.onclick=retakeCurrentPreview;
+    right.innerHTML='<div class="c"><svg width="22" height="22"><use href="#i-alert"/></svg></div>标注异常';
+    right.onclick=markCurrentPreviewAbnormal;
+  }else{
+    left.innerHTML='<div class="c"><svg width="22" height="22"><use href="#i-back"/></svg></div>上一项';
+    left.onclick=prevPhotoItem;
+    mid.textContent='';mid.onclick=shoot;
+    right.innerHTML=`<div class="c"><svg width="22" height="22"><use href="#i-arrow"/></svg></div>${ALL[curIdx]&&ALL[curIdx].na?'不涉及':'下一项'}`;
+    right.onclick=skipNext;
+  }
 }
 function previewCamShot(i){
   const it=ALL[curIdx],s=camShots[i];
   if(!s)return;
   it.shots=camShots;refresh(it);
-  openPhotoReview(curIdx,i);
+  camMode='preview';previewIdx=i;renderCam();
 }
+function exitPhotoPreview(){camMode='shoot';renderCam()}
+function retakeCurrentPreview(){camShots.splice(previewIdx,1);camMode='shoot';renderCam()}
+function markCurrentPreviewAbnormal(){const it=ALL[curIdx];it.shots=camShots;it.judge='异常';refresh(it);camMode='shoot';renderCam();toast('已标注异常')}
+function prevPhotoItem(){const p=ALL.map((x,i)=>({x,i})).filter(o=>o.i<curIdx&&o.x.type==='photo').pop();if(p)enterCam(p.i);else toast('已经是第一项')}
 function openPhotoReview(idx,focusIndex=0){
   const it=ALL[idx];curIdx=idx;
   $('guide-title').textContent=it.name+' · 照片预览';
@@ -1181,7 +1223,7 @@ function openGuide(){
   const steps=[
     '按要求角度取景，车辆或设备主体完整入画',
     '拍摄距离保持稳定，避免过曝、遮挡、虚焦',
-    '拍完自动进入下一项，完成后可在列表点照片回看',
+    '按一下快门拍一张，可点底部缩略图预览',
   ].concat(it.guide||[]).slice(0,5);
   $('guide-steps').innerHTML=steps.map((s,i)=>`<div class="guide-step"><div class="gn">${i+1}</div><div class="gx">${s}</div></div>`).join('');
   $('guide-mask').classList.add('on');
