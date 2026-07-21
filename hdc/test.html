@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>采标平台 · 日检完整原型（主页→检查→打卡→收车→费用闭环）</title>
+<style>
+  :root{
+    --blue:#2B6FF6;--blue-d:#1E5AD8;--green:#00B578;--orange:#FF8F1F;--red:#FA5151;
+    --bg:#EEF2F8;--card:#FFFFFF;--sep:#EDF0F5;
+    --t1:#1A1D24;--t2:#52586A;--t3:#9AA1B0;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",sans-serif;background:#22252B;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:26px 16px 46px;color:var(--t1)}
+  .cap{color:#9BA3AE;font-size:13px;margin-bottom:16px;text-align:center;line-height:1.65;max-width:410px}
+  .cap b{color:#D5DAE0;font-weight:600}
+  .phone{width:393px;height:852px;border-radius:52px;box-shadow:0 0 0 12px #000,0 0 0 14px #3A3A3C,0 40px 80px rgba(0,0,0,.55);overflow:hidden;position:relative;flex-shrink:0;background:var(--bg)}
+  .island{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:118px;height:33px;background:#000;border-radius:20px;z-index:61}
+  .sbar{position:absolute;top:0;left:0;right:0;height:52px;z-index:60;display:flex;justify-content:space-between;align-items:center;padding:14px 28px 0;font-size:15px;font-weight:600;pointer-events:none}
+  .sbar.light{color:#fff}
+  .sbar .ic{display:flex;gap:6px;align-items:center}
+  .hbar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:138px;height:5px;background:#000;border-radius:3px;z-index:62;opacity:.85}
+  svg use{pointer-events:none}
+  .screen{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden;background:var(--bg)}
+  .screen.on{display:flex}
+  .scroll{flex:1;overflow-y:auto;scrollbar-width:none}
+  .scroll::-webkit-scrollbar{display:none}
+
+  .btn{display:flex;align-items:center;justify-content:center;gap:7px;height:44px;border:none;border-radius:12px;font-size:15.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:transform .08s;width:100%}
+  .btn:active{transform:scale(.98)}
+  .btn.primary{background:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(43,111,246,.26)}
+  .btn.primary:disabled{background:#C6D2E6;box-shadow:none}
+  .btn.green{background:var(--green);color:#fff;box-shadow:0 4px 12px rgba(0,181,120,.24)}
+  .btn.ghost{background:rgba(43,111,246,.08);color:var(--blue)}
+  .btn.gray{background:#EEF1F6;color:var(--t2)}
+  .btn.sm{height:38px;font-size:14px;border-radius:10px}
+  .btn.big{height:50px;font-size:17px;border-radius:14px}
+
+  /* ===== 主页 hero ===== */
+  .hero{background:linear-gradient(150deg,#3B82F7 0%,#2B6FF6 55%,#1E5AD8 100%);padding:56px 20px 56px;color:#fff;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;top:-60px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.08)}
+  .hero::after{content:'';position:absolute;top:20px;right:60px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.06)}
+  .h-top{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:2}
+  .h-hi{display:flex;align-items:baseline;gap:9px}
+  .h-hi #h-name{font-size:19px;font-weight:700}
+  .h-hi .h-sub{font-size:13px;opacity:.8}
+  .hero .date{font-size:13px;opacity:.9;background:rgba(255,255,255,.16);padding:6px 12px;border-radius:20px;display:flex;align-items:center;gap:6px;cursor:pointer}
+  /* 打卡卡片 */
+  .punch-hero{position:relative;z-index:2;margin-top:18px;background:rgba(255,255,255,.14);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between}
+  .ph-l{min-width:0}
+  .ph-label{font-size:13px;opacity:.85;font-weight:500}
+  .ph-clock{font-size:38px;font-weight:300;font-variant-numeric:tabular-nums;line-height:1.1;margin:2px 0 5px;letter-spacing:1px}
+  .ph-loc{display:flex;align-items:center;gap:5px;font-size:12.5px;opacity:.85}
+  .ph-r{cursor:pointer;flex-shrink:0}
+  .ph-ring{width:82px;height:82px;border-radius:50%;background:#fff;color:var(--blue);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:0 6px 20px rgba(0,0,0,.18);transition:transform .12s}
+  .ph-r:active .ph-ring{transform:scale(.94)}
+  .ph-ring span{font-size:13px;font-weight:700}
+  .ph-ring.done{background:rgba(255,255,255,.2);color:#fff;box-shadow:none}
+  .ph-ring.off{background:rgba(255,255,255,.25);color:rgba(255,255,255,.7);box-shadow:none}
+  /* 概览 */
+  .h-sum{position:relative;z-index:2;display:flex;align-items:center;margin-top:16px;padding:0 4px}
+  .h-sum .hsi{display:flex;align-items:baseline;gap:4px}
+  .h-sum .hsi .n{font-size:18px;font-weight:700}
+  .h-sum .hsi .l{font-size:12px;opacity:.8}
+  .h-sum .hsi-sep{width:1px;height:14px;background:rgba(255,255,255,.25);margin:0 16px}
+  .sheet-body{margin-top:-40px;position:relative;z-index:2;padding:0 15px}
+
+  /* 工作流主卡 */
+  .flow-card{background:var(--card);border-radius:18px;padding:18px 16px 16px;box-shadow:0 6px 24px rgba(20,40,90,.1)}
+  .fc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+  .fc-title{font-size:17px;font-weight:700}
+  .fc-plate{font-size:12.5px;font-weight:600;color:#0B8A5D;background:#EAF8F1;padding:3px 9px;border-radius:6px}
+  .fc-task{font-size:13px;color:var(--t3);margin-bottom:16px}
+  .steps{position:relative}
+  .step{display:flex;gap:13px;position:relative}
+  .step .lc{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+  .step .dot{width:30px;height:30px;border-radius:50%;background:#EEF1F6;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--t3);z-index:2}
+  .step .line{width:2.5px;flex:1;background:#E4E9F2;margin:3px 0;min-height:14px}
+  .step:last-child .line{display:none}
+  .step .rc{flex:1;padding-bottom:16px;min-width:0}
+  .step .snm{font-size:15.5px;font-weight:600;display:flex;align-items:center;gap:8px}
+  .step .sdd{font-size:12.5px;color:var(--t3);margin-top:3px}
+  .step .sbtn{margin-top:11px}
+  .step.done .dot{background:var(--green);color:#fff}
+  .step.done .line{background:var(--green)}
+  .step.done .snm{color:var(--t2)}
+  .step.now .dot{background:var(--blue);color:#fff;box-shadow:0 0 0 5px rgba(43,111,246,.15)}
+  .step.now .snm{color:var(--t1)}
+  .step.todo .snm{color:var(--t3)}
+  .step.todo .sdd{color:#C2C9D6}
+  .mini-tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px}
+  .mini-tag.wait{background:rgba(43,111,246,.1);color:var(--blue)}
+  .mini-tag.done{background:rgba(0,181,120,.12);color:var(--green)}
+  .mini-tag.flaw{background:rgba(250,81,81,.1);color:var(--red)}
+
+  /* 费用常驻窗口 */
+  .sect{font-size:15px;font-weight:700;margin:22px 4px 10px;display:flex;align-items:center;justify-content:space-between}
+  .sect .more{font-size:13px;color:var(--blue);font-weight:400;cursor:pointer;display:flex;align-items:center;gap:2px}
+  .exp-card{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(20,40,90,.05)}
+  .exp-hd{display:flex;align-items:center;gap:13px;padding:16px}
+  .exp-hd .eic{width:46px;height:46px;border-radius:13px;background:linear-gradient(160deg,#FFB65C,#FF8F1F);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+  .exp-hd .grow{flex:1;min-width:0}
+  .exp-hd .et{font-size:16px;font-weight:600}
+  .exp-hd .ed{font-size:12.5px;color:var(--t3);margin-top:2px}
+  .exp-hd .add{width:38px;height:38px;border-radius:11px;background:rgba(255,143,31,.12);color:#C97A00;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+  .exp-stat{display:flex;border-top:.5px solid var(--sep)}
+  .exp-stat .es{flex:1;text-align:center;padding:12px 0;position:relative}
+  .exp-stat .es+.es::before{content:'';position:absolute;left:0;top:14px;bottom:14px;width:.5px;background:var(--sep)}
+  .exp-stat .en{font-size:18px;font-weight:700}
+  .exp-stat .el{font-size:11.5px;color:var(--t3);margin-top:2px}
+  .exp-stat .en.rev{color:var(--orange)}
+  .exp-list{border-top:.5px solid var(--sep)}
+  .exp-row{display:flex;align-items:center;gap:11px;padding:12px 16px;position:relative}
+  .exp-row+.exp-row::before{content:'';position:absolute;top:0;left:16px;right:0;height:.5px;background:var(--sep)}
+  .exp-row .grow{flex:1}
+  .exp-row .rt{font-size:14.5px;font-weight:600}
+  .exp-row .rd{font-size:12px;color:var(--t3);margin-top:2px}
+  .tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;flex-shrink:0}
+  .tag.rev{background:rgba(255,143,31,.13);color:#C97A00}
+  .tag.pass{background:rgba(0,181,120,.12);color:var(--green)}
+  .tag.draft{background:#EDF1F8;color:var(--t3)}
+
+  .mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .mini-card{background:var(--card);border-radius:16px;padding:15px;cursor:pointer;box-shadow:0 2px 10px rgba(20,40,90,.05);transition:transform .1s}
+  .mini-card:active{transform:scale(.98)}
+  .mini-card .mic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+  .mini-card .mt{font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:space-between}
+  .mini-card .md{font-size:12px;color:var(--t3);margin-top:3px}
+  .dot-badge{width:8px;height:8px;border-radius:50%}
+
+  .tabbar{position:absolute;bottom:0;left:0;right:0;height:82px;background:rgba(255,255,255,.94);backdrop-filter:blur(20px);border-top:.5px solid var(--sep);display:flex;padding-top:8px;z-index:40}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:var(--t3);cursor:pointer}
+  .tab svg{width:24px;height:24px}
+  .tab.on{color:var(--blue);font-weight:600}
+
+  /* ===== 通用 nav ===== */
+  .nav{padding:56px 16px 10px;background:var(--card);display:flex;align-items:center;height:92px;border-bottom:.5px solid var(--sep)}
+  .nav .bk{width:32px;height:32px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .nav .nt{flex:1;text-align:center;font-size:17px;font-weight:600;margin-right:32px}
+  .nav .veh{font-size:12px;color:#0B8A5D;background:#EAF8F1;padding:3px 9px;border-radius:6px;font-weight:600}
+  .nav .rbtn{width:32px;height:32px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer}
+
+  /* ===== 检查清单主场 ===== */
+  #check .top{padding:56px 18px 0;background:var(--card);border-bottom:.5px solid var(--sep)}
+  #check .top-nav{display:flex;align-items:center;height:36px;gap:10px}
+  #check .bk2{width:32px;height:32px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer}
+  #check .cti{flex:1;font-size:17px;font-weight:600}
+  #check .ov{padding:14px 2px 16px}
+  #check .ov-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:11px}
+  #check .ov-big{font-size:15px;font-weight:600}
+  #check .ov-big b{font-size:26px;color:var(--blue);font-weight:700}
+  #check .ov-sub{font-size:12.5px;color:var(--t3)}
+  #check .track{height:8px;border-radius:5px;background:#EEF1F6;display:flex;overflow:hidden;gap:2px}
+  #check .track i{height:100%;transition:width .4s}
+  #check .track .d{background:var(--green)}
+  #check .track .f{background:var(--red)}
+  #check .track .p{background:var(--orange)}
+  #check .lg{display:flex;gap:14px;margin-top:11px;font-size:12px;color:var(--t2)}
+  #check .lg span{display:flex;align-items:center;gap:5px}
+  #check .lg i{width:8px;height:8px;border-radius:50%}
+  #check .cbody{padding:14px 16px 130px}
+  #check .grp{margin-bottom:16px}
+  #check .grp-h{display:flex;align-items:center;justify-content:space-between;padding:2px 4px 9px}
+  #check .grp-h .gt{font-size:14px;font-weight:600;color:var(--t2)}
+  #check .grp-h .gc{font-size:12px;color:var(--t3)}
+  #check .grp-card{background:var(--card);border-radius:14px;overflow:hidden}
+  #check .crow{display:flex;align-items:center;gap:12px;padding:13px 15px;position:relative;cursor:pointer;transition:background .12s}
+  #check .crow:active{background:#F7F9FC}
+  #check .crow+.crow::before{content:'';position:absolute;top:0;left:15px;right:0;height:.5px;background:var(--sep)}
+  #check .crow.na{opacity:.5}
+  #check .st{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+  #check .st.empty{border:2px solid #D5DCE6}
+  #check .st.part{background:#fff;border:2px solid var(--orange);color:var(--orange);font-size:11px}
+  #check .st.done{background:var(--green);color:#fff}
+  #check .st.flaw{background:var(--red);color:#fff}
+  #check .st.na{background:#E7EBF1;color:#9AA1B0}
+  #check .crow .mid{flex:1;min-width:0}
+  #check .crow .nm{font-size:15.5px;font-weight:500;display:flex;align-items:center;gap:6px}
+  #check .crow .req{color:var(--red);font-size:13px}
+  #check .crow .meta{font-size:12.5px;color:var(--t3);margin-top:3px;display:flex;align-items:center;gap:7px}
+  #check .type-chip{font-size:10.5px;padding:1px 6px;border-radius:4px;background:#EEF2F8;color:#7A8397;font-weight:500}
+  #check .crow .rt{display:flex;align-items:center;gap:8px;flex-shrink:0}
+  #check .verdict{font-size:12px;font-weight:600;padding:3px 10px;border-radius:7px}
+  #check .verdict.good{background:rgba(0,181,120,.1);color:var(--green)}
+  #check .verdict.bad{background:rgba(250,81,81,.1);color:var(--red)}
+  #check .chev{color:#CAD2DE;font-size:16px}
+  #check .na-link{font-size:12px;color:#9AA1B0;text-decoration:underline;text-underline-offset:2px;text-decoration-color:#D5DBE4}
+  #check .inline-j{display:flex;gap:8px;margin-top:9px}
+  #check .ijb{font-size:13px;padding:6px 15px;border-radius:9px;background:#F1F5FB;color:var(--t2);font-weight:600;border:1.5px solid transparent}
+  #check .cfoot{position:absolute;bottom:0;left:0;right:0;padding:12px 16px 30px;background:rgba(255,255,255,.94);backdrop-filter:blur(20px);border-top:.5px solid var(--sep);z-index:30}
+  #check .foot-l{font-size:13px;color:var(--t2);margin-bottom:10px}
+  #check .foot-l b{color:var(--t1);font-weight:600}
+  #check .foot-l .warn{color:var(--orange);font-weight:600}
+
+  /* ===== 相机 ===== */
+  #cam{background:#000}
+  .cam-top{padding:56px 18px 10px;display:flex;justify-content:space-between;align-items:center;color:#fff;z-index:5}
+  .cam-top .cx{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .cam-ti{text-align:center}
+  .cam-ti .n{font-size:16px;font-weight:600}
+  .cam-ti .p{font-size:12px;color:rgba(255,255,255,.55);margin-top:2px}
+  .cam-guide{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff}
+  .vf{flex:1;position:relative;margin:6px 12px;border-radius:16px;overflow:hidden}
+  .angle-hint{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.5);backdrop-filter:blur(8px);color:#fff;font-size:13.5px;font-weight:500;padding:8px 16px;border-radius:20px;white-space:nowrap;display:flex;align-items:center;gap:7px}
+  .angle-hint b{color:#FFD60A;font-weight:600}
+  .vf-example{position:absolute;top:12px;right:12px;width:56px;height:56px;border-radius:10px;border:2px solid rgba(255,255,255,.7);overflow:hidden;cursor:pointer;background:linear-gradient(135deg,#4a5568,#2d3748)}
+  .vf-example .el{position:absolute;bottom:0;left:0;right:0;font-size:9px;color:#fff;background:rgba(0,0,0,.5);text-align:center;padding:1px}
+  .vf-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+  .vf-flash.go{animation:fl .3s}@keyframes fl{0%{opacity:.9}100%{opacity:0}}
+  .angle-dots{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:7px}
+  .adot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.3);transition:all .2s}
+  .adot.shot{background:var(--green)}
+  .adot.cur{background:#fff;transform:scale(1.35)}
+  .cam-strip{display:flex;gap:8px;padding:8px 16px 2px;min-height:56px;align-items:center;overflow-x:auto}
+  .cam-strip::-webkit-scrollbar{display:none}
+  .thumb{width:44px;height:44px;border-radius:8px;flex-shrink:0;position:relative;overflow:hidden}
+  .thumb .rt{position:absolute;top:2px;right:2px;background:rgba(255,214,10,.92);color:#4a3b00;font-size:8px;font-weight:700;width:13px;height:13px;border-radius:4px;display:flex;align-items:center;justify-content:center}
+  .cam-act{padding:6px 24px 40px;display:flex;align-items:center;justify-content:space-between}
+  .cam-side{width:60px;text-align:center;color:#fff;font-size:12px;cursor:pointer;opacity:.9}
+  .cam-side .c{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;margin:0 auto 5px}
+  .shutter{width:74px;height:74px;border-radius:50%;border:4px solid #fff;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .shutter::after{content:'';width:58px;height:58px;border-radius:50%;background:#fff;transition:transform .1s}
+  .shutter:active::after{transform:scale(.85)}
+  .judge-bar{position:absolute;left:0;right:0;bottom:150px;padding:0 20px;display:none;flex-direction:column;gap:12px;z-index:6}
+  .judge-bar.on{display:flex}
+  .judge-q{text-align:center;color:#fff;font-size:15px;font-weight:500;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);padding:8px;border-radius:12px}
+  .judge-btns{display:flex;gap:12px}
+  .jb{flex:1;height:52px;border-radius:14px;border:none;font-size:17px;font-weight:600;font-family:inherit;cursor:pointer}
+  .jb.good{background:var(--green);color:#fff}
+  .jb.bad{background:rgba(255,255,255,.16);color:#fff;border:1.5px solid rgba(255,255,255,.55)}
+  .jb:active{transform:scale(.96)}
+  .perm{position:absolute;top:100px;left:16px;right:16px;background:rgba(250,81,81,.95);color:#fff;border-radius:14px;padding:13px 15px;display:none;align-items:center;gap:11px;z-index:8}
+  .perm.on{display:flex}
+  .perm .pt{flex:1;font-size:13px;line-height:1.45}
+  .perm .pb{background:#fff;color:var(--red);font-size:13px;font-weight:600;padding:7px 12px;border-radius:9px;cursor:pointer;white-space:nowrap}
+
+  /* ===== 打卡 ===== */
+  .punch{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 30px;background:var(--bg)}
+  .clock{font-size:54px;font-weight:200;font-variant-numeric:tabular-nums}
+  .loc{display:flex;align-items:center;gap:6px;font-size:14.5px;color:var(--t2);margin-top:4px}
+  .loc .ld{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pl 1.6s infinite}
+  @keyframes pl{50%{opacity:.4}}
+  .punchbtn{width:196px;height:196px;border-radius:50%;background:linear-gradient(180deg,#3B82F7,#2B6FF6);color:#fff;border:none;font-size:22px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 16px 38px rgba(43,111,246,.4);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;margin-top:30px;transition:transform .1s}
+  .punchbtn:active{transform:scale(.96)}
+  .punchbtn small{font-size:13px;font-weight:400;opacity:.85}
+  .punchbtn.done{background:linear-gradient(180deg,#00C685,#00B578)}
+  .punch-info{background:var(--card);border-radius:14px;margin-top:26px;width:100%;overflow:hidden}
+  .pi-row{display:flex;padding:13px 16px;font-size:14.5px;position:relative}
+  .pi-row+.pi-row::before{content:'';position:absolute;top:0;left:16px;right:0;height:.5px;background:var(--sep)}
+  .pi-row .k{width:90px;color:var(--t3)}
+  .pi-row .v{flex:1;font-weight:500}
+
+  /* ===== 收车小结 ===== */
+  .form-scroll{flex:1;overflow-y:auto;padding:16px 15px 40px;scrollbar-width:none}
+  .form-scroll::-webkit-scrollbar{display:none}
+  .card{background:var(--card);border-radius:14px;overflow:hidden;margin-bottom:14px}
+  .decl{display:flex;align-items:center;justify-content:space-between;padding:15px 16px;position:relative}
+  .decl+.decl::before{content:'';position:absolute;top:0;left:16px;right:0;height:.5px;background:var(--sep)}
+  .decl .dt{font-size:16px;font-weight:500}
+  .decl .dd{font-size:12px;color:var(--t3);margin-top:2px}
+  .sw{width:50px;height:30px;border-radius:16px;background:#E4E9F2;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+  .sw::after{content:'';position:absolute;top:2px;left:2px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.15);transition:left .2s}
+  .sw.on{background:var(--green)}
+  .sw.on::after{left:22px}
+  .seg{display:flex;gap:8px}
+  .segb{padding:7px 20px;border-radius:9px;background:#F1F5FB;color:var(--t2);font-size:14px;font-weight:600;cursor:pointer;border:1.5px solid transparent}
+  .segb.on{background:rgba(43,111,246,.1);color:var(--blue);border-color:var(--blue)}
+  .note-input{padding:14px 16px}
+  .note-input textarea{border:none;outline:none;font-size:15px;width:100%;font-family:inherit;resize:none;background:transparent}
+  .foot{padding:12px 16px 32px;background:var(--card);border-top:.5px solid var(--sep);display:flex;gap:11px}
+
+  /* ===== sheet ===== */
+  .sheet-mask{position:absolute;inset:0;background:rgba(10,15,25,.5);z-index:80;display:none;align-items:flex-end}
+  .sheet-mask.on{display:flex}
+  .sheet{width:100%;background:var(--bg);border-radius:22px 22px 0 0;padding:10px 16px 40px;animation:up .3s;max-height:84%;overflow-y:auto}
+  @keyframes up{from{transform:translateY(50%)}to{transform:translateY(0)}}
+  .grab{width:38px;height:5px;background:#C9D2E0;border-radius:3px;margin:2px auto 14px}
+  .sheet h3{font-size:19px;font-weight:700;text-align:center;margin-bottom:4px}
+  .sheet .sub{font-size:13px;color:var(--t3);text-align:center;margin-bottom:14px}
+  .chips{display:flex;flex-wrap:wrap;gap:9px;padding:2px 0 8px}
+  .chip{padding:9px 15px;border-radius:11px;background:#fff;font-size:14px;color:var(--t2);cursor:pointer;border:1.5px solid transparent;font-weight:500}
+  .chip.on{background:rgba(43,111,246,.08);color:var(--blue);border-color:var(--blue);font-weight:600}
+  .fld{padding:13px 15px;background:#fff;border-radius:12px;margin-bottom:10px}
+  .fld label{font-size:12.5px;color:var(--t3);display:block;margin-bottom:5px}
+  .fld input{border:none;outline:none;font-size:17px;width:100%;font-family:inherit;background:transparent}
+  .upbox{border:1.5px dashed #C7D2E4;border-radius:12px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--t3);font-size:13px;cursor:pointer;background:#fff}
+  .upbox.has{border-style:solid;border-color:var(--green);background:rgba(0,181,120,.05);color:#0B8A5D}
+  .sheet .sect{margin:12px 2px 8px;font-size:14px}
+  .guide-img{height:150px;border-radius:14px;background:linear-gradient(135deg,#4a5568,#2d3748);margin:10px 0 16px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);font-size:13px}
+  .guide-step{display:flex;gap:11px;padding:11px 0;border-bottom:.5px solid var(--sep)}
+  .guide-step .gn{width:22px;height:22px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .guide-step .gx{font-size:14px;color:var(--t2);line-height:1.5}
+  .jump-item{display:flex;align-items:center;gap:11px;padding:12px 4px;cursor:pointer;position:relative}
+  .jump-item+.jump-item::before{content:'';position:absolute;top:0;left:4px;right:0;height:.5px;background:var(--sep)}
+  .jump-item .jn{flex:1;font-size:15px;font-weight:500}
+  .jump-item.cur .jn{color:var(--blue);font-weight:600}
+
+  .toast{position:absolute;left:50%;transform:translateX(-50%) translateY(16px);bottom:130px;background:rgba(26,29,36,.94);color:#fff;font-size:14px;padding:11px 20px;border-radius:22px;opacity:0;pointer-events:none;transition:all .3s;z-index:99;max-width:84%;text-align:center;backdrop-filter:blur(10px)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @media(max-width:440px){body{padding:0}.phone{width:100vw;height:100vh;border-radius:0;box-shadow:none}.cap{display:none}}
+</style>
+</head>
+<body>
+<div class="cap"><b>采标平台 · 日检完整原型</b><br>一条闭环：主页工作流 → 上班打卡 → 出车检查（清单主场+双拍摄+判断）→ 执行 → 收车检查 → 收车小结（交盘/充电/费用）→ 下班打卡 → 日志自动生成。费用首页常驻随时填。<br><span style="color:#6E7683">按主卡从「上班打卡」一路走到底</span></div>
+<div class="phone">
+  <div class="island"></div>
+  <div class="sbar" id="sbar"><span>9:41</span><span class="ic">
+    <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+    <svg width="24" height="12" viewBox="0 0 26 13" fill="none"><rect x="0.5" y="0.5" width="21" height="12" rx="3.5" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="17" height="9" rx="2" fill="currentColor"/><path d="M23.5 4.5v4a2.2 2.2 0 0 0 0-4z" fill="currentColor" opacity=".5"/></svg>
+  </span></div>
+  <div class="hbar"></div>
+  <div class="toast" id="toast"></div>
+
+  <!-- ===== 主页 ===== -->
+  <div class="screen on" id="home">
+    <div class="scroll" style="padding:0 0 100px">
+      <div class="hero">
+        <div class="h-top">
+          <div class="h-hi"><span id="h-name">刘朝阳</span><span class="h-sub" id="h-greet">今天也辛苦了</span></div>
+          <div class="date" onclick="toast('可切换日期查看历史（原型未展开）')"><svg width="14" height="14"><use href="#i-cal"/></svg>7月14日 周二</div>
+        </div>
+        <!-- 打卡卡片 -->
+        <div class="punch-hero" id="punch-hero">
+          <div class="ph-l">
+            <div class="ph-label" id="ph-label">上班打卡</div>
+            <div class="ph-clock" id="ph-clock">08:00</div>
+            <div class="ph-loc"><svg width="13" height="13" style="opacity:.9"><use href="#i-loc"/></svg><span id="ph-loc">上海市奉贤区 · 采集基地</span></div>
+          </div>
+          <div class="ph-r" id="ph-r" onclick="heroPunch()">
+            <div class="ph-ring" id="ph-ring">
+              <svg width="26" height="26"><use href="#i-punch"/></svg>
+              <span id="ph-btn">打卡</span>
+            </div>
+          </div>
+        </div>
+        <div class="h-sum">
+          <div class="hsi"><span class="n" id="sum-step">0</span><span class="l">/6 流程</span></div>
+          <div class="hsi-sep"></div>
+          <div class="hsi"><span class="n" id="sum-exp">¥0</span><span class="l">今日费用</span></div>
+          <div class="hsi-sep"></div>
+          <div class="hsi"><span class="n" id="sum-flaw">0</span><span class="l">异常项</span></div>
+        </div>
+      </div>
+      <div class="sheet-body">
+        <div class="flow-card">
+          <div class="fc-head"><span class="fc-title">今日任务</span><span class="fc-plate">QR985</span></div>
+          <div class="fc-task">出车支持任务 · 上海奉贤区 · 正常班</div>
+          <div class="steps" id="steps"></div>
+        </div>
+        <div class="sect">费用报销 <span class="more" onclick="toast('费用记录列表（原型未展开）')">全部记录 <svg width="14" height="14"><use href="#i-chev"/></svg></span></div>
+        <div class="exp-card">
+          <div class="exp-hd">
+            <div class="eic"><svg width="24" height="24"><use href="#i-yuan"/></svg></div>
+            <div class="grow"><div class="et">随时报销</div><div class="ed">拍发票即传，关联今日任务</div></div>
+            <div class="add" onclick="openExp()"><svg width="20" height="20"><use href="#i-plus"/></svg></div>
+          </div>
+          <div class="exp-stat">
+            <div class="es"><div class="en" id="es-total">¥0</div><div class="el">今日合计</div></div>
+            <div class="es"><div class="en rev" id="es-review">¥0</div><div class="el">审批中</div></div>
+            <div class="es"><div class="en" id="es-pass" style="color:var(--green)">¥0</div><div class="el">已通过</div></div>
+          </div>
+          <div class="exp-list" id="exp-list" style="display:none"></div>
+        </div>
+        <div class="sect">今日记录</div>
+        <div class="mini-grid">
+          <div class="mini-card" onclick="toast('驾驶员日志：六步走完自动生成，此处查看/补充')">
+            <div class="mic" style="background:rgba(43,111,246,.1);color:var(--blue)"><svg width="20" height="20"><use href="#i-doc"/></svg></div>
+            <div class="mt">驾驶员日志 <span class="dot-badge" id="log-dot" style="background:var(--orange)"></span></div>
+            <div class="md" id="log-md">流程完成后自动生成</div>
+          </div>
+          <div class="mini-card" onclick="openFlaw()">
+            <div class="mic" style="background:rgba(250,81,81,.1);color:var(--red)"><svg width="20" height="20"><use href="#i-alert"/></svg></div>
+            <div class="mt">异常上报 <span class="dot-badge" id="flaw-dot" style="background:#D5DCE6"></span></div>
+            <div class="md" id="flaw-md">暂无异常</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tabbar">
+      <div class="tab on"><svg><use href="#i-home"/></svg>工作台</div>
+      <div class="tab" onclick="toast('记录（原型未展开）')"><svg><use href="#i-list"/></svg>记录</div>
+      <div class="tab" onclick="toast('我的（原型未展开）')"><svg><use href="#i-user"/></svg>我的</div>
+    </div>
+  </div>
+
+  <!-- ===== 打卡 ===== -->
+  <div class="screen" id="punch">
+    <div class="nav"><div class="bk" onclick="go('home')"><svg width="18" height="18"><use href="#i-back"/></svg></div><div class="nt" id="punch-nt">上班打卡</div></div>
+    <div class="punch">
+      <div class="clock" id="clock">08:00</div>
+      <div class="loc"><span class="ld"></span><span id="punch-loc">上海市奉贤区 · 采集基地</span></div>
+      <button class="punchbtn" id="punchbtn" onclick="doPunch()"><span id="punch-word">上班打卡</span><small>时间地点自动记录</small></button>
+      <div class="punch-info">
+        <div class="pi-row"><span class="k">工作状态</span><span class="v">作业(出车支持任务)</span></div>
+        <div class="pi-row"><span class="k">班次</span><span class="v" id="punch-shift">正常班 · 08:00 上班</span></div>
+        <div class="pi-row"><span class="k">车辆</span><span class="v">QR985</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 检查清单主场 ===== -->
+  <div class="screen" id="check">
+    <div class="top">
+      <div class="top-nav">
+        <div class="bk2" onclick="exitCheck()"><svg width="18" height="18"><use href="#i-back"/></svg></div>
+        <div class="cti" id="chk-title">出车检查</div>
+        <div class="nav .veh" style="font-size:12px;color:#0B8A5D;background:#EAF8F1;padding:3px 9px;border-radius:6px;font-weight:600">QR985</div>
+        <div class="bk2" onclick="openJump()"><svg width="18" height="18"><use href="#i-list"/></svg></div>
+      </div>
+      <div class="ov">
+        <div class="ov-top">
+          <div class="ov-big">已完成 <b id="ov-done">0</b> / <span id="ov-total">19</span> 项</div>
+          <div class="ov-sub" id="ov-sub">还需拍摄 0 张</div>
+        </div>
+        <div class="track" id="track"></div>
+        <div class="lg"><span><i style="background:var(--green)"></i>完成</span><span><i style="background:var(--orange)"></i>进行中</span><span><i style="background:var(--red)"></i>异常</span><span><i style="background:#D5DCE6"></i>待检查</span></div>
+      </div>
+    </div>
+    <div class="scroll"><div class="cbody" id="chk-body"></div></div>
+    <div class="cfoot">
+      <div class="foot-l" id="chk-foot">继续检查，还剩 <b>19</b> 项</div>
+      <button class="btn primary big" id="chk-submit" disabled onclick="submitCheck()">提交检查</button>
+    </div>
+  </div>
+
+  <!-- ===== 相机 ===== -->
+  <div class="screen" id="cam">
+    <div class="perm" id="perm"><svg width="20" height="20" style="flex-shrink:0"><use href="#i-alert"/></svg><div class="pt">页内相机不可用，已自动切换到系统相机</div><div class="pb" onclick="dismissPerm()">知道了</div></div>
+    <div class="cam-top">
+      <div class="cx" onclick="camExit()"><svg width="17" height="17"><use href="#i-close"/></svg></div>
+      <div class="cam-ti"><div class="n" id="cam-n">车外观</div><div class="p" id="cam-p">第 1 / 19 项</div></div>
+      <div class="cam-guide" onclick="openGuide()"><svg width="18" height="18"><use href="#i-help"/></svg></div>
+    </div>
+    <div class="vf" id="vf">
+      <div class="vf-flash" id="flash"></div>
+      <div class="angle-hint" id="angle"><b id="angle-t">左前</b><span id="angle-tip"></span></div>
+      <div class="vf-example" onclick="openGuide()"><div class="el">示例</div></div>
+      <div class="angle-dots" id="dots"></div>
+    </div>
+    <div class="judge-bar" id="judge"><div class="judge-q" id="judge-q"></div><div class="judge-btns" id="judge-btns"></div></div>
+    <div class="cam-strip" id="strip"></div>
+    <div class="cam-act">
+      <div class="cam-side" onclick="nativeShot()"><div class="c"><svg width="19" height="19"><use href="#i-cam"/></svg></div>原相机</div>
+      <div class="shutter" onclick="shoot()"></div>
+      <div class="cam-side" onclick="skipNext()"><div class="c"><svg width="19" height="19"><use href="#i-arrow"/></svg></div>下一项</div>
+    </div>
+  </div>
+
+  <!-- ===== 收车小结 ===== -->
+  <div class="screen" id="declare">
+    <div class="nav"><div class="bk" onclick="go('home')"><svg width="18" height="18"><use href="#i-back"/></svg></div><div class="nt">收车小结</div></div>
+    <div class="form-scroll">
+      <div style="font-size:13px;color:var(--t3);padding:2px 4px 12px">收车前顺手确认，提交后自动汇入今日日志</div>
+      <div class="card">
+        <div class="decl"><div><div class="dt">今日是否交盘</div><div class="dd">交接班需与下一班确认</div></div>
+          <div class="seg"><span class="segb on" id="seg-y" onclick="setSeg(true)">是</span><span class="segb" id="seg-n" onclick="setSeg(false)">否</span></div></div>
+        <div class="decl"><div><div class="dt">是否充电</div><div class="dd">收车后是否已充电</div></div>
+          <div class="sw" id="sw-charge" onclick="this.classList.toggle('on')"></div></div>
+        <div class="decl"><div><div class="dt">是否产生费用</div><div class="dd">开启后可跳转填报</div></div>
+          <div class="sw" id="sw-exp" onclick="toggleExpSw(this)"></div></div>
+      </div>
+      <div class="card"><div class="note-input"><textarea rows="3" placeholder="备注：可描述今日交接、车辆状况等" id="decl-note"></textarea></div></div>
+    </div>
+    <div class="foot">
+      <button class="btn gray" style="flex:1" onclick="go('home')">暂存</button>
+      <button class="btn primary" style="flex:1.4" onclick="submitDeclare()">确认，去下班打卡</button>
+    </div>
+  </div>
+
+  <!-- ===== 费用 sheet ===== -->
+  <div class="sheet-mask" id="exp-mask" onclick="if(event.target===this)closeExp()">
+    <div class="sheet"><div class="grab"></div><h3>费用报销</h3>
+      <div class="sub">关联今日任务 QR985 · 拍发票即传</div>
+      <div class="sect">费用科目</div><div class="chips" id="exp-chips"></div>
+      <div class="fld"><label>金额（元）</label><input type="number" placeholder="0.00" id="exp-amt"></div>
+      <div class="sect">发票 / 凭证（端内直传 · PDF 或图片）</div>
+      <div class="upbox" id="exp-up" onclick="mockInv()"><span id="exp-up-ic" style="color:var(--t3)"><svg width="24" height="24"><use href="#i-import"/></svg></span><span id="exp-up-tx">从相册 / 文件 / 微信中选择</span></div>
+      <div style="display:flex;gap:11px;margin-top:16px">
+        <button class="btn gray" style="flex:1" onclick="saveExp(true)">暂存</button>
+        <button class="btn primary" style="flex:1.4" onclick="saveExp(false)">提交报销</button>
+      </div>
+      <div style="font-size:12px;color:var(--t3);text-align:center;margin-top:10px">审批开始前可随时修改或删除</div>
+    </div>
+  </div>
+
+  <!-- ===== 拍摄指南 sheet ===== -->
+  <div class="sheet-mask" id="guide-mask" onclick="if(event.target===this)closeGuide()">
+    <div class="sheet"><div class="grab"></div><h3 id="guide-title">拍摄指南</h3>
+      <div style="font-size:13px;color:var(--t3);text-align:center">照着示例图拍，确保关键部位清晰入画</div>
+      <div class="guide-img" id="guide-img">示例图</div>
+      <div id="guide-steps"></div>
+    </div>
+  </div>
+
+  <!-- ===== 全项跳转 sheet ===== -->
+  <div class="sheet-mask" id="jump-mask" onclick="if(event.target===this)closeJump()">
+    <div class="sheet"><div class="grab"></div><h3>全部检查项</h3>
+      <div class="sub" id="jump-sub">点击任意项快速跳转</div>
+      <div id="jump-list"></div>
+    </div>
+  </div>
+
+  <!-- ===== 异常汇总 sheet ===== -->
+  <div class="sheet-mask" id="flaw-mask" onclick="if(event.target===this)closeFlaw()">
+    <div class="sheet"><div class="grab"></div><h3>异常上报</h3>
+      <div class="sub" id="flaw-sub">检查中标记的异常，提交后由处理人跟进</div>
+      <div id="flaw-list"></div>
+    </div>
+  </div>
+
+</div>
+<script id="ICONS" type="text/template">
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3.5v3M16 3.5v3"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 8 12l6.5 7"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19.5 7"/></symbol>
+<symbol id="i-loc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.4-6.5-10.2A6.5 6.5 0 0 1 12 4.3a6.5 6.5 0 0 1 6.5 6.5C18.5 15.6 12 21 12 21z"/><circle cx="12" cy="10.6" r="2.3"/></symbol>
+<symbol id="i-punch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12.5" r="8"/><path d="M12 8.5v4l2.8 1.8M9 2.5h6"/></symbol>
+<symbol id="i-cam" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1.4-2h6.2L16.5 7h2A1.5 1.5 0 0 1 20 8.5v9A1.5 1.5 0 0 1 18.5 19h-13A1.5 1.5 0 0 1 4 17.5v-9z"/><circle cx="12" cy="12.5" r="3.2"/></symbol>
+<symbol id="i-yuan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5.5 12 13l5-7.5M12 13v5.5M8.5 14.5h7M8.5 17.5h7"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h8L18.5 8v12.5a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1z"/><path d="M13.5 3.5V8H18M8.5 13h7M8.5 16.5h5"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5 21 19.5H3L12 4.5z"/><path d="M12 10v4.5"/><circle cx="12" cy="17.4" r=".4" fill="currentColor"/></symbol>
+<symbol id="i-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></symbol>
+<symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 4l8 7.5V20a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1v-8.5z"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.2" r="3.6"/><path d="M4.5 20.2c1.2-3.6 4.1-5.4 7.5-5.4s6.3 1.8 7.5 5.4"/></symbol>
+<symbol id="i-import" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M12 15V8.5M9 11.5 12 8.5 15 11.5"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+<symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6 18 18M18 6 6 18"/></symbol>
+<symbol id="i-help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 0 1 4.5 1.5c0 1.5-2 2-2 3"/><circle cx="12" cy="16.5" r=".4" fill="currentColor"/></symbol>
+<symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+<symbol id="i-chevr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></symbol>
+</defs></svg>
+</script>
+
+<script>
+document.getElementById('app')&&0;
+document.body.insertAdjacentHTML('afterbegin','');
+/* 注入图标 */
+(function(){var t=document.getElementById('ICONS');if(t){var d=document.createElement('div');d.innerHTML=t.innerHTML;document.body.insertBefore(d.firstElementChild||d,document.querySelector('.phone'))}})();
+
+/* ============ 检查项数据（按规范）============ */
+const CHK={
+ out:[
+  {g:'车况检查',items:[
+   {name:'车外观',type:'photo',need:['左前','右前','左后','右后'],tips:['距车1米，与车身平行','拍全车漆与保险杠','含后视镜与轮眉','车尾与牌照清晰'],opts:['正常','故障'],bad:'故障',guide:['环车一周目视有无凹陷刮擦','检查有无漏油漏水','每角度距车约1米','损伤部位额外单独拍摄'],hue:212},
+   {name:'前风挡玻璃与工作台',type:'photo',need:['正前'],tips:['正前方拍全景，含工作台'],opts:['正常','故障'],bad:'故障',guide:['正前方拍摄，距离不超过1米','工作台设备完整入画'],hue:206},
+   {name:'车辆卫生',type:'photo',need:['左前门','右前门','左后门','右后门','后备箱','水冷机'],tips:['车门开启通透拍摄','','','','含后备箱整体','水冷机温度读数'],opts:['达标','不达标'],bad:'不达标',guide:['四门角度通透拍摄','加拍后备箱与水冷机温度'],hue:36},
+   {name:'轮胎',type:'photo',need:['左前','右前','左后','右后','左后内侧','右后内侧'],tips:['距轮胎1米，与轮毂中心平行','','','','后轮从车尾向内拍','距后轮面0.8米'],opts:['正常','故障'],bad:'故障',guide:['查胎压与胎面磨损','胎壁抬肩有无裂缝','每胎单独1张清晰照','后轮加拍内侧胎面'],hue:262},
+   {name:'电气',type:'judge',opts:['正常','故障'],bad:'故障',guide:['启动后指示灯正常','读数与车况相符'],hue:0},
+  ]},
+  {g:'硬件检查',items:[
+   {name:'工控机急停按钮',type:'photo',need:['斜拍'],tips:['斜拍一张，周边无杂物'],opts:['正常','故障','不涉及'],bad:'故障',na:'不涉及',guide:['周边无杂物、按钮操作流畅'],hue:210},
+   {name:'pandar128雷达',type:'photo',need:['前','后','左','右'],tips:['擦拭后拍摄','距离不远于1米','',''],opts:['正常','故障','不涉及'],bad:'故障',na:'不涉及',guide:['酒精纸擦拭后四角度拍摄'],hue:160},
+   {name:'AT128/ATX雷达',type:'photo',need:['正前'],tips:['擦拭后车前方拍'],opts:['正常','故障','不涉及'],bad:'故障',na:'不涉及',guide:['擦拭后车前方拍摄，不远于1米'],hue:156},
+   {name:'BP补盲雷达',type:'photo',need:['前右','前左','后右','后左'],tips:['','','',''],opts:['正常','故障','不涉及'],bad:'故障',na:'不涉及',guide:['球形每个1张，全部拍全'],hue:166},
+   {name:'摄像头',type:'photo',need:['1号','2号','3号','4号','5号','6号'],tips:['顺时针逐个','正面聚焦','不远于20cm','','',''],opts:['正常','故障','不涉及'],bad:'故障',na:'不涉及',guide:['顺时针逐个拍摄','正面聚焦，距离不远于20cm'],hue:150},
+   {name:'PAD及电源线',type:'photo',need:['亮屏充电'],tips:['亮屏拍，电流为负表充电'],opts:['正常','故障','不涉及'],bad:'故障',na:'不涉及',guide:['亮屏拍摄，确认正在充电'],hue:200},
+   {name:'DMS记录仪',type:'photo',need:['主机含编号','外接头'],tips:['编号标签清晰','外接头到位'],opts:['正常','故障','不涉及'],bad:'故障',na:'不涉及',guide:['主机照需清晰显示编号标签'],hue:46},
+   {name:'硬盘照片和状态',type:'photo',need:['当班硬盘'],tips:['容量以T结尾为正常'],opts:['正常','故障','不涉及'],bad:'故障',na:'不涉及',guide:['容量以T结尾为正常'],hue:26},
+   {name:'NAS状态',type:'photo',need:['指示灯'],tips:['指示灯全绿'],opts:['正常','故障','不涉及'],bad:'故障',na:'不涉及',guide:['指示灯全绿、无异响'],hue:262},
+  ]},
+  {g:'物料与自身',items:[
+   {name:'灭火器',type:'confirm',opts:['正常','缺失'],bad:'缺失',guide:['水基查有效期，干粉查压力'],hue:0},
+   {name:'反光背心/三脚架',type:'confirm',opts:['齐全','缺失'],bad:'缺失',guide:['应急物料齐全'],hue:12},
+   {name:'24小时内未饮酒',type:'confirm',opts:['未饮酒','有饮酒'],bad:'有饮酒',guide:[],hue:354},
+  ]},
+ ],
+ in:[
+  {g:'停放与安全',items:[
+   {name:'车辆停放安全',type:'photo',need:['全局横版','侧方1','侧方2'],tips:['7-8米全局','判断落窗落锁',''],opts:['达标','不达标'],bad:'不达标',guide:['位置安全合规未挡通行','侧方判断落窗落锁'],hue:212},
+   {name:'油/电余量',type:'photo',need:['仪表读数'],tips:['电量不低于80%'],opts:['达标','不达标'],bad:'不达标',guide:['油量不影响次日作业'],hue:160},
+   {name:'关闭车内设备',type:'photo',need:['后备箱'],tips:['拍后备箱确认已关'],opts:['是','否'],bad:'否',guide:['收车关闭设备'],hue:36},
+   {name:'是否关闭pad',type:'confirm',opts:['是','否'],bad:'否',guide:['确保次日电量'],hue:42},
+  ]},
+ ]
+};
+
+let stage=0,expenses=[],expCat='充电费',expInv=false,flawCount=0;
+let chkMode='out',ALL=[],GROUPS=[],curIdx=0,camShots=[];
+
+function $(id){return document.getElementById(id)}
+function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');$('sbar').classList.toggle('light',id==='home'||id==='cam')}
+let tT;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),2400)}
+
+/* ============ 主页 / 工作流 ============ */
+const STEPS=[
+  {k:'上班打卡',d:'到岗打卡，自动记录时间地点',act:'去打卡',type:'punch-in'},
+  {k:'出车检查',d:'19 项车况与设备检查',act:'开始检查',type:'check-out'},
+  {k:'执行任务',d:'采集作业进行中',act:'',type:'exec'},
+  {k:'收车检查',d:'停放、落锁、余量确认',act:'开始检查',type:'check-in'},
+  {k:'收车小结',d:'交盘 / 充电 / 费用确认',act:'去确认',type:'declare'},
+  {k:'下班打卡',d:'收工打卡，生成今日日志',act:'去打卡',type:'punch-out'},
+];
+function renderHome(){
+  renderHeroPunch();
+  $('sum-step').textContent=Math.min(stage,6);
+  const total=expenses.reduce((a,e)=>a+Number(e.amt),0);
+  $('sum-exp').textContent='¥'+total.toFixed(0);
+  $('sum-flaw').textContent=flawCount;
+  $('steps').innerHTML=STEPS.map((s,i)=>{
+    const cls=i<stage?'done':(i===stage?'now':'todo');
+    const inner=i<stage?'<svg width="15" height="15"><use href="#i-check"/></svg>':(i+1);
+    let btn='';
+    if(i===stage){
+      if(s.type==='exec')btn='<div class="sbtn"><button class="btn gray sm" onclick="endExec()">结束执行，去收车检查</button></div>';
+      else if(s.type==='punch-in'||s.type==='punch-out')btn='<div class="sbtn"><button class="btn ghost sm" onclick="scrollTop()">↑ 点顶部打卡区打卡</button></div>';
+      else{const cn=s.type.indexOf('check')===0?'ghost':'primary';btn=`<div class="sbtn"><button class="btn ${cn} sm" onclick="doStep('${s.type}')">${s.act}</button></div>`}
+    }
+    let tag='';
+    if(i<stage){if(s.type==='check-out'&&flawCount>0)tag=`<span class="mini-tag flaw">${flawCount} 项异常</span>`;else tag='<span class="mini-tag done">已完成</span>'}
+    else if(i===stage)tag='<span class="mini-tag wait">进行中</span>';
+    return `<div class="step ${cls}"><div class="lc"><div class="dot">${inner}</div><div class="line"></div></div><div class="rc"><div class="snm">${s.k} ${tag}</div><div class="sdd">${s.d}</div>${btn}</div></div>`;
+  }).join('');
+  $('es-total').textContent='¥'+total.toFixed(0);
+  $('es-review').textContent='¥'+expenses.filter(e=>!e.draft).reduce((a,e)=>a+Number(e.amt),0).toFixed(0);
+  if(expenses.length){$('exp-list').style.display='block';$('exp-list').innerHTML=expenses.map(e=>`<div class="exp-row"><div class="grow"><div class="rt">${e.cat} · ¥${Number(e.amt).toFixed(2)}</div><div class="rd">${e.inv?'发票已上传':'无发票'} · 刚刚</div></div><span class="tag ${e.draft?'draft':'rev'}">${e.draft?'已暂存':'审批中'}</span></div>`).join('')}
+  if(stage>=6){$('log-dot').style.background='var(--green)';$('log-md').textContent='今日日志已生成'}
+  if(flawCount>0){$('flaw-dot').style.background='var(--red)';$('flaw-md').textContent=flawCount+' 项待处理'}
+}
+function doStep(type){
+  if(type==='punch-in'){heroPunch2('in')}
+  else if(type==='punch-out'){heroPunch2('out')}
+  else if(type==='check-out'){startCheck('out')}
+  else if(type==='check-in'){startCheck('in')}
+  else if(type==='declare'){go('declare')}
+}
+function endExec(){stage++;renderHome();toast('执行结束，请完成收车检查')}
+
+function scrollTop(){document.querySelector('#home .scroll').scrollTo({top:0,behavior:'smooth'});const r=$('ph-ring');r.style.transition='transform .3s';r.style.transform='scale(1.12)';setTimeout(()=>r.style.transform='',400)}
+function heroPunch2(k){
+  if(k==='in'){stage=1;renderHome();toast('上班打卡成功 · 时间地点已记录')}
+  else{stage=6;renderHome();toast('下班打卡成功 · 今日日志已生成')}
+}
+/* ============ 打卡（保留独立页，未使用）============ */
+let clockT;
+function setupPunch(type){
+  $('punch-nt').textContent=type==='punch-in'?'上班打卡':'下班打卡';
+  $('punch-word').textContent=type==='punch-in'?'上班打卡':'下班打卡';
+  $('punch-loc').textContent=type==='punch-in'?'上海市奉贤区 · 采集基地':'上海市嘉定区 · 停车场';
+  $('punch-shift').textContent=type==='punch-in'?'正常班 · 08:00 上班':'正常班 · 预计 01:31 下班';
+  const b=$('punchbtn');b.classList.remove('done');b.dataset.type=type;
+  clearInterval(clockT);const tick=()=>{const d=new Date();$('clock').textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};tick();clockT=setInterval(tick,1000);
+}
+function doPunch(){
+  const b=$('punchbtn'),type=b.dataset.type;b.classList.add('done');$('punch-word').textContent='打卡成功';
+  setTimeout(()=>{stage++;renderHome();go('home');toast(type==='punch-in'?'上班打卡成功':'下班打卡成功 · 今日日志已生成')},800);
+}
+
+/* ============ 检查清单 ============ */
+function startCheck(m){
+  chkMode=m;
+  GROUPS=CHK[m].map(gr=>({g:gr.g,items:gr.items.map(it=>({...it,shots:[],judge:null,status:'empty'}))}));
+  ALL=GROUPS.flatMap(g=>g.items);ALL.forEach((it,i)=>it.idx=i);
+  $('chk-title').textContent=m==='out'?'出车检查':'收车检查';
+  renderCheck();go('check');
+}
+function need(it){return it.type==='photo'?it.need.length:0}
+function itemDone(it){if(it.na&&it.judge===it.na)return true;if(it.judge===null)return false;if(it.type==='photo')return it.shots.length>=it.need.length;return true}
+function refresh(it){if(it.na&&it.judge===it.na){it.status='na';return}if(it.judge===it.bad){it.status='flaw';return}if(itemDone(it)){it.status='done';return}it.status=it.shots.length>0?'part':'empty'}
+function doneCount(){return ALL.filter(itemDone).length}
+function renderCheck(){
+  $('chk-body').innerHTML=GROUPS.map(g=>{
+    const rows=g.items.map(it=>{
+      let st;
+      if(it.status==='done')st='<div class="st done"><svg width="13" height="13"><use href="#i-check"/></svg></div>';
+      else if(it.status==='flaw')st='<div class="st flaw">!</div>';
+      else if(it.status==='na')st='<div class="st na">—</div>';
+      else if(it.status==='part')st=`<div class="st part">${it.shots.length}</div>`;
+      else st='<div class="st empty"></div>';
+      const tc=it.type==='photo'?`<span class="type-chip">${it.need.length}张</span>`:(it.type==='judge'?'<span class="type-chip">判断</span>':'<span class="type-chip">确认</span>');
+      let meta;
+      if(it.status==='na')meta='<span style="color:#A9B2C0">不涉及</span>';
+      else if(it.type==='photo')meta=tc+`<span>${it.shots.length}/${it.need.length} 已拍</span>`;
+      else meta=tc;
+      let rt='';
+      if((it.status==='done'||it.status==='flaw')&&it.judge&&it.judge!==it.na)rt=`<span class="verdict ${it.status==='flaw'?'bad':'good'}">${it.judge}</span>`;
+      else if(it.type==='photo')rt='<span class="chev"><svg width="16" height="16"><use href="#i-chevr"/></svg></span>';
+      let inlineJ='';
+      if((it.type==='judge'||it.type==='confirm')&&it.status!=='done'&&it.status!=='flaw'&&it.status!=='na'){
+        inlineJ='<div class="inline-j">'+it.opts.filter(o=>o!==it.na).map(o=>`<span class="ijb" onclick="event.stopPropagation();inlineJudge(${it.idx},'${o}')">${o}</span>`).join('')+'</div>';rt='';
+      }
+      const naLink=(it.na&&it.judge===null&&it.type==='photo')?`<span class="na-link" onclick="event.stopPropagation();setNa(${it.idx})">不涉及</span>`:'';
+      const clickable=it.type==='photo'&&!(it.na&&it.judge===it.na);
+      const showMeta=(it.type==='photo')||it.status==='done'||it.status==='flaw'||it.status==='na';
+      return `<div class="crow ${it.status==='na'?'na':''}" ${clickable?`onclick="enterCam(${it.idx})"`:'style="cursor:default"'}>${st}<div class="mid"><div class="nm">${it.name}${it.type==='photo'?'<span class="req">*</span>':''}</div>${showMeta?`<div class="meta">${meta}</div>`:''}${inlineJ}</div><div class="rt">${naLink}${rt}</div></div>`;
+    }).join('');
+    const gd=g.items.filter(itemDone).length;
+    return `<div class="grp"><div class="grp-h"><span class="gt">${g.g}</span><span class="gc">${gd}/${g.items.length}</span></div><div class="grp-card">${rows}</div></div>`;
+  }).join('');
+  const done=doneCount(),total=ALL.length;
+  $('ov-done').textContent=done;$('ov-total').textContent=total;
+  const sn=ALL.filter(it=>it.type==='photo'&&it.judge!==it.na).reduce((a,it)=>a+Math.max(0,it.need.length-it.shots.length),0);
+  $('ov-sub').textContent=sn>0?`还需拍摄 ${sn} 张`:'照片已拍齐';
+  const dc=ALL.filter(i=>i.status==='done'||i.status==='na').length,fc=ALL.filter(i=>i.status==='flaw').length,pc=ALL.filter(i=>i.status==='part').length;
+  $('track').innerHTML=`<i class="d" style="width:${dc/total*100}%"></i><i class="f" style="width:${fc/total*100}%"></i><i class="p" style="width:${pc/total*100}%"></i>`;
+  const left=total-done,flaws=ALL.filter(i=>i.status==='flaw').length;
+  $('chk-foot').innerHTML=left>0?`继续检查，还剩 <b>${left}</b> 项`+(flaws?` · <span class="warn">${flaws} 项异常</span>`:''):(flaws?`全部完成 · <span class="warn">${flaws} 项异常将上报</span>`:'全部完成，可以提交');
+  $('chk-submit').disabled=left>0;
+}
+function inlineJudge(idx,v){const it=ALL[idx];it.judge=v;refresh(it);renderCheck();if(v===it.bad)toast(`「${it.name}」已标记${v}，提交后生成异常上报`)}
+function setNa(idx){const it=ALL[idx];it.judge=it.na;it.shots=[];refresh(it);renderCheck();toast(`「${it.name}」已标记不涉及`)}
+function exitCheck(){go('home')}
+function submitCheck(){
+  const flaws=ALL.filter(i=>i.status==='flaw').length;
+  if(chkMode==='out'){flawCount=flaws;stage=2;renderHome();go('home');toast(flaws?`出车检查已提交 · ${flaws} 项异常已生成上报单`:'出车检查已提交，全部正常')}
+  else{stage=4;renderHome();go('home');toast('收车检查已提交')}
+}
+
+/* ============ 相机 ============ */
+function enterCam(idx){curIdx=idx;const it=ALL[idx];camShots=it.shots.slice();$('judge').classList.remove('on');$('perm').classList.remove('on');renderCam();go('cam')}
+function renderCam(){
+  const it=ALL[curIdx],n=camShots.length,total=it.need.length,full=n>=total;
+  $('cam-n').textContent=it.name;$('cam-p').textContent=`第 ${it.idx+1} / ${ALL.length} 项`;
+  $('vf').style.background=`linear-gradient(160deg,hsl(${it.hue},28%,30%),hsl(${it.hue+40},24%,20%))`;
+  if(!full){
+    $('angle').style.display='flex';$('angle-t').textContent=it.need[n];$('angle-tip').textContent=it.tips&&it.tips[n]?'· '+it.tips[n]:'';
+    $('judge').classList.remove('on');
+  }else{
+    $('angle').style.display='none';$('judge').classList.add('on');
+    $('judge-q').textContent=it.name+(it.opts.indexOf('达标')>=0?' 是否达标？':' 是否正常？');
+    $('judge-btns').innerHTML=it.opts.filter(o=>o!==it.na).map(o=>`<button class="jb ${o===it.bad?'bad':'good'}" onclick="camJudge('${o}')">${o}</button>`).join('');
+  }
+  $('dots').innerHTML=it.need.map((_,i)=>`<div class="adot ${i<n?'shot':''} ${i===n&&!full?'cur':''}"></div>`).join('');
+  $('strip').innerHTML=camShots.map(s=>`<div class="thumb" style="background:linear-gradient(150deg,hsl(${it.hue},30%,44%),hsl(${it.hue+28},28%,28%))">${s.native?'<span class="rt">原</span>':''}</div>`).join('')||'<span style="color:rgba(255,255,255,.4);font-size:13px">按快门拍摄当前角度</span>';
+}
+function shoot(){const it=ALL[curIdx];if(camShots.length>=it.need.length)return;$('flash').classList.remove('go');void $('flash').offsetWidth;$('flash').classList.add('go');camShots.push({angle:it.need[camShots.length]});renderCam()}
+function nativeShot(){const it=ALL[curIdx];if(camShots.length>=it.need.length)return;if(!$('perm').classList.contains('shown')){$('perm').classList.add('on','shown');setTimeout(()=>$('perm').classList.remove('on'),2600)}$('flash').classList.remove('go');void $('flash').offsetWidth;$('flash').classList.add('go');camShots.push({angle:it.need[camShots.length],native:true});renderCam();toast('已用系统相机拍摄本张')}
+function camJudge(v){const it=ALL[curIdx];it.shots=camShots;it.judge=v;refresh(it);if(v===it.bad)toast(`「${it.name}」已标记${v}`);autoNext()}
+function skipNext(){const it=ALL[curIdx];it.shots=camShots;refresh(it);autoNext(true)}
+function autoNext(){
+  const nx=ALL.findIndex((x,i)=>i>curIdx&&x.type==='photo'&&!itemDone(x)&&x.judge!==x.na);
+  const any=ALL.findIndex((x,i)=>i!==curIdx&&x.type==='photo'&&!itemDone(x)&&x.judge!==x.na);
+  const t=nx>=0?nx:any;
+  if(t>=0){enterCam(t);toast('下一项：'+ALL[t].name)}
+  else{renderCheck();go('check');toast('照片项全部完成，请完成剩余确认项')}
+}
+function camExit(){const it=ALL[curIdx];it.shots=camShots;refresh(it);renderCheck();go('check')}
+function openGuide(){const it=ALL[curIdx];$('guide-title').textContent=it.name+' · 拍摄指南';$('guide-img').textContent='示例图（'+it.name+'）';$('guide-steps').innerHTML=(it.guide||[]).map((s,i)=>`<div class="guide-step"><div class="gn">${i+1}</div><div class="gx">${s}</div></div>`).join('');$('guide-mask').classList.add('on')}
+function closeGuide(){$('guide-mask').classList.remove('on')}
+function dismissPerm(){$('perm').classList.remove('on')}
+function openJump(){
+  $('jump-list').innerHTML=GROUPS.map(g=>{
+    const rows=g.items.map(it=>{
+      let st;
+      if(it.status==='done')st='<div class="st done" style="width:22px;height:22px"><svg width="11" height="11"><use href="#i-check"/></svg></div>';
+      else if(it.status==='flaw')st='<div class="st flaw" style="width:22px;height:22px">!</div>';
+      else if(it.status==='na')st='<div class="st na" style="width:22px;height:22px">—</div>';
+      else if(it.status==='part')st=`<div class="st part" style="width:22px;height:22px">${it.shots.length}</div>`;
+      else st='<div class="st empty" style="width:22px;height:22px"></div>';
+      const click=it.type==='photo'&&!(it.na&&it.judge===it.na)?`onclick="closeJump();enterCam(${it.idx})"`:'onclick="closeJump()"';
+      return `<div class="jump-item ${it.idx===curIdx?'cur':''}" ${click}>${st}<span class="jn">${it.idx+1}. ${it.name}</span>${it.status==='done'?'<span class="verdict good" style="font-size:11px">'+(it.judge||'完成')+'</span>':''}</div>`;
+    }).join('');
+    return `<div style="font-size:13px;color:var(--t3);margin:14px 4px 4px;font-weight:600">${g.g}</div>${rows}`;
+  }).join('');
+  $('jump-sub').textContent=`共 ${ALL.length} 项 · 已完成 ${doneCount()} 项`;$('jump-mask').classList.add('on');
+}
+function closeJump(){$('jump-mask').classList.remove('on')}
+
+/* ============ 收车小结 ============ */
+function setSeg(y){$('seg-y').classList.toggle('on',y);$('seg-n').classList.toggle('on',!y)}
+function toggleExpSw(el){el.classList.toggle('on');if(el.classList.contains('on'))openExp()}
+function submitDeclare(){stage=5;renderHome();go('home');toast('收车小结已确认，请下班打卡')}
+
+/* ============ 费用 ============ */
+const CATS=['充电费','加油费','停车费','过路费','测试流量费','其他'];
+function openExp(){$('exp-chips').innerHTML=CATS.map(c=>`<span class="chip ${c===expCat?'on':''}" onclick="expCat='${c}';openExp()">${c}</span>`).join('');$('exp-amt').value='';expInv=false;const u=$('exp-up');u.classList.remove('has');$('exp-up-ic').innerHTML='<svg width="24" height="24"><use href="#i-import"/></svg>';$('exp-up-tx').textContent='从相册 / 文件 / 微信中选择';$('exp-mask').classList.add('on')}
+function closeExp(){$('exp-mask').classList.remove('on')}
+function mockInv(){expInv=true;const u=$('exp-up');u.classList.add('has');$('exp-up-ic').innerHTML='<svg width="24" height="24"><use href="#i-doc"/></svg>';$('exp-up-tx').textContent='电子发票_充电服务.pdf · 已选择'}
+function saveExp(draft){const amt=$('exp-amt').value||'86.00';expenses.unshift({cat:expCat,amt,inv:expInv,draft});closeExp();renderHome();toast(draft?'费用已暂存':'费用已提交，审批中')}
+
+/* ============ 异常汇总 ============ */
+function openFlaw(){
+  const flaws=ALL.filter(i=>i.status==='flaw');
+  $('flaw-list').innerHTML=flaws.length?flaws.map(it=>`<div class="jump-item"><div class="st flaw" style="width:22px;height:22px">!</div><span class="jn">${it.name}</span><span class="verdict bad" style="font-size:11px">${it.judge}</span></div>`).join(''):'<div style="text-align:center;color:var(--t3);padding:20px;font-size:14px">暂无异常</div>';
+  $('flaw-sub').textContent=flaws.length?`${flaws.length} 项异常已生成上报单，处理人跟进中`:'检查中标记的异常会汇总在此';
+  $('flaw-mask').classList.add('on');
+}
+function closeFlaw(){$('flaw-mask').classList.remove('on')}
+
+
+/* ============ 顶部打卡区 ============ */
+let heroClockT;
+function greetWord(){const hr=new Date().getHours();if(hr<6)return'夜里也辛苦了';if(hr<11)return'早上好，元气满满';if(hr<14)return'午间注意休息';if(hr<18)return'下午好，稳稳当当';return'今天也辛苦了'}
+function renderHeroPunch(){
+  $('h-greet').textContent=greetWord();
+  const label=$('ph-label'),clock=$('ph-clock'),loc=$('ph-loc'),ring=$('ph-ring'),btn=$('ph-btn');
+  clearInterval(heroClockT);
+  const tick=()=>{const d=new Date();clock.textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
+  /* 阶段：0未上班打卡 → stage>=1 已上班；stage<5 未下班；stage>=6 已下班 */
+  if(stage<1){
+    /* 待上班打卡 */
+    label.textContent='上班打卡 · 正常班 08:00';
+    loc.textContent='上海市奉贤区 · 采集基地';
+    tick();heroClockT=setInterval(tick,1000);
+    ring.className='ph-ring';btn.textContent='打卡';ring.dataset.act='in';
+  }else if(stage<5){
+    /* 已上班，工作中 */
+    label.textContent='已上班 08:02 · 工作中';
+    clock.textContent='已打卡';clock.style.fontSize='30px';
+    loc.textContent='完成收车小结后可下班打卡';
+    ring.className='ph-ring off';btn.textContent='下班';ring.dataset.act='out-wait';
+  }else if(stage===5){
+    /* 可下班打卡 */
+    label.textContent='下班打卡 · 收工';
+    clock.style.fontSize='';tick();heroClockT=setInterval(tick,1000);
+    loc.textContent='上海市嘉定区 · 停车场';
+    ring.className='ph-ring';btn.textContent='打卡';ring.dataset.act='out';
+  }else{
+    /* 已下班 */
+    label.textContent='今日已收工';
+    clock.textContent='已完成';clock.style.fontSize='30px';
+    loc.textContent='上班 08:02 · 下班 '+nowHM();
+    ring.className='ph-ring done';btn.innerHTML='<svg width="26" height="26"><use href="#i-check"/></svg>';ring.dataset.act='none';
+  }
+}
+function nowHM(){const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
+function heroPunch(){
+  const act=$('ph-ring').dataset.act;
+  if(act==='in'){
+    if(stage>=1){toast('已完成上班打卡');return}
+    stage=1;renderHome();toast('上班打卡成功 · 时间地点已记录');
+  }else if(act==='out'){
+    stage=6;renderHome();toast('下班打卡成功 · 今日日志已生成');
+  }else if(act==='out-wait'){
+    toast('请先完成收车检查与收车小结');
+  }else{toast('今日打卡已完成')}
+}
+
+renderHome();go('home');
+</script>
+
+</body>
+</html>
