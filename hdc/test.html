@@ -393,6 +393,31 @@
   body.design-v2 #guide-mask .sheet h3{font-size:16px}
   body.design-v2 #guide-mask .sheet{background:#fff}
   body.design-v2 .shot-toast{position:absolute;left:50%;bottom:214px;transform:translateX(-50%);z-index:19;color:#fff;background:rgba(0,0,0,.32);font-size:11px;padding:4px 8px;border-radius:12px;pointer-events:none}
+  body.design-v2{width:100vw;height:100vh;min-height:100vh;padding:0;overflow:hidden;background:#F5F7FA}
+  body.design-v2 .phone{width:100vw;height:100vh;border-radius:0;box-shadow:none}
+  body.design-v2 .screen{inset:0}
+  body.design-v2 .home-blue{height:28vh;min-height:224px;padding:calc(48px + env(safe-area-inset-top)) 15px 0}
+  body.design-v2 .flow-btn{height:36px;font-size:14px}
+  body.design-v2 #check .top{height:calc(118px + env(safe-area-inset-top));padding:calc(44px + env(safe-area-inset-top)) 14px 0}
+  body.design-v2 #check .crow{min-height:58px}
+  body.design-v2 #check .cfoot{padding:12px 16px calc(24px + env(safe-area-inset-bottom));gap:12px}
+  body.design-v2 #check .cfoot .foot-l,body.design-v2 #check #chk-submit{height:48px;font-size:15px}
+  body.design-v2 #cam .cam-top{height:clamp(72px,11vh,104px);padding:calc(28px + env(safe-area-inset-top)) 18px 0}
+  body.design-v2 #cam .cam-ti .n{font-size:15px}.design-v2 #cam .cam-ti .p{font-size:13px}
+  body.design-v2 #cam .cam-top .cx,body.design-v2 #cam .cam-guide{width:34px;height:34px}
+  body.design-v2 #cam .cam-act{height:clamp(178px,23vh,238px);padding:70px 26px calc(28px + env(safe-area-inset-bottom))}
+  body.design-v2 #cam .cam-side{width:72px;font-size:12px}
+  body.design-v2 #cam .cam-side .c{width:58px;height:58px}
+  body.design-v2 #cam .shutter{width:82px;height:82px}
+  body.design-v2 #cam .shutter:after{width:66px;height:66px}
+  body.design-v2 #cam .cam-strip{display:flex;position:absolute;left:18px;right:18px;bottom:calc(clamp(178px,23vh,238px) - 64px);z-index:22;padding:0;min-height:42px;justify-content:center;gap:8px;overflow-x:auto}
+  body.design-v2 #cam .thumb{width:38px;height:38px;border-radius:7px;border:1px dashed rgba(255,255,255,.88);background:rgba(255,255,255,.18)}
+  body.design-v2 #cam .thumb.filled{border-style:solid;background-size:cover;background-position:center}
+  body.design-v2 #cam .angle-dots{display:none}
+  body.design-v2 #cam .angle-hint{bottom:calc(clamp(178px,23vh,238px) + 16px)}
+  body.design-v2 #cam .judge-bar{display:none!important}
+  body.design-v2 .review-actions{display:flex;gap:12px;margin-top:16px}
+  body.design-v2 .review-actions .btn{height:46px;border-radius:4px;font-size:15px}
   @media(max-width:440px){body{padding:0}.phone{width:100vw;height:100vh;border-radius:0;box-shadow:none}.cap{display:none}}
 </style>
 </head>
@@ -545,7 +570,7 @@
       <div class="shutter" id="shutter" onclick="shootBurst()"></div>
       <div class="cam-side" onclick="skipNext()"><div class="c"><svg width="19" height="19"><use href="#i-arrow"/></svg></div>下一项</div>
     </div>
-    <input id="native-cam-input" type="file" accept="image/*" capture="environment" style="display:none" onchange="handleNativeFile(event)">
+    <input id="native-cam-input" type="file" accept="image/*" capture="environment" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;opacity:0" onchange="handleNativeFile(event)">
   </div>
 
   <!-- ===== 收车小结 ===== -->
@@ -848,11 +873,13 @@ async function startCamera(){
 function stopCamera(){if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null}camReady=false;$('cam-video').classList.add('off')}
 function flashShot(){$('flash').classList.remove('go');void $('flash').offsetWidth;$('flash').classList.add('go')}
 function captureFrame(){
-  const video=$('cam-video');
+  const video=$('cam-video'),frame=$('vf');
   if(!camReady||video.readyState<2)return '';
-  const canvas=document.createElement('canvas'),w=video.videoWidth||720,h=video.videoHeight||1280;
-  canvas.width=w;canvas.height=h;
-  canvas.getContext('2d').drawImage(video,0,0,w,h);
+  const canvas=document.createElement('canvas'),vw=video.videoWidth||720,vh=video.videoHeight||1280;
+  const rect=frame.getBoundingClientRect(),cw=Math.max(1,Math.round(rect.width)),ch=Math.max(1,Math.round(rect.height));
+  canvas.width=cw;canvas.height=ch;
+  const scale=Math.max(cw/vw,ch/vh),sw=cw/scale,sh=ch/scale,sx=(vw-sw)/2,sy=(vh-sh)/2;
+  canvas.getContext('2d').drawImage(video,sx,sy,sw,sh,0,0,cw,ch);
   return canvas.toDataURL('image/jpeg',.86);
 }
 function shoot(){
@@ -862,6 +889,7 @@ function shoot(){
   flashShot();
   camShots.push({angle:it.need[camShots.length],src:captureFrame()});
   renderCam();
+  if(camShots.length>=it.need.length)setTimeout(()=>camExit(),360);
   return true;
 }
 function shootBurst(){
@@ -871,7 +899,7 @@ function shootBurst(){
   if(!camReady){toast('相机未就绪，正在重新启动');startCamera();return}
   bursting=true;$('shutter').classList.add('burst');
   const take=()=>{
-    if(!shoot()||camShots.length>=it.need.length){stopBurst();if(camShots.length>=it.need.length)toast('拍摄完成，返回列表标记');return}
+    if(!shoot()||camShots.length>=it.need.length){stopBurst();return}
   };
   take();
   burstTimer=setInterval(take,720);
@@ -882,7 +910,7 @@ function handleNativeFile(event){
   const it=ALL[curIdx],file=event.target.files&&event.target.files[0];
   if(!file||camShots.length>=it.need.length)return;
   const reader=new FileReader();
-  reader.onload=()=>{flashShot();camShots.push({angle:it.need[camShots.length],native:true,src:reader.result});renderCam();toast('已通过系统相机拍摄本张')};
+  reader.onload=()=>{flashShot();camShots.push({angle:it.need[camShots.length],native:true,src:reader.result});renderCam();if(camShots.length>=it.need.length)setTimeout(()=>camExit(),360)};
   reader.readAsDataURL(file);
 }
 function camJudge(v){const it=ALL[curIdx];it.shots=camShots;it.judge=v;refresh(it);if(v===it.bad)toast(`「${it.name}」已标记${v}`);autoNext()}
@@ -1092,9 +1120,9 @@ function renderCheck(){
       const count=it.type==='photo'?`<span>${it.shots.length}/${it.need.length}张</span>`:(it.note?`<span>${it.note}</span>`:'');
       const st=it.status==='done'?'<div class="st done"><svg width="10" height="10"><use href="#i-check"/></svg></div>':(it.status==='part'?'<div class="st part"><svg width="10" height="10"><use href="#i-check"/></svg></div>':(it.status==='flaw'?'<div class="st flaw">!</div>':'<div class="st empty"></div>'));
       const ready=it.type==='photo'&&it.shots.length>=it.need.length&&!it.judge;
-      const inline=it.type!=='photo'&&it.status==='empty'?`<div class="inline-j">${it.opts.map(o=>`<span class="ijb" onclick="event.stopPropagation();inlineJudge(${it.idx},'${o}')">${o}</span>`).join('')}</div>`:(ready?`<div class="mark-actions"><span class="ijb" onclick="event.stopPropagation();inlineJudge(${it.idx},'正常')">正常</span><span class="ijb bad-mark" onclick="event.stopPropagation();inlineJudge(${it.idx},'异常')">异常</span></div>`:'');
-      const verdict=it.status==='done'||it.status==='flaw'?`<span class="verdict ${it.status==='flaw'?'bad':'good'}">${it.judge||'正常'}</span>`:(!ready&&it.type==='photo'?'<span class="chev"><svg width="14" height="14"><use href="#i-chevr"/></svg></span>':'');
-      const click=it.type==='photo'?`onclick="enterCam(${it.idx})"`:'style="cursor:default"';
+      const inline=it.type!=='photo'&&it.status==='empty'?`<div class="inline-j">${it.opts.map(o=>`<span class="ijb" onclick="event.stopPropagation();inlineJudge(${it.idx},'${o}')">${o}</span>`).join('')}</div>`:'';
+      const verdict=it.status==='done'||it.status==='flaw'?`<span class="verdict ${it.status==='flaw'?'bad':'good'}">${it.judge||'正常'}</span>`:(it.type==='photo'?'<span class="chev"><svg width="14" height="14"><use href="#i-chevr"/></svg></span>':'');
+      const click=it.type==='photo'?`onclick="${ready||it.judge?`openPhotoReview(${it.idx})`:`enterCam(${it.idx})`}"`:'style="cursor:default"';
       return `<div class="crow ${ready?'ready':''}" ${click}>${st}<div class="mid"><div class="nm">${it.name}</div><div class="meta">${count}</div></div><div class="rt">${inline}${verdict}</div></div>`;
     }).join('');
     return `<div class="grp"><div class="grp-h"><span class="gt">${g.g}</span><span class="gc"></span></div><div class="grp-card">${rows}</div></div>`;
@@ -1114,16 +1142,23 @@ function renderCam(){
   $('vf').style.background=`linear-gradient(180deg,#e5e5e5,#cfcfcf)`;
   $('angle').style.display=full?'none':'flex';
   if(!full){$('angle-t').textContent=n>0?'已拍'+n+'张':'已拍0张';$('angle-tip').textContent=''}
-  if(full){
-    $('judge').classList.add('on');
-    $('judge-q').textContent=`已拍 ${n}/${total}，返回列表后标记`;
-    $('judge-btns').innerHTML=`<button class="jb bad" onclick="camShots=[];renderCam()">重拍</button><button class="jb good" onclick="camExit()">完成拍摄</button>`;
-  }else{$('judge').classList.remove('on')}
+  $('judge').classList.remove('on');
   $('dots').innerHTML=it.need.map((_,i)=>`<div class="adot ${i<n?'shot':''} ${i===n&&!full?'cur':''}"></div>`).join('');
-  $('strip').innerHTML=camShots.map(s=>`<div class="thumb" style="${s.src?`background-image:url('${s.src}');background-size:cover;background-position:center`:''}">${s.native?'<span class="rt">原</span>':''}</div>`).join('');
+  $('strip').innerHTML=it.need.map((_,i)=>{
+    const s=camShots[i];
+    return `<div class="thumb ${s?'filled':''}" style="${s&&s.src?`background-image:url('${s.src}')`:''}">${s&&s.native?'<span class="rt">原</span>':''}</div>`;
+  }).join('');
   $('vf').querySelector('.shot-toast')?.remove();
   if(n>0&&!full){$('vf').insertAdjacentHTML('beforeend',`<div class="shot-toast">已拍${n}张</div>`)}
 }
+function openPhotoReview(idx){
+  const it=ALL[idx];curIdx=idx;
+  $('guide-title').textContent=it.name+' · 照片预览';
+  $('guide-img').innerHTML=(it.shots.length?it.shots:it.need.map(()=>null)).map((s,i)=>`<div class="guide-photo" style="${s&&s.src?`background-image:url('${s.src}');background-size:cover;background-position:center`:''}"><span class="guide-badge">${i+1}/${it.need.length}</span></div>`).join('');
+  $('guide-steps').innerHTML=`<div class="guide-step"><div class="gn">1</div><div class="gx">查看照片是否清晰、角度是否完整，确认后标记检查结果。</div></div><div class="review-actions"><button class="btn gray" onclick="closeGuide();enterCam(${idx})">重拍</button><button class="btn primary" onclick="markPhoto(${idx},'正常')">正常</button><button class="btn gray" onclick="markPhoto(${idx},'异常')">异常</button></div>`;
+  $('guide-mask').classList.add('on');
+}
+function markPhoto(idx,v){const it=ALL[idx];it.judge=v;refresh(it);closeGuide();renderCheck();toast(v==='异常'?'已标记异常':'已标记正常')}
 function openGuide(){
   const it=ALL[curIdx]||{name:'拍摄指南',guide:[]};
   $('guide-title').textContent=it.name+' · 拍摄指南';
