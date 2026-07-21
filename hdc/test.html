@@ -353,6 +353,7 @@
   body.design-v2 #check .crow .nm{font-size:13px;font-weight:600;color:#1E2733}.design-v2 #check .crow .req,.design-v2 #check .type-chip{display:none}
   body.design-v2 #check .crow .meta{font-size:10px;color:#9CA6B5;margin-top:2px}.design-v2 #check .chev{color:#15202E}
   body.design-v2 #check .verdict{font-size:11px;border-radius:3px;padding:3px 7px}.design-v2 #check .inline-j{margin:0;justify-content:flex-end}.design-v2 #check .ijb{font-size:11px;background:#EEF1F5;border:0;border-radius:2px;padding:5px 10px}
+  body.design-v2 #check .ijb.on{background:#2B6FF6!important;color:#fff!important}
   body.design-v2 #check .cfoot{display:flex;gap:14px;padding:10px 14px 34px;background:rgba(255,255,255,.9);backdrop-filter:blur(18px);border:0}.design-v2 #check .foot-l{display:none}.design-v2 #check .cfoot:before{content:'连续拍照';flex:1;height:42px;background:#4B5563;color:#fff;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}.design-v2 #check .cfoot:after{content:'完成检查';flex:1;height:42px;background:#68A8F5;color:#fff;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}.design-v2 #check #chk-submit{display:none}
   body.design-v2 #cam{background:#000;overflow:hidden}
   body.design-v2 #cam .cam-top{position:absolute;top:0;left:0;right:0;height:64px;padding:30px 14px 0;background:rgba(255,255,255,.92);color:#111;z-index:20;backdrop-filter:blur(14px)}
@@ -567,7 +568,7 @@
     <div class="cam-strip" id="strip"></div>
     <div class="cam-act">
       <div class="cam-side" onclick="nativeShot()"><div class="c"><svg width="19" height="19"><use href="#i-cam"/></svg></div>原相机</div>
-      <div class="shutter" id="shutter" onclick="shootBurst()"></div>
+      <div class="shutter" id="shutter" onclick="shoot()"></div>
       <div class="cam-side" onclick="skipNext()"><div class="c"><svg width="19" height="19"><use href="#i-arrow"/></svg></div>下一项</div>
     </div>
     <input id="native-cam-input" type="file" accept="image/*" capture="environment" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;opacity:0" onchange="handleNativeFile(event)">
@@ -889,7 +890,6 @@ function shoot(){
   flashShot();
   camShots.push({angle:it.need[camShots.length],src:captureFrame()});
   renderCam();
-  if(camShots.length>=it.need.length)setTimeout(()=>camExit(),360);
   return true;
 }
 function shootBurst(){
@@ -910,8 +910,17 @@ function handleNativeFile(event){
   const it=ALL[curIdx],file=event.target.files&&event.target.files[0];
   if(!file||camShots.length>=it.need.length)return;
   const reader=new FileReader();
-  reader.onload=()=>{flashShot();camShots.push({angle:it.need[camShots.length],native:true,src:reader.result});renderCam();if(camShots.length>=it.need.length)setTimeout(()=>camExit(),360)};
+  reader.onload=()=>{flashShot();camShots.push({angle:it.need[camShots.length],native:true,src:reader.result});renderCam()};
   reader.readAsDataURL(file);
+}
+function advanceAfterShot(){
+  const it=ALL[curIdx];
+  it.shots=camShots;refresh(it);
+  const next=ALL.findIndex((x,i)=>i>curIdx&&x.type==='photo'&&x.shots.length<x.need.length);
+  const any=ALL.findIndex((x,i)=>i!==curIdx&&x.type==='photo'&&x.shots.length<x.need.length);
+  const t=next>=0?next:any;
+  if(t>=0){enterCam(t);return}
+  stopBurst();stopCamera();renderCheck();go('check');toast('拍摄完成，可回看照片或完成检查');
 }
 function camJudge(v){const it=ALL[curIdx];it.shots=camShots;it.judge=v;refresh(it);if(v===it.bad)toast(`「${it.name}」已标记${v}`);autoNext()}
 function skipNext(){const it=ALL[curIdx];it.shots=camShots;refresh(it);autoNext(true)}
@@ -1108,7 +1117,7 @@ function startCheck(m){
   $('chk-title').textContent=m==='out'?'出车检查':'收车检查';
   renderCheck();go('check');
 }
-function itemDone(it){if(it.na&&it.judge===it.na)return true;if(it.type==='photo')return it.shots.length>=it.need.length&&it.judge!==null;return it.judge!==null}
+function itemDone(it){if(it.na&&it.judge===it.na)return true;if(it.type==='photo')return it.shots.length>=it.need.length;return it.judge!==null}
 function refresh(it){if(it.na&&it.judge===it.na){it.status='na';return}if(it.judge===it.bad){it.status='flaw';return}if(itemDone(it)){it.status='done';return}it.status=it.shots&&it.shots.length>0?'part':'empty'}
 function doneCount(){return ALL.filter(itemDone).length}
 function renderCheck(){
@@ -1119,9 +1128,9 @@ function renderCheck(){
     const rows=g.items.map(it=>{
       const count=it.type==='photo'?`<span>${it.shots.length}/${it.need.length}张</span>`:(it.note?`<span>${it.note}</span>`:'');
       const st=it.status==='done'?'<div class="st done"><svg width="10" height="10"><use href="#i-check"/></svg></div>':(it.status==='part'?'<div class="st part"><svg width="10" height="10"><use href="#i-check"/></svg></div>':(it.status==='flaw'?'<div class="st flaw">!</div>':'<div class="st empty"></div>'));
-      const ready=it.type==='photo'&&it.shots.length>=it.need.length&&!it.judge;
-      const inline=it.type!=='photo'&&it.status==='empty'?`<div class="inline-j">${it.opts.map(o=>`<span class="ijb" onclick="event.stopPropagation();inlineJudge(${it.idx},'${o}')">${o}</span>`).join('')}</div>`:'';
-      const verdict=it.status==='done'||it.status==='flaw'?`<span class="verdict ${it.status==='flaw'?'bad':'good'}">${it.judge||'正常'}</span>`:(it.type==='photo'?'<span class="chev"><svg width="14" height="14"><use href="#i-chevr"/></svg></span>':'');
+      const ready=it.type==='photo'&&it.shots.length>=it.need.length;
+      const inline=it.type!=='photo'?`<div class="inline-j">${it.opts.map(o=>`<span class="ijb ${it.judge===o?'on':''}" onclick="event.stopPropagation();inlineJudge(${it.idx},'${o}')">${o}</span>`).join('')}</div>`:'';
+      const verdict=it.type==='photo'?(it.status==='flaw'?`<span class="verdict bad">${it.judge}</span>`:'<span class="chev"><svg width="14" height="14"><use href="#i-chevr"/></svg></span>'):'';
       const click=it.type==='photo'?`onclick="${ready||it.judge?`openPhotoReview(${it.idx})`:`enterCam(${it.idx})`}"`:'style="cursor:default"';
       return `<div class="crow ${ready?'ready':''}" ${click}>${st}<div class="mid"><div class="nm">${it.name}</div><div class="meta">${count}</div></div><div class="rt">${inline}${verdict}</div></div>`;
     }).join('');
@@ -1146,19 +1155,25 @@ function renderCam(){
   $('dots').innerHTML=it.need.map((_,i)=>`<div class="adot ${i<n?'shot':''} ${i===n&&!full?'cur':''}"></div>`).join('');
   $('strip').innerHTML=it.need.map((_,i)=>{
     const s=camShots[i];
-    return `<div class="thumb ${s?'filled':''}" style="${s&&s.src?`background-image:url('${s.src}')`:''}">${s&&s.native?'<span class="rt">原</span>':''}</div>`;
+    return `<div class="thumb ${s?'filled':''}" ${s?`onclick="event.stopPropagation();previewCamShot(${i})"`:''} style="${s&&s.src?`background-image:url('${s.src}')`:''}">${s&&s.native?'<span class="rt">原</span>':''}</div>`;
   }).join('');
   $('vf').querySelector('.shot-toast')?.remove();
-  if(n>0&&!full){$('vf').insertAdjacentHTML('beforeend',`<div class="shot-toast">已拍${n}张</div>`)}
 }
-function openPhotoReview(idx){
+function previewCamShot(i){
+  const it=ALL[curIdx],s=camShots[i];
+  if(!s)return;
+  it.shots=camShots;refresh(it);
+  openPhotoReview(curIdx,i);
+}
+function openPhotoReview(idx,focusIndex=0){
   const it=ALL[idx];curIdx=idx;
   $('guide-title').textContent=it.name+' · 照片预览';
-  $('guide-img').innerHTML=(it.shots.length?it.shots:it.need.map(()=>null)).map((s,i)=>`<div class="guide-photo" style="${s&&s.src?`background-image:url('${s.src}');background-size:cover;background-position:center`:''}"><span class="guide-badge">${i+1}/${it.need.length}</span></div>`).join('');
-  $('guide-steps').innerHTML=`<div class="guide-step"><div class="gn">1</div><div class="gx">查看照片是否清晰、角度是否完整，确认后标记检查结果。</div></div><div class="review-actions"><button class="btn gray" onclick="closeGuide();enterCam(${idx})">重拍</button><button class="btn primary" onclick="markPhoto(${idx},'正常')">正常</button><button class="btn gray" onclick="markPhoto(${idx},'异常')">异常</button></div>`;
+  $('guide-img').innerHTML=(it.shots.length?it.shots:it.need.map(()=>null)).map((s,i)=>`<div class="guide-photo" style="${s&&s.src?`background-image:url('${s.src}');background-size:cover;background-position:center`:''};${i===focusIndex?'outline:2px solid #2B6FF6;outline-offset:-2px':''}"><span class="guide-badge">${i+1}/${it.need.length}</span></div>`).join('');
+  $('guide-steps').innerHTML=`<div class="guide-step"><div class="gn">1</div><div class="gx">照片默认作为正常记录保存；只在发现问题时标注异常，或选择重拍覆盖本项照片。</div></div><div class="review-actions"><button class="btn gray" onclick="closeGuide()">退出预览</button><button class="btn primary" onclick="retakePhoto(${idx})">重拍</button><button class="btn gray" onclick="markPhoto(${idx},'异常')">标注异常</button></div>`;
   $('guide-mask').classList.add('on');
 }
-function markPhoto(idx,v){const it=ALL[idx];it.judge=v;refresh(it);closeGuide();renderCheck();toast(v==='异常'?'已标记异常':'已标记正常')}
+function retakePhoto(idx){const it=ALL[idx];it.shots=[];it.judge=null;refresh(it);closeGuide();renderCheck();enterCam(idx)}
+function markPhoto(idx,v){const it=ALL[idx];it.judge=v;refresh(it);closeGuide();renderCheck();toast('已标注异常')}
 function openGuide(){
   const it=ALL[curIdx]||{name:'拍摄指南',guide:[]};
   $('guide-title').textContent=it.name+' · 拍摄指南';
@@ -1166,7 +1181,7 @@ function openGuide(){
   const steps=[
     '按要求角度取景，车辆或设备主体完整入画',
     '拍摄距离保持稳定，避免过曝、遮挡、虚焦',
-    '拍完返回检查列表，再按实际情况标记正常或异常',
+    '拍完自动进入下一项，完成后可在列表点照片回看',
   ].concat(it.guide||[]).slice(0,5);
   $('guide-steps').innerHTML=steps.map((s,i)=>`<div class="guide-step"><div class="gn">${i+1}</div><div class="gx">${s}</div></div>`).join('');
   $('guide-mask').classList.add('on');
