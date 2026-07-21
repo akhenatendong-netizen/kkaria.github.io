@@ -304,6 +304,95 @@
 
   .toast{position:absolute;left:50%;transform:translateX(-50%) translateY(16px);bottom:130px;background:rgba(26,29,36,.94);color:#fff;font-size:14px;padding:11px 20px;border-radius:22px;opacity:0;pointer-events:none;transition:all .3s;z-index:99;max-width:84%;text-align:center;backdrop-filter:blur(10px)}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* ===== Figma 还原版 ===== */
+  body.design-v2{background:#eee;padding:24px 16px 44px}
+  body.design-v2 .cap{display:none}
+  body.design-v2 .phone{width:375px;height:812px;border-radius:0;box-shadow:none;background:#F5F7FA}
+  body.design-v2 .island{display:none}
+  body.design-v2 .sbar{height:44px;padding:12px 18px 0;color:#0E1520;font-size:12px;z-index:75}
+  body.design-v2 .sbar.light{color:#fff}
+  body.design-v2 .hbar{bottom:7px;width:132px;height:4px;background:#111;border-radius:8px;z-index:90}
+  body.design-v2 #home{background:#F2F5F9}
+  body.design-v2 #home .scroll{padding:0 0 86px!important}
+  body.design-v2 .home-blue{height:232px;background:linear-gradient(138deg,#4C91FF 0%,#1F71F2 54%,#0962EA 100%);padding:76px 14px 0;color:#fff;position:relative;overflow:hidden}
+  body.design-v2 .home-blue:after{content:'';position:absolute;top:-18px;right:-24px;width:168px;height:168px;border-radius:50%;background:rgba(255,255,255,.08)}
+  body.design-v2 .home-date{text-align:center;font-size:15px;font-weight:600;margin-bottom:20px;position:relative;z-index:2}
+  body.design-v2 .clock-card{height:54px;border:1px solid rgba(255,255,255,.32);border-radius:7px;background:rgba(255,255,255,.18);backdrop-filter:blur(18px);display:flex;align-items:center;gap:13px;padding:0 12px;position:relative;z-index:2}
+  body.design-v2 .clock-ico{width:30px;height:30px;border-radius:6px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center}
+  body.design-v2 .clock-main{flex:1}.clock-main b{display:block;font-size:12px}.clock-main span{display:block;font-size:10px;color:rgba(255,255,255,.72);margin-top:3px}
+  body.design-v2 .clock-pill{font-size:11px;color:#fff;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.28);padding:5px 13px;border-radius:14px}
+  body.design-v2 .task-wrap{padding:0 14px 14px;margin-top:-20px;position:relative;z-index:3}
+  body.design-v2 .task-label{font-size:13px;color:#fff;font-weight:700;margin:0 0 8px}
+  body.design-v2 .task-card{background:#fff;border-radius:7px;padding:16px 16px 4px;box-shadow:0 14px 30px rgba(26,64,128,.12)}
+  body.design-v2 .task-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  body.design-v2 .task-head b{font-size:15px}.plate-badge{font-size:10px;color:#09A35D;background:#E6F8EF;padding:5px 8px;border-radius:3px;font-weight:700}
+  body.design-v2 .task-desc{font-size:11px;line-height:1.75;color:#6D7685;margin-bottom:11px}
+  body.design-v2 .flow-line{position:relative;padding-bottom:8px}
+  body.design-v2 .flow-row{display:flex;gap:10px;position:relative;padding:0 0 15px}
+  body.design-v2 .flow-row:before{content:'';position:absolute;left:9px;top:20px;bottom:0;width:1px;background:#DDE4EF}
+  body.design-v2 .flow-row:last-child:before{display:none}
+  body.design-v2 .flow-dot{width:20px;height:20px;border-radius:50%;background:#E9EEF6;color:#9AA5B5;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;z-index:1}
+  body.design-v2 .flow-row.done .flow-dot,body.design-v2 .flow-row.now .flow-dot{background:#2F7CF6;color:#fff;box-shadow:0 2px 6px rgba(47,124,246,.28)}
+  body.design-v2 .flow-mid{flex:1;min-width:0}.flow-title{font-size:13px;font-weight:700;color:#1F2733;display:flex;align-items:center;gap:8px}.flow-sub{font-size:10px;color:#9AA5B5;margin-top:3px}
+  body.design-v2 .flow-tag{font-size:9px;color:#12A56A;background:#E9F8EF;padding:2px 6px;border-radius:3px}
+  body.design-v2 .flow-btn{height:30px;border:0;border-radius:4px;background:#2674F5;color:#fff;font-size:12px;font-weight:700;margin-top:8px;width:100%;box-shadow:0 6px 12px rgba(38,116,245,.22)}
+  body.design-v2 .tabbar{height:54px;padding-top:5px;background:rgba(255,255,255,.92);backdrop-filter:blur(18px)}
+  body.design-v2 .tab{font-size:10px;gap:2px}.tab svg{width:19px;height:19px}
+  body.design-v2 #check{background:#F5F7FA}
+  body.design-v2 #check .top{height:124px;padding:44px 14px 0;background:#fff;border:0;box-shadow:0 8px 20px rgba(20,35,60,.04)}
+  body.design-v2 #check .top-nav{height:28px}.design-v2 #check .bk2{background:transparent;width:24px;height:24px}
+  body.design-v2 #check .cti{text-align:center;font-size:14px;font-weight:600;color:#1D2633}
+  body.design-v2 #check .ov{padding:8px 0 0}.design-v2 #check .ov-big{font-size:12px;font-weight:500;color:#263240}.design-v2 #check .ov-big b{font-size:14px;color:#1D6FEF}
+  body.design-v2 #check .ov-sub{font-size:12px;color:#8F99A8}.design-v2 #check .track,.design-v2 #check .lg{display:none}
+  body.design-v2 #check .cbody{padding:15px 14px 86px}.design-v2 #check .grp{margin-bottom:17px}
+  body.design-v2 #check .grp-h{padding:0 0 8px}.design-v2 #check .grp-h .gt{font-size:13px;color:#8A94A3;font-weight:500}.design-v2 #check .grp-h .gc{display:none}
+  body.design-v2 #check .grp-card{border-radius:7px;box-shadow:0 8px 22px rgba(30,50,90,.07)}
+  body.design-v2 #check .crow{min-height:52px;padding:11px 13px;gap:10px}.design-v2 #check .crow+.crow:before{left:42px;background:#EEF1F5}
+  body.design-v2 #check .st{width:16px;height:16px;font-size:9px;border-width:1px}.design-v2 #check .st.empty{border:1px solid #CBD4E1}.design-v2 #check .st.part,.design-v2 #check .st.done{background:#6FCF8E;border:0;color:#fff}.design-v2 #check .st.flaw{background:#FA5151}
+  body.design-v2 #check .crow .nm{font-size:13px;font-weight:600;color:#1E2733}.design-v2 #check .crow .req,.design-v2 #check .type-chip{display:none}
+  body.design-v2 #check .crow .meta{font-size:10px;color:#9CA6B5;margin-top:2px}.design-v2 #check .chev{color:#15202E}
+  body.design-v2 #check .verdict{font-size:11px;border-radius:3px;padding:3px 7px}.design-v2 #check .inline-j{margin:0;justify-content:flex-end}.design-v2 #check .ijb{font-size:11px;background:#EEF1F5;border:0;border-radius:2px;padding:5px 10px}
+  body.design-v2 #check .cfoot{display:flex;gap:14px;padding:10px 14px 34px;background:rgba(255,255,255,.9);backdrop-filter:blur(18px);border:0}.design-v2 #check .foot-l{display:none}.design-v2 #check .cfoot:before{content:'连续拍照';flex:1;height:42px;background:#4B5563;color:#fff;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}.design-v2 #check .cfoot:after{content:'完成检查';flex:1;height:42px;background:#68A8F5;color:#fff;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}.design-v2 #check #chk-submit{display:none}
+  body.design-v2 #cam{background:#000;overflow:hidden}
+  body.design-v2 #cam .cam-top{position:absolute;top:0;left:0;right:0;height:64px;padding:30px 14px 0;background:rgba(255,255,255,.92);color:#111;z-index:20;backdrop-filter:blur(14px)}
+  body.design-v2 #cam .cam-top .cx,body.design-v2 #cam .cam-guide{background:transparent;color:#111;width:24px;height:24px}.design-v2 #cam .cam-ti .n{font-size:13px;color:#1E2733}.design-v2 #cam .cam-ti .p{display:inline;color:#697386;font-size:12px;margin-left:3px}
+  body.design-v2 #cam .vf{position:absolute;inset:0;margin:0;border-radius:0;z-index:1}
+  body.design-v2 #cam .cam-video{object-fit:cover}.design-v2 #cam .cam-fallback{background:linear-gradient(#E5E5E5,#D7D7D7);color:#252B33;padding-top:80px}.design-v2 #cam .cam-fallback svg{display:none}
+  body.design-v2 #cam .angle-hint{top:auto;bottom:220px;background:transparent;backdrop-filter:none;font-size:11px;text-shadow:0 1px 3px rgba(0,0,0,.5)}.design-v2 #cam .angle-hint b{color:#fff;font-weight:500}
+  body.design-v2 #cam .vf-example{display:none}.design-v2 #cam .angle-dots{bottom:166px;gap:8px}.design-v2 #cam .adot{width:34px;height:34px;border-radius:5px;border:1px dashed rgba(255,255,255,.9);background:rgba(255,255,255,.15)}.design-v2 #cam .adot.shot{border-style:solid;background:rgba(255,255,255,.55)}.design-v2 #cam .adot.cur{background:rgba(47,124,246,.5);transform:none}
+  body.design-v2 #cam .cam-strip{display:none}
+  body.design-v2 #cam .cam-act{position:absolute;left:0;right:0;bottom:0;height:150px;padding:18px 24px 36px;background:rgba(246,246,246,.28);backdrop-filter:blur(28px);border-top:1px solid rgba(255,255,255,.28);z-index:18}
+  body.design-v2 #cam .cam-side{color:#fff;font-size:10px;width:54px;text-shadow:0 1px 3px rgba(0,0,0,.32)}.design-v2 #cam .cam-side .c{width:44px;height:44px;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.2)}
+  body.design-v2 #cam .shutter{width:68px;height:68px;border:4px solid #fff;background:rgba(255,255,255,.25)}.design-v2 #cam .shutter:after{width:54px;height:54px}
+  body.design-v2 #cam .judge-bar{bottom:150px;padding:0 18px}.design-v2 #cam .perm{top:76px}
+  body.design-v2 #punch{background:#F5F7FA}
+  body.design-v2 #punch .nav{height:89px;padding:44px 14px 0;background:#fff;border:0}
+  body.design-v2 #punch .nav .bk{background:transparent;width:24px;height:24px}
+  body.design-v2 #punch .nav .nt{font-size:14px;margin-right:24px;color:#1E2733}
+  body.design-v2 #punch .punch{padding:92px 24px 34px;background:#F5F7FA;justify-content:flex-start}
+  body.design-v2 #punch .clock{font-size:40px;font-weight:300;color:#111;letter-spacing:0}
+  body.design-v2 #punch .loc{font-size:13px;color:#4E5969;margin-top:10px}
+  body.design-v2 #punch .punchbtn{width:132px;height:132px;margin-top:38px;border-radius:50%;background:#3F8CFF;box-shadow:0 14px 26px rgba(47,124,246,.28);font-size:16px}
+  body.design-v2 #punch .punchbtn small{display:none}
+  body.design-v2 #punch .punch-info{display:none}
+  body.design-v2 .mark-actions{display:flex;gap:8px;align-items:center}
+  body.design-v2 .mark-actions .ijb{padding:4px 8px!important;font-size:10px!important}
+  body.design-v2 .mark-actions .bad-mark{color:#FA5151;background:#FFF0F0!important}
+  body.design-v2 #check .st.part{background:#E9EEF6!important;color:#9AA5B5!important}
+  body.design-v2 #check .crow.ready .st.part{border:1px solid #C9D2DF!important;background:#fff!important;color:#9AA5B5!important}
+  body.design-v2 #check .cfoot:before,body.design-v2 #check .cfoot:after{display:none!important}
+  body.design-v2 #check .cfoot .foot-l{display:flex!important;flex:1;height:42px;background:#4B5563;color:#fff;border-radius:3px;align-items:center;justify-content:center;font-size:13px;font-weight:700;margin:0}
+  body.design-v2 #check #chk-submit{display:flex!important;flex:1;height:42px;background:#68A8F5;color:#fff;border-radius:3px;font-size:13px}
+  body.design-v2 #check #chk-submit:disabled{opacity:.55;background:#9DC7F8}
+  body.design-v2 .guide-img{height:210px;background:#F6F8FB;color:#4E5969;border:1px solid #E6EAF0;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px}
+  body.design-v2 .guide-photo{border-radius:6px;background:linear-gradient(160deg,#DDE3EA,#AEB8C4);position:relative;overflow:hidden}
+  body.design-v2 .guide-photo:before{content:'';position:absolute;left:18%;right:18%;bottom:22%;height:30%;background:#fff;border-radius:8px 8px 3px 3px;box-shadow:0 16px 0 #444}
+  body.design-v2 .guide-photo:after{content:'';position:absolute;left:10%;right:10%;bottom:14%;height:6px;background:#222;border-radius:10px}
+  body.design-v2 .guide-badge{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.55);color:#fff;font-size:10px;padding:3px 5px;border-radius:4px}
+  body.design-v2 #guide-mask .sheet h3{font-size:16px}
+  body.design-v2 #guide-mask .sheet{background:#fff}
+  body.design-v2 .shot-toast{position:absolute;left:50%;bottom:214px;transform:translateX(-50%);z-index:19;color:#fff;background:rgba(0,0,0,.32);font-size:11px;padding:4px 8px;border-radius:12px;pointer-events:none}
   @media(max-width:440px){body{padding:0}.phone{width:100vw;height:100vh;border-radius:0;box-shadow:none}.cap{display:none}}
 </style>
 </head>
@@ -782,7 +871,7 @@ function shootBurst(){
   if(!camReady){toast('相机未就绪，正在重新启动');startCamera();return}
   bursting=true;$('shutter').classList.add('burst');
   const take=()=>{
-    if(!shoot()||camShots.length>=it.need.length){stopBurst();if(camShots.length>=it.need.length)toast('连拍完成，请选择检查结果');return}
+    if(!shoot()||camShots.length>=it.need.length){stopBurst();if(camShots.length>=it.need.length)toast('拍摄完成，返回列表标记');return}
   };
   take();
   burstTimer=setInterval(take,720);
@@ -896,6 +985,156 @@ function heroPunch(){
   }else if(act==='out-wait'){
     toast('请先完成收车检查与收车小结');
   }else{toast('今日打卡已完成')}
+}
+
+/* ============ Figma 还原流程覆盖 ============ */
+document.body.classList.add('design-v2');
+let dailyPunchDone=false,taskPunchMode='start';
+const DESIGN_STEPS=[
+  {k:'开始打卡',d:'开始任务时打卡，自动记录时间地点'},
+  {k:'出车检查',d:'30项车况与设备检查'},
+  {k:'执行任务',d:'任务进行中，记得及时填报异常和费用'},
+  {k:'收车检查',d:'停放、落锁、余量确认'},
+  {k:'下班打卡',d:'收工打卡，完成今日日志'},
+  {k:'回盘',d:'交盘 / 充电 / 费用确认'},
+];
+
+const DESIGN_PHOTO_GROUPS=[
+  {g:'车辆正面',items:[['车外观（正面）',1],['前挡风玻璃与工作台',1],['摄像头',10]]},
+  {g:'副驾驶侧',items:[['车外观（副驾驶侧）',1],['车卫生（副驾驶侧前排）',1],['车卫生（副驾驶侧后排）',1],['轮胎',6],['摄像头',10]]},
+  {g:'车辆后面',items:[['车外观（后面）',1],['车卫生（后备箱）',1],['后备箱',1],['后排显示器电源线、HDMI线',1],['水冷机及设置温度',1],['CAN记录仪',1],['NAS状态',1],['逆变器',1],['摄像头',10]]},
+  {g:'驾驶侧',items:[['车外观（驾驶侧）',1],['车卫生（驾驶侧后排）',1],['轮胎',6],['摄像头',10],['车卫生（驾驶侧前排）',1]]},
+  {g:'雷达',items:[['AT128/ATX雷达',1],['pandar128雷达',1],['固达通雷达',6],['QT128雷达',10],['BP补盲雷达',1]]},
+  {g:'车内',items:[['仪表',1],['工程急停按钮',1],['pad',1],['记录仪',1],['硬盘',1],['油卡',1],['ICAR/M32T原车记录仪U盘',1],['传感器',1]]},
+];
+const DESIGN_CHECK_GROUPS=[
+  {g:'摄像头',items:[{name:'摄像头',type:'confirm',opts:['正常','异常'],bad:'异常',note:'当前已拍摄8张，确认是否有遮罩'}]},
+  {g:'物料检查',items:[
+    {name:'灭火器',type:'confirm',opts:['有','无'],bad:'无'},
+    {name:'三脚架',type:'confirm',opts:['有','无'],bad:'无'},
+    {name:'反光背心',type:'confirm',opts:['有','无'],bad:'无'},
+    {name:'拖车钩',type:'confirm',opts:['有','无'],bad:'无'},
+    {name:'安全锤',type:'confirm',opts:['有','无'],bad:'无'},
+    {name:'ETC设备/卡',type:'confirm',opts:['正常','异常','不涉及'],bad:'异常',na:'不涉及'},
+    {name:'油卡',type:'confirm',opts:['正常','异常','不涉及'],bad:'异常',na:'不涉及'},
+    {name:'行驶证',type:'confirm',opts:['正常','异常'],bad:'异常'},
+    {name:'正式牌照/临时牌照',type:'confirm',opts:['正常','异常'],bad:'异常'},
+  ]},
+  {g:'其他检查',items:[
+    {name:'24小时内未饮酒',type:'confirm',opts:['有饮酒','未饮酒'],bad:'有饮酒'},
+    {name:'身体状态确认',type:'confirm',opts:['状态良好','身体疲劳'],bad:'身体疲劳'},
+  ]},
+];
+
+function makePhotoItem(name,count){
+  return {name,type:'photo',need:Array.from({length:count},(_,i)=>count===1?'正面':`${i+1}号`),tips:[],opts:['正常','异常'],bad:'异常',guide:['按设计稿全框取景，拍摄内容覆盖整张照片','底部控制区仅作为取景浮层，不裁切照片'],hue:210};
+}
+function designTotalPhotos(){return ALL.filter(it=>it.type==='photo').length}
+function designShotReadyPhotos(){return ALL.filter(it=>it.type==='photo'&&it.shots.length>=it.need.length).length}
+function designDonePhotos(){return ALL.filter(it=>it.type==='photo'&&itemDone(it)).length}
+function designCloneChecks(){
+  const photoGroups=DESIGN_PHOTO_GROUPS.map(g=>({g:g.g,items:g.items.map(([name,count])=>({...makePhotoItem(name,count),shots:[],judge:null,status:'empty'}))}));
+  const checkGroups=DESIGN_CHECK_GROUPS.map(g=>({g:g.g,items:g.items.map(it=>({...it,shots:[],judge:null,status:'empty'}))}));
+  return photoGroups.concat(checkGroups);
+}
+function renderHome(){
+  const dailyLabel=dailyPunchDone?'已打卡':'下班打卡';
+  const rows=DESIGN_STEPS.map((s,i)=>{
+    const cls=i<stage?'done':(i===stage?'now':'');
+    const act=i===stage;
+    let label='';let handler='';
+    if(act&&i===0){label='去打卡';handler="openTaskPunch('start')"}
+    else if(act&&i===1){label='去检查';handler="startCheck('out')"}
+    else if(act&&i===2){label='完成执行';handler='finishExec()'}
+    else if(act&&i===3){label='去检查';handler="startCheck('in')"}
+    else if(act&&i===4){label='去打卡';handler="openTaskPunch('end')"}
+    else if(act&&i===5){label='去完成';handler='finishReturnDisk()'}
+    const btn=label?`<button class="flow-btn" onclick="${handler}">${label}</button>`:'';
+    return `<div class="flow-row ${cls}"><div class="flow-dot">${i<stage?'<svg width="11" height="11"><use href="#i-check"/></svg>':i+1}</div><div class="flow-mid"><div class="flow-title">${s.k}${i<stage?'<span class="flow-tag">已完成</span>':''}</div><div class="flow-sub">${s.d}</div>${btn}</div></div>`;
+  }).join('');
+  document.querySelector('#home .scroll').innerHTML=`<div class="home-blue"><div class="home-date">7月14日 周二 <svg width="13" height="13"><use href="#i-cal"/></svg></div><div class="clock-card"><div class="clock-ico"><svg width="17" height="17"><use href="#i-doc"/></svg></div><div class="clock-main"><b>上下班打卡</b><span>${dailyPunchDone?'今日考勤已记录':'上班打卡时间：12:00'}</span></div><div class="clock-pill" onclick="dailyPunch()">${dailyLabel}</div></div></div><div class="task-wrap"><div class="task-label">任务列表</div><div class="task-card"><div class="task-head"><b>今日任务1</b><span class="plate-badge">京A·B77970</span></div><div class="task-desc">上午班 · HX00372（常规） · 土五感知<br>拍摄30个路口的红绿灯，重点覆盖早高峰时段，注意信号灯完整入画。</div><div class="flow-line">${rows}</div></div></div>`;
+}
+function dailyPunch(){dailyPunchDone=true;renderHome();toast('每日上下班打卡已记录')}
+function openTaskPunch(mode){taskPunchMode=mode;setupPunch(mode==='start'?'punch-in':'punch-out');go('punch')}
+function doPunch(){
+  const word=taskPunchMode==='start'?'开始任务打卡成功':'下班打卡成功';
+  $('punchbtn').classList.add('done');$('punch-word').textContent='打卡成功';
+  setTimeout(()=>{stage=taskPunchMode==='start'?1:5;renderHome();go('home');toast(word)},450);
+}
+function finishExec(){stage=3;renderHome();toast('执行任务已完成，请进行收车检查')}
+function finishReturnDisk(){
+  const unfinished=ALL&&ALL.length?ALL.filter(it=>!itemDone(it)).length:0;
+  if(unfinished>0){toast('仍有检查项未完成');return}
+  stage=6;renderHome();toast('回盘完成，今日流程已闭环')
+}
+function startCheck(m){
+  chkMode=m;
+  if(m==='out'){GROUPS=designCloneChecks()}
+  else{GROUPS=[{g:'',items:[
+    {name:'车辆停放环境和遮窗套锁',type:'photo',need:['全景'],tips:[''],opts:['正常','异常'],bad:'异常',shots:[],judge:null,status:'empty',hue:212},
+    {name:'油/电余量',type:'photo',need:['仪表'],tips:[''],opts:['正常','异常'],bad:'异常',shots:[],judge:null,status:'empty',hue:160},
+    {name:'是否关闭ipad',type:'confirm',opts:['是','否'],bad:'否',shots:[],judge:null,status:'empty'},
+    {name:'是否关闭车内设备',type:'confirm',opts:['是','否'],bad:'否',shots:[],judge:null,status:'empty'},
+  ]}]}
+  ALL=GROUPS.flatMap(g=>g.items);ALL.forEach((it,i)=>it.idx=i);
+  $('chk-title').textContent=m==='out'?'出车检查':'收车检查';
+  renderCheck();go('check');
+}
+function itemDone(it){if(it.na&&it.judge===it.na)return true;if(it.type==='photo')return it.shots.length>=it.need.length&&it.judge!==null;return it.judge!==null}
+function refresh(it){if(it.na&&it.judge===it.na){it.status='na';return}if(it.judge===it.bad){it.status='flaw';return}if(itemDone(it)){it.status='done';return}it.status=it.shots&&it.shots.length>0?'part':'empty'}
+function doneCount(){return ALL.filter(itemDone).length}
+function renderCheck(){
+  const photoTotal=designTotalPhotos()||ALL.length,photoDone=designShotReadyPhotos();
+  $('ov-done').textContent=photoDone;$('ov-total').textContent=photoTotal;$('ov-sub').textContent=chkMode==='out'?'绕车辆顺时针检查':'';
+  const navVeh=document.querySelector('#check .top-nav .nav');if(navVeh)navVeh.style.display='none';
+  $('chk-body').innerHTML=GROUPS.map(g=>{
+    const rows=g.items.map(it=>{
+      const count=it.type==='photo'?`<span>${it.shots.length}/${it.need.length}张</span>`:(it.note?`<span>${it.note}</span>`:'');
+      const st=it.status==='done'?'<div class="st done"><svg width="10" height="10"><use href="#i-check"/></svg></div>':(it.status==='part'?'<div class="st part"><svg width="10" height="10"><use href="#i-check"/></svg></div>':(it.status==='flaw'?'<div class="st flaw">!</div>':'<div class="st empty"></div>'));
+      const ready=it.type==='photo'&&it.shots.length>=it.need.length&&!it.judge;
+      const inline=it.type!=='photo'&&it.status==='empty'?`<div class="inline-j">${it.opts.map(o=>`<span class="ijb" onclick="event.stopPropagation();inlineJudge(${it.idx},'${o}')">${o}</span>`).join('')}</div>`:(ready?`<div class="mark-actions"><span class="ijb" onclick="event.stopPropagation();inlineJudge(${it.idx},'正常')">正常</span><span class="ijb bad-mark" onclick="event.stopPropagation();inlineJudge(${it.idx},'异常')">异常</span></div>`:'');
+      const verdict=it.status==='done'||it.status==='flaw'?`<span class="verdict ${it.status==='flaw'?'bad':'good'}">${it.judge||'正常'}</span>`:(!ready&&it.type==='photo'?'<span class="chev"><svg width="14" height="14"><use href="#i-chevr"/></svg></span>':'');
+      const click=it.type==='photo'?`onclick="enterCam(${it.idx})"`:'style="cursor:default"';
+      return `<div class="crow ${ready?'ready':''}" ${click}>${st}<div class="mid"><div class="nm">${it.name}</div><div class="meta">${count}</div></div><div class="rt">${inline}${verdict}</div></div>`;
+    }).join('');
+    return `<div class="grp"><div class="grp-h"><span class="gt">${g.g}</span><span class="gc"></span></div><div class="grp-card">${rows}</div></div>`;
+  }).join('');
+  $('chk-foot').textContent='连续拍照';
+  $('chk-foot').onclick=()=>startContinuousShoot();
+  $('chk-submit').disabled=ALL.some(it=>!itemDone(it));
+}
+function startContinuousShoot(){
+  const t=ALL.findIndex(it=>it.type==='photo'&&it.shots.length<it.need.length);
+  if(t>=0)enterCam(t);else toast('照片已拍完，请标记检查结果');
+}
+function renderCam(){
+  const it=ALL[curIdx],n=camShots.length,total=it.need.length,full=n>=total;
+  $('cam-n').textContent=it.name+' ';
+  $('cam-p').textContent=`(${Math.min(n+1,total)}/${total})`;
+  $('vf').style.background=`linear-gradient(180deg,#e5e5e5,#cfcfcf)`;
+  $('angle').style.display=full?'none':'flex';
+  if(!full){$('angle-t').textContent=n>0?'已拍'+n+'张':'已拍0张';$('angle-tip').textContent=''}
+  if(full){
+    $('judge').classList.add('on');
+    $('judge-q').textContent=`已拍 ${n}/${total}，返回列表后标记`;
+    $('judge-btns').innerHTML=`<button class="jb bad" onclick="camShots=[];renderCam()">重拍</button><button class="jb good" onclick="camExit()">完成拍摄</button>`;
+  }else{$('judge').classList.remove('on')}
+  $('dots').innerHTML=it.need.map((_,i)=>`<div class="adot ${i<n?'shot':''} ${i===n&&!full?'cur':''}"></div>`).join('');
+  $('strip').innerHTML=camShots.map(s=>`<div class="thumb" style="${s.src?`background-image:url('${s.src}');background-size:cover;background-position:center`:''}">${s.native?'<span class="rt">原</span>':''}</div>`).join('');
+  $('vf').querySelector('.shot-toast')?.remove();
+  if(n>0&&!full){$('vf').insertAdjacentHTML('beforeend',`<div class="shot-toast">已拍${n}张</div>`)}
+}
+function openGuide(){
+  const it=ALL[curIdx]||{name:'拍摄指南',guide:[]};
+  $('guide-title').textContent=it.name+' · 拍摄指南';
+  $('guide-img').innerHTML='<div class="guide-photo"><span class="guide-badge">标准角度</span></div><div class="guide-photo"><span class="guide-badge">关键细节</span></div>';
+  const steps=[
+    '按要求角度取景，车辆或设备主体完整入画',
+    '拍摄距离保持稳定，避免过曝、遮挡、虚焦',
+    '拍完返回检查列表，再按实际情况标记正常或异常',
+  ].concat(it.guide||[]).slice(0,5);
+  $('guide-steps').innerHTML=steps.map((s,i)=>`<div class="guide-step"><div class="gn">${i+1}</div><div class="gx">${s}</div></div>`).join('');
+  $('guide-mask').classList.add('on');
 }
 
 renderHome();go('home');
