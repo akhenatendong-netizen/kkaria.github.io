@@ -995,7 +995,7 @@ function shoot(){
   camShots.push({angle:it.need[camShots.length],src:captureFrame()});
   renderCam();
   saveCurrentCamItem();
-  if(itemDone(it)&&allPhotosDone())openCheckFormFromCamera('照片项已完成，请提交表单');
+  afterShotAutoAdvance();
   return true;
 }
 function shootBurst(){
@@ -1016,7 +1016,7 @@ function handleNativeFile(event){
   const it=ALL[curIdx],file=event.target.files&&event.target.files[0];
   if(!file||camShots.length>=it.need.length)return;
   const reader=new FileReader();
-  reader.onload=()=>{flashShot();camShots.push({angle:it.need[camShots.length],native:true,src:reader.result});renderCam();saveCurrentCamItem();if(itemDone(it)&&allPhotosDone())openCheckFormFromCamera('照片项已完成，请提交表单')};
+  reader.onload=()=>{flashShot();camShots.push({angle:it.need[camShots.length],native:true,src:reader.result});renderCam();saveCurrentCamItem();afterShotAutoAdvance()};
   reader.readAsDataURL(file);
 }
 function advanceAfterShot(){
@@ -1301,6 +1301,16 @@ function allPhotosDone(){return ALL.filter(it=>it.type==='photo').every(itemDone
 function saveCurrentCamItem(){
   const it=ALL[curIdx];
   if(it&&it.type==='photo'){it.shots=camShots;refresh(it)}
+}
+function afterShotAutoAdvance(){
+  const it=ALL[curIdx];
+  if(!it||!itemDone(it))return;
+  if(allPhotosDone()){openCheckFormFromCamera('照片项已完成，请提交表单');return}
+  const groupNext=ALL.findIndex((x,i)=>i>curIdx&&x.type==='photo'&&x.groupName===it.groupName&&!itemDone(x)&&x.judge!==x.na);
+  const groupAny=ALL.findIndex((x,i)=>i!==curIdx&&x.type==='photo'&&x.groupName===it.groupName&&!itemDone(x)&&x.judge!==x.na);
+  const t=groupNext>=0?groupNext:groupAny;
+  if(t>=0){enterCam(t);return}
+  toast('本分类已完成，请点下一项');
 }
 function openCheckFormFromCamera(message='照片项全部完成，请完成剩余确认项'){
   stopBurst();stopCamera();saveCurrentCamItem();formReturnCamIdx=curIdx;renderCheck();go('check');toast(message);
