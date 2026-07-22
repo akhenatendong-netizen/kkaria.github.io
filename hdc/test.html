@@ -1177,8 +1177,9 @@ const DESIGN_CHECK_GROUPS=[
 
 function makePhotoItem(name,count,groupName=''){
   const sharedKey=null;
-  const minShots=groupName==='雷达'?1:count;
-  return {name,groupName,type:'photo',sharedKey,minShots,flexCount:groupName==='雷达',need:Array.from({length:count},(_,i)=>count===1?'正面':`${i+1}号`),tips:[],opts:['正常','异常'],bad:'异常',guide:['按设计稿全框取景，拍摄内容覆盖整张照片','底部控制区仅作为取景浮层，不裁切照片'],hue:210};
+  const cameraFree=name==='摄像头'&&['正面','副驾驶侧','后面','驾驶侧'].includes(groupName);
+  const minShots=(groupName==='雷达'||cameraFree)?1:count;
+  return {name,groupName,type:'photo',sharedKey,minShots,freeCount:cameraFree,flexCount:groupName==='雷达',need:Array.from({length:count},(_,i)=>count===1?'正面':`${i+1}号`),tips:[],opts:['正常','异常'],bad:'异常',guide:['按设计稿全框取景，拍摄内容覆盖整张照片','底部控制区仅作为取景浮层，不裁切照片'],hue:210};
 }
 function designUniquePhotos(){
   const seen=new Set();
@@ -1257,7 +1258,10 @@ function startCheck(m){
   $('chk-title').textContent=m==='out'?'出车检查':'收车检查';
   renderCheck();
   const first=ALL.findIndex(it=>it.type==='photo'&&!itemDone(it));
-  if(first>=0)enterCam(first);else go('check');
+  if(first>=0){
+    enterCam(first);
+    if(m==='out')setTimeout(showStartShootTip,160);
+  }else go('check');
 }
 function itemDone(it){if(it.na&&it.judge===it.na)return true;if(it.type==='photo')return it.shots.length>=(it.minShots||it.need.length);return it.judge!==null}
 function syncSharedPhoto(it){
@@ -1275,10 +1279,13 @@ function renderCheck(){
   const photoTotal=designTotalPhotos()||ALL.length,photoDone=designShotReadyPhotos();
   $('ov-done').textContent=photoDone;$('ov-total').textContent=photoTotal;$('ov-sub').textContent=chkMode==='out'?'绕车辆顺时针检查':'';
   const navVeh=document.querySelector('#check .top-nav .nav');if(navVeh)navVeh.style.display='none';
-  $('chk-body').innerHTML=GROUPS.map(g=>{
+  const orderedGroups=allPhotosDone()
+    ? GROUPS.slice().sort((a,b)=>(a.g==='摄像头'?-1:b.g==='摄像头'?1:0))
+    : GROUPS;
+  $('chk-body').innerHTML=orderedGroups.map(g=>{
     const rows=g.items.map(it=>{
       if(it.type==='confirm'&&it.name==='摄像头')it.note=`当前已拍摄${cameraShotSummary()}张，确认是否有遮罩`;
-      const count=it.type==='photo'?`<span>${it.flexCount?`已拍${it.shots.length}张`:`${it.shots.length}/${it.need.length}张`}</span>`:(it.note?`<span>${it.note}</span>`:'');
+      const count=it.type==='photo'?`<span>${it.freeCount?(it.shots.length?'已拍摄':'待拍摄'):(it.flexCount?`已拍${it.shots.length}张`:`${it.shots.length}/${it.need.length}张`)}</span>`:(it.note?`<span>${it.note}</span>`:'');
       const checkIcon='<svg width="10" height="10"><use href="#i-check"/></svg>';
       const st=it.status==='done'?`<div class="st done">${checkIcon}</div>`:(it.status==='part'?`<div class="st part">${checkIcon}</div>`:(it.status==='flaw'?'<div class="st flaw">!</div>':`<div class="st empty">${checkIcon}</div>`));
       const ready=it.type==='photo'&&itemDone(it);
@@ -1324,7 +1331,7 @@ function showStartShootTip(){
 function renderCam(){
   const it=ALL[curIdx],n=camShots.length,total=it.need.length,full=n>=total;
   $('cam-n').innerHTML=displayItemTitleHtml(it);
-  $('cam-p').textContent=`(${Math.min(n+1,total)}/${total})`;
+  $('cam-p').textContent=it.freeCount?(n?'已拍摄':'待拍摄'):`(${Math.min(n+1,total)}/${total})`;
   $('vf').style.background=`linear-gradient(180deg,#e5e5e5,#cfcfcf)`;
   $('cam').classList.toggle('preview',camMode==='preview');
   const video=$('cam-video'),fallback=$('cam-fallback'),ps=camShots[previewIdx];
@@ -1340,15 +1347,19 @@ function renderCam(){
   }
   $('angle').style.display='flex';
   if(camMode==='preview'){$('angle-t').textContent=`预览中 ${previewIdx+1}/${Math.max(1,total)}`;$('angle-tip').textContent=''}
-  else{$('angle-t').textContent=n>0?'已拍'+n+'张':'已拍0张';$('angle-tip').textContent=''}
+  else{$('angle-t').textContent=it.freeCount?(n?'已拍摄':'待拍摄'):(n>0?'已拍'+n+'张':'已拍0张');$('angle-tip').textContent=''}
   $('judge').classList.remove('on');
-  $('dots').innerHTML=it.need.map((_,i)=>`<div class="adot ${i<n?'shot':''} ${i===n&&!full?'cur':''}"></div>`).join('');
+  const dotTotal=it.freeCount?Math.min(total,Math.max(1,n+(n<total?1:0))):total;
+  $('dots').innerHTML=Array.from({length:dotTotal},(_,i)=>`<div class="adot ${i<n?'shot':''} ${i===n&&n<total?'cur':''}"></div>`).join('');
   const groupItems=ALL.filter(x=>x.type==='photo'&&x.groupName===it.groupName);
-  $('strip').innerHTML=groupItems.flatMap(item=>item.need.map((_,i)=>{
-    const s=item.idx===curIdx?camShots[i]:item.shots[i];
+  $('strip').innerHTML=groupItems.flatMap(item=>{
+    const shots=item.idx===curIdx?camShots:item.shots;
+    const slotTotal=item.freeCount?Math.min(item.need.length,Math.max(1,shots.length+(shots.length<item.need.length?1:0))):item.need.length;
+    return Array.from({length:slotTotal},(_,i)=>{
+    const s=shots[i];
     const cur=item.idx===curIdx&&camMode==='preview'&&i===previewIdx;
     return `<div class="thumb ${s?'filled':''} ${cur?'cur':''}" title="${displayItemName(item)} ${i+1}" ${s?`onclick="event.stopPropagation();previewGroupShot(${item.idx},${i})"`:''} style="${s&&s.src?`background-image:url('${s.src}')`:''}">${s&&s.native?'<span class="rt">原</span>':''}</div>`;
-  })).join('');
+  })}).join('');
   renderCamActions();
   $('vf').querySelector('.shot-toast')?.remove();
 }
