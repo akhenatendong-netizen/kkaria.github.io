@@ -514,6 +514,7 @@
   body.design-v2 #check .st.empty,body.design-v2 #check .st.part,body.design-v2 #check .st.na{background:#D8DEE8!important}
   body.design-v2 #check .st.done{background:#6FCF8E!important}
   body.design-v2 #check .st svg{width:calc(13px * var(--fx));height:calc(13px * var(--fx))}
+  body.design-v2 #check .camera-total{font-size:calc(12px * var(--fx));font-weight:500;color:#8F99A8;margin-left:calc(6px * var(--fx))}
   @media(max-width:440px){body{padding:0}.phone{width:100vw;height:100vh;border-radius:0;box-shadow:none}.cap{display:none}}
 </style>
 </head>
@@ -1229,7 +1230,7 @@ function renderHome(){
     const btn=label?`<button class="flow-btn" onclick="${handler}">${label}</button>`:'';
     return `<div class="flow-row ${cls}"><div class="flow-dot">${i<stage?'<svg width="11" height="11"><use href="#i-check"/></svg>':i+1}</div><div class="flow-mid"><div class="flow-title">${s.k}${i<stage?'<span class="flow-tag">已完成</span>':''}</div><div class="flow-sub">${s.d}</div>${btn}</div></div>`;
   }).join('');
-  document.querySelector('#home .scroll').innerHTML=`<div class="home-blue"><div class="home-date">7月14日 周二 <svg width="13" height="13"><use href="#i-cal"/></svg></div><div class="clock-card"><div class="clock-ico"><svg width="17" height="17"><use href="#i-doc"/></svg></div><div class="clock-main"><b>上下班打卡</b><span>${dailyPunchDone?'今日考勤已记录':'上班打卡时间：12:00'}</span></div><div class="clock-pill" onclick="dailyPunch()">${dailyLabel}</div></div></div><div class="task-wrap"><div class="task-label">任务列表</div><div class="task-card"><div class="task-head"><b>今日任务1</b><span class="plate-badge">京A·B77970</span></div><div class="task-desc">上午班 · HX00372（常规） · 土五感知<br>拍摄30个路口的红绿灯，重点覆盖早高峰时段，注意信号灯完整入画。</div><div class="flow-line">${rows}</div></div></div>`;
+  document.querySelector('#home .scroll').innerHTML=`<div class="home-blue"><div class="home-date">7月14日 周二 <svg width="13" height="13"><use href="#i-cal"/></svg></div></div><div class="task-wrap"><div class="task-label">任务列表</div><div class="task-card"><div class="task-head"><b>今日任务1</b><span class="plate-badge">京A·B77970</span></div><div class="task-desc">上午班 · HX00372（常规） · 土五感知<br>拍摄30个路口的红绿灯，重点覆盖早高峰时段，注意信号灯完整入画。</div><div class="flow-line">${rows}</div></div></div>`;
 }
 function dailyPunch(){dailyPunchDone=true;renderHome();toast('每日上下班打卡已记录')}
 function openTaskPunch(mode){taskPunchMode=mode;setupPunch(mode==='start'?'punch-in':'punch-out');go('punch')}
@@ -1279,12 +1280,12 @@ function renderCheck(){
   const photoTotal=designTotalPhotos()||ALL.length,photoDone=designShotReadyPhotos();
   $('ov-done').textContent=photoDone;$('ov-total').textContent=photoTotal;$('ov-sub').textContent=chkMode==='out'?'绕车辆顺时针检查':'';
   const navVeh=document.querySelector('#check .top-nav .nav');if(navVeh)navVeh.style.display='none';
-  const orderedGroups=allPhotosDone()
-    ? GROUPS.slice().sort((a,b)=>(a.g==='摄像头'?-1:b.g==='摄像头'?1:0))
-    : GROUPS;
+  const orderedGroups=GROUPS;
   $('chk-body').innerHTML=orderedGroups.map(g=>{
     const rows=g.items.map(it=>{
-      if(it.type==='confirm'&&it.name==='摄像头')it.note=`当前已拍摄${cameraShotSummary()}张，确认是否有遮罩`;
+      const cameraSummary=it.type==='confirm'&&it.name==='摄像头'?cameraShotSummary():null;
+      if(cameraSummary!==null)it.note='确认是否有遮罩';
+      const title=cameraSummary!==null?`${it.name}<span class="camera-total">已拍摄${cameraSummary}张</span>`:it.name;
       const count=it.type==='photo'?`<span>${it.freeCount?(it.shots.length?'已拍摄':'待拍摄'):(it.flexCount?`已拍${it.shots.length}张`:`${it.shots.length}/${it.need.length}张`)}</span>`:(it.note?`<span>${it.note}</span>`:'');
       const checkIcon='<svg width="10" height="10"><use href="#i-check"/></svg>';
       const st=it.status==='done'?`<div class="st done">${checkIcon}</div>`:(it.status==='part'?`<div class="st part">${checkIcon}</div>`:(it.status==='flaw'?'<div class="st flaw">!</div>':`<div class="st empty">${checkIcon}</div>`));
@@ -1292,7 +1293,7 @@ function renderCheck(){
       const inline=it.type!=='photo'?`<div class="inline-j">${it.opts.map(o=>`<span class="ijb ${it.judge===o?'on':''}" onclick="event.stopPropagation();inlineJudge(${it.idx},'${o}')">${o}</span>`).join('')}</div>`:'';
       const verdict=it.type==='photo'?(it.status==='flaw'?`<span class="verdict bad">${it.judge}</span>`:'<span class="chev"><svg width="14" height="14"><use href="#i-chevr"/></svg></span>'):'';
       const click=it.type==='photo'?`onclick="${ready||it.judge?`openPhotoReview(${it.idx})`:`enterCam(${it.idx})`}"`:'style="cursor:default"';
-      return `<div class="crow ${ready?'ready':''}" ${click}>${st}<div class="mid"><div class="nm">${it.name}</div><div class="meta">${count}</div></div><div class="rt">${inline}${verdict}</div></div>`;
+      return `<div class="crow ${ready?'ready':''}" ${click}>${st}<div class="mid"><div class="nm">${title}</div><div class="meta">${count}</div></div><div class="rt">${inline}${verdict}</div></div>`;
     }).join('');
     return `<div class="grp"><div class="grp-h"><span class="gt">${g.g}</span><span class="gc"></span></div><div class="grp-card">${rows}</div></div>`;
   }).join('');
@@ -1317,7 +1318,7 @@ function afterShotAutoAdvance(){
   const groupAny=ALL.findIndex((x,i)=>i!==curIdx&&x.type==='photo'&&x.groupName===it.groupName&&!itemDone(x)&&x.judge!==x.na);
   const t=groupNext>=0?groupNext:groupAny;
   if(t>=0){enterCam(t);return}
-  toast('本分类已完成，请点下一项');
+  toast(it.name==='摄像头'?'请拍摄完成后点击确认进入下一项':'本分类已完成，请点下一项');
 }
 function openCheckFormFromCamera(message='照片项全部完成，请完成剩余确认项'){
   stopBurst();stopCamera();saveCurrentCamItem();formReturnCamIdx=curIdx;renderCheck();go('check');toast(message);
