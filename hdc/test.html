@@ -994,8 +994,8 @@ function shoot(){
   if(!camReady){toast('页内相机未就绪，请点原相机拍摄');return false}
   flashShot();
   camShots.push({angle:it.need[camShots.length],src:captureFrame()});
-  renderCam();
   saveCurrentCamItem();
+  renderCam();
   afterShotAutoAdvance();
   return true;
 }
@@ -1017,7 +1017,7 @@ function handleNativeFile(event){
   const it=ALL[curIdx],file=event.target.files&&event.target.files[0];
   if(!file||camShots.length>=it.need.length)return;
   const reader=new FileReader();
-  reader.onload=()=>{flashShot();camShots.push({angle:it.need[camShots.length],native:true,src:reader.result});renderCam();saveCurrentCamItem();afterShotAutoAdvance()};
+  reader.onload=()=>{flashShot();camShots.push({angle:it.need[camShots.length],native:true,src:reader.result});saveCurrentCamItem();renderCam();afterShotAutoAdvance()};
   reader.readAsDataURL(file);
 }
 function advanceAfterShot(){
@@ -1216,6 +1216,9 @@ function displayItemTitleHtml(it){
   return `<span class="cam-name-text">${it.name}</span>`;
 }
 function cameraShotSummary(){return ALL.filter(it=>it.type==='photo'&&it.name==='摄像头').reduce((sum,it)=>sum+it.shots.length,0)}
+function liveCameraShotSummary(){
+  return ALL.filter(it=>it.type==='photo'&&it.name==='摄像头').reduce((sum,it)=>sum+(it.idx===curIdx?camShots.length:it.shots.length),0);
+}
 function renderHome(){
   const dailyLabel=dailyPunchDone?'已打卡':'下班打卡';
   const rows=DESIGN_STEPS.map((s,i)=>{
@@ -1296,7 +1299,8 @@ function renderCheck(){
       const click=it.type==='photo'?`onclick="${ready||it.judge?`openPhotoReview(${it.idx})`:`enterCam(${it.idx})`}"`:'style="cursor:default"';
       return `<div class="crow ${ready?'ready':''}" ${click}>${st}<div class="mid"><div class="nm">${title}</div><div class="meta">${count}</div></div><div class="rt">${inline}${verdict}</div></div>`;
     }).join('');
-    return `<div class="grp"><div class="grp-h"><span class="gt">${g.g}</span><span class="gc"></span></div><div class="grp-card">${rows}</div></div>`;
+    const groupTitle=g.g==='摄像头'?`${g.g}<span class="camera-total">已拍摄${cameraShotSummary()}张</span>`:g.g;
+    return `<div class="grp"><div class="grp-h"><span class="gt">${groupTitle}</span><span class="gc"></span></div><div class="grp-card">${rows}</div></div>`;
   }).join('');
   $('chk-foot').textContent='连续拍照';
   $('chk-foot').onclick=()=>startContinuousShoot();
@@ -1333,7 +1337,7 @@ function showStartShootTip(){
 function renderCam(){
   const it=ALL[curIdx],n=camShots.length,total=it.need.length,full=n>=total;
   $('cam-n').innerHTML=displayItemTitleHtml(it);
-  $('cam-p').textContent=it.freeCount?(n?'已拍摄':'待拍摄'):`(${Math.min(n+1,total)}/${total})`;
+  $('cam-p').textContent=it.freeCount?`已拍摄${liveCameraShotSummary()}张`:`(${Math.min(n+1,total)}/${total})`;
   $('vf').style.background=`linear-gradient(180deg,#e5e5e5,#cfcfcf)`;
   $('cam').classList.toggle('preview',camMode==='preview');
   const video=$('cam-video'),fallback=$('cam-fallback'),ps=camShots[previewIdx];
@@ -1362,6 +1366,7 @@ function renderCam(){
     const cur=item.idx===curIdx&&camMode==='preview'&&i===previewIdx;
     return `<div class="thumb ${s?'filled':''} ${cur?'cur':''}" title="${displayItemName(item)} ${i+1}" ${s?`onclick="event.stopPropagation();previewGroupShot(${item.idx},${i})"`:''} style="${s&&s.src?`background-image:url('${s.src}')`:''}">${s&&s.native?'<span class="rt">原</span>':''}</div>`;
   })}).join('');
+  if(camMode!=='preview')requestAnimationFrame(()=>{$('strip').scrollLeft=$('strip').scrollWidth});
   renderCamActions();
   $('vf').querySelector('.shot-toast')?.remove();
 }
