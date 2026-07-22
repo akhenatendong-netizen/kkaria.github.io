@@ -1151,9 +1151,9 @@ const DESIGN_STEPS=[
 
 const DESIGN_PHOTO_GROUPS=[
   {g:'正面',items:[['车外观（正面）',1],['前挡风玻璃与工作台',1],['摄像头',10]]},
-  {g:'副驾驶侧',items:[['车外观（副驾驶侧）',1],['车卫生（副驾驶侧前排）',1],['车卫生（副驾驶侧后排）',1],['轮胎',6],['摄像头',10]]},
-  {g:'后面',items:[['车外观（后面）',1],['车卫生（后备箱）',1],['后备箱',1],['后排显示器电源线、HDMI线',1],['水冷机及设置温度',1],['CAN记录仪',1],['NAS状态',1],['逆变器',1],['摄像头',10]]},
-  {g:'驾驶侧',items:[['车外观（驾驶侧）',1],['车卫生（驾驶侧后排）',1],['轮胎',6],['摄像头',10],['车卫生（驾驶侧前排）',1]]},
+  {g:'副驾驶侧',items:[['车外观（副驾驶侧）',1],['车卫生（副驾驶侧前排）',1],['车卫生（副驾驶侧后排）',1],['轮胎',2],['摄像头',10]]},
+  {g:'后面',items:[['车外观（后面）',1],['车卫生（后备箱）',1],['后备箱',1],['后排显示器电源线、HDMI线',1],['水冷机及设置温度',1],['CAN记录仪',1],['NAS状态',1],['逆变器',1],['轮胎',2],['摄像头',10]]},
+  {g:'驾驶侧',items:[['车外观（驾驶侧）',1],['车卫生（驾驶侧后排）',1],['轮胎',2],['摄像头',10],['车卫生（驾驶侧前排）',1]]},
   {g:'雷达',items:[['AT128/ATX雷达',1],['pandar128雷达',1],['固达通雷达',6],['QT128雷达',10],['BP补盲雷达',1]]},
   {g:'车内',items:[['仪表',1],['工程急停按钮',1],['pad',1],['记录仪',1],['硬盘',1],['油卡',1],['ICAR/M32T原车记录仪U盘',1],['传感器',1]]},
 ];
@@ -1180,7 +1180,8 @@ function makePhotoItem(name,count,groupName=''){
   const sharedKey=null;
   const cameraFree=name==='摄像头'&&['正面','副驾驶侧','后面','驾驶侧'].includes(groupName);
   const minShots=(groupName==='雷达'||cameraFree)?1:count;
-  return {name,groupName,type:'photo',sharedKey,minShots,freeCount:cameraFree,flexCount:groupName==='雷达',need:Array.from({length:count},(_,i)=>count===1?'正面':`${i+1}号`),tips:[],opts:['正常','异常'],bad:'异常',guide:['按设计稿全框取景，拍摄内容覆盖整张照片','底部控制区仅作为取景浮层，不裁切照片'],hue:210};
+  const need=name==='轮胎'&&count===2?['近景','远景']:Array.from({length:count},(_,i)=>count===1?'正面':`${i+1}号`);
+  return {name,groupName,type:'photo',sharedKey,minShots,freeCount:cameraFree,flexCount:groupName==='雷达',need,tips:[],opts:['正常','异常'],bad:'异常',guide:['按设计稿全框取景，拍摄内容覆盖整张照片','底部控制区仅作为取景浮层，不裁切照片'],hue:210};
 }
 function designUniquePhotos(){
   const seen=new Set();
@@ -1230,7 +1231,7 @@ function renderHome(){
     const btn=label?`<button class="flow-btn" onclick="${handler}">${label}</button>`:'';
     return `<div class="flow-row ${cls}"><div class="flow-dot">${i<stage?'<svg width="11" height="11"><use href="#i-check"/></svg>':i+1}</div><div class="flow-mid"><div class="flow-title">${s.k}${i<stage?'<span class="flow-tag">已完成</span>':''}</div><div class="flow-sub">${s.d}</div>${btn}</div></div>`;
   }).join('');
-  document.querySelector('#home .scroll').innerHTML=`<div class="home-blue"><div class="home-date">7月14日 周二 <svg width="13" height="13"><use href="#i-cal"/></svg></div></div><div class="task-wrap"><div class="task-label">任务列表</div><div class="task-card"><div class="task-head"><b>今日任务1</b><span class="plate-badge">京A·B77970</span></div><div class="task-desc">上午班 · HX00372（常规） · 土五感知<br>拍摄30个路口的红绿灯，重点覆盖早高峰时段，注意信号灯完整入画。</div><div class="flow-line">${rows}</div></div></div>`;
+  document.querySelector('#home .scroll').innerHTML=`<div class="home-blue"><div class="home-date">7月14日 周二 <svg width="13" height="13"><use href="#i-cal"/></svg></div><div class="clock-card"><div class="clock-ico"><svg width="17" height="17"><use href="#i-doc"/></svg></div><div class="clock-main"><b>上下班打卡</b><span>${dailyPunchDone?'今日考勤已记录':'上班打卡时间：12:00'}</span></div><div class="clock-pill" onclick="dailyPunch()">${dailyLabel}</div></div></div><div class="task-wrap"><div class="task-label">任务列表</div><div class="task-card"><div class="task-head"><b>今日任务1</b><span class="plate-badge">京A·B77970</span></div><div class="task-desc">上午班 · HX00372（常规） · 土五感知<br>拍摄30个路口的红绿灯，重点覆盖早高峰时段，注意信号灯完整入画。</div><div class="flow-line">${rows}</div></div></div>`;
 }
 function dailyPunch(){dailyPunchDone=true;renderHome();toast('每日上下班打卡已记录')}
 function openTaskPunch(mode){taskPunchMode=mode;setupPunch(mode==='start'?'punch-in':'punch-out');go('punch')}
