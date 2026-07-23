@@ -1337,7 +1337,7 @@ function showStartShootTip(){
 function renderCam(){
   const it=ALL[curIdx],n=camShots.length,total=it.need.length,full=n>=total;
   $('cam-n').innerHTML=displayItemTitleHtml(it);
-  $('cam-p').textContent=it.freeCount?`已拍摄${liveCameraShotSummary()}张`:`(${Math.min(n+1,total)}/${total})`;
+  $('cam-p').textContent=it.freeCount?`已拍摄${liveCameraShotSummary()}张`:`(${n}/${total})`;
   $('vf').style.background=`linear-gradient(180deg,#e5e5e5,#cfcfcf)`;
   $('cam').classList.toggle('preview',camMode==='preview');
   const video=$('cam-video'),fallback=$('cam-fallback'),ps=camShots[previewIdx];
