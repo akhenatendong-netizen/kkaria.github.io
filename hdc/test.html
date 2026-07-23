@@ -515,6 +515,7 @@
   body.design-v2 #check .st.done{background:#6FCF8E!important}
   body.design-v2 #check .st svg{width:calc(13px * var(--fx));height:calc(13px * var(--fx))}
   body.design-v2 #check .camera-total{font-size:calc(12px * var(--fx));font-weight:500;color:#8F99A8;margin-left:calc(6px * var(--fx))}
+  body.design-v2 #check .na-text{color:#8F99A8;font-weight:500}
   @media(max-width:440px){body{padding:0}.phone{width:100vw;height:100vh;border-radius:0;box-shadow:none}.cap{display:none}}
 </style>
 </head>
@@ -1030,7 +1031,7 @@ function advanceAfterShot(){
   stopBurst();stopCamera();renderCheck();go('check');toast('拍摄完成，可回看照片或完成检查');
 }
 function camJudge(v){const it=ALL[curIdx];it.shots=camShots;it.judge=v;refresh(it);if(v===it.bad)toast(`「${it.name}」已标记${v}`);autoNext()}
-function skipNext(){const it=ALL[curIdx];if(it.na&&camShots.length===0&&!it.judge){it.judge=it.na;it.shots=[];refresh(it)}else{it.shots=camShots;refresh(it)}autoNext(true)}
+function skipNext(){const it=ALL[curIdx];it.na=it.na||'不涉及';it.judge=it.na;it.shots=[];camShots=[];refresh(it);autoNext(true)}
 function autoNext(){
   stopBurst();
   const nx=ALL.findIndex((x,i)=>i>curIdx&&x.type==='photo'&&!itemDone(x)&&x.judge!==x.na);
@@ -1181,7 +1182,7 @@ function makePhotoItem(name,count,groupName=''){
   const cameraFree=name==='摄像头'&&['正面','副驾驶侧','后面','驾驶侧'].includes(groupName);
   const minShots=(groupName==='雷达'||cameraFree)?1:count;
   const need=name==='轮胎'&&count===2?['近景','远景']:Array.from({length:count},(_,i)=>count===1?'正面':`${i+1}号`);
-  return {name,groupName,type:'photo',sharedKey,minShots,freeCount:cameraFree,flexCount:groupName==='雷达',need,tips:[],opts:['正常','异常'],bad:'异常',guide:['按设计稿全框取景，拍摄内容覆盖整张照片','底部控制区仅作为取景浮层，不裁切照片'],hue:210};
+  return {name,groupName,type:'photo',sharedKey,minShots,freeCount:cameraFree,flexCount:groupName==='雷达',need,tips:[],opts:['正常','异常','不涉及'],bad:'异常',na:'不涉及',guide:['按设计稿全框取景，拍摄内容覆盖整张照片','底部控制区仅作为取景浮层，不裁切照片'],hue:210};
 }
 function designUniquePhotos(){
   const seen=new Set();
@@ -1290,9 +1291,11 @@ function renderCheck(){
       const cameraSummary=it.type==='confirm'&&it.name==='摄像头'?cameraShotSummary():null;
       if(cameraSummary!==null)it.note='确认是否有遮罩';
       const title=cameraSummary!==null?`${it.name}<span class="camera-total">已拍摄${cameraSummary}张</span>`:it.name;
-      const count=it.type==='photo'?`<span>${it.freeCount?(it.shots.length?'已拍摄':'待拍摄'):(it.flexCount?`已拍${it.shots.length}张`:`${it.shots.length}/${it.need.length}张`)}</span>`:(it.note?`<span>${it.note}</span>`:'');
+      const count=it.status==='na'
+        ? '<span class="na-text">不涉及</span>'
+        : (it.type==='photo'?`<span>${it.freeCount?(it.shots.length?'已拍摄':'待拍摄'):(it.flexCount?`已拍${it.shots.length}张`:`${it.shots.length}/${it.need.length}张`)}</span>`:(it.note?`<span>${it.note}</span>`:''));
       const checkIcon='<svg width="10" height="10"><use href="#i-check"/></svg>';
-      const st=it.status==='done'?`<div class="st done">${checkIcon}</div>`:(it.status==='part'?`<div class="st part">${checkIcon}</div>`:(it.status==='flaw'?'<div class="st flaw">!</div>':`<div class="st empty">${checkIcon}</div>`));
+      const st=it.status==='done'?`<div class="st done">${checkIcon}</div>`:(it.status==='na'?`<div class="st na">${checkIcon}</div>`:(it.status==='part'?`<div class="st part">${checkIcon}</div>`:(it.status==='flaw'?'<div class="st flaw">!</div>':`<div class="st empty">${checkIcon}</div>`)));
       const ready=it.type==='photo'&&itemDone(it);
       const inline=it.type!=='photo'?`<div class="inline-j">${it.opts.map(o=>`<span class="ijb ${it.judge===o?'on':''}" onclick="event.stopPropagation();inlineJudge(${it.idx},'${o}')">${o}</span>`).join('')}</div>`:'';
       const verdict=it.type==='photo'?(it.status==='flaw'?`<span class="verdict bad">${it.judge}</span>`:'<span class="chev"><svg width="14" height="14"><use href="#i-chevr"/></svg></span>'):'';
@@ -1384,7 +1387,7 @@ function renderCamActions(){
     left.innerHTML='<div class="c"><svg width="22" height="22"><use href="#i-back"/></svg></div>上一项';
     left.onclick=prevPhotoItem;
     mid.textContent='';mid.onclick=shoot;
-    right.innerHTML=`<div class="c"><svg width="22" height="22"><use href="#i-arrow"/></svg></div>${ALL[curIdx]&&ALL[curIdx].na?'不涉及':'下一项'}`;
+    right.innerHTML='<div class="c"><svg width="22" height="22"><use href="#i-arrow"/></svg></div>不涉及';
     right.onclick=skipNext;
   }
 }
