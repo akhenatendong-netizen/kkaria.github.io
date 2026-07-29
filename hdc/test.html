@@ -516,6 +516,8 @@
   body.design-v2 #check .st svg{width:calc(13px * var(--fx));height:calc(13px * var(--fx))}
   body.design-v2 #check .camera-total{font-size:calc(12px * var(--fx));font-weight:500;color:#8F99A8;margin-left:calc(6px * var(--fx))}
   body.design-v2 #check .na-text{color:#8F99A8;font-weight:500}
+  body.design-v2 #check #chk-submit.soft-disabled{opacity:.55;background:#9DC7F8}
+  body.design-v2 #check .crow.pulse{background:#EFF6FF}
   @media(max-width:440px){body{padding:0}.phone{width:100vw;height:100vh;border-radius:0;box-shadow:none}.cap{display:none}}
 </style>
 </head>
@@ -935,6 +937,10 @@ function inlineJudge(idx,v){const it=ALL[idx];it.judge=v;refresh(it);renderCheck
 function setNa(idx){const it=ALL[idx];it.judge=it.na;it.shots=[];refresh(it);renderCheck();toast(`「${it.name}」已标记不涉及`)}
 function exitCheck(){go('home')}
 function submitCheck(){
+  if(ALL.some(it=>!itemDone(it))){
+    focusUnfinishedItem();
+    return;
+  }
   formReturnCamIdx=null;
   const flaws=ALL.filter(i=>i.status==='flaw').length;
   if(chkMode==='out'){flawCount=flaws;stage=2;renderHome();go('home');toast(flaws?`出车检查已提交 · ${flaws} 项异常已生成上报单`:'出车检查已提交，全部正常')}
@@ -1349,19 +1355,43 @@ function renderCheck(){
       const ready=it.type==='photo'&&itemDone(it);
       const inline=it.type!=='photo'?`<div class="inline-j">${it.opts.map(o=>`<span class="ijb ${it.judge===o?'on':''}" onclick="event.stopPropagation();inlineJudge(${it.idx},'${o}')">${o}</span>`).join('')}</div>`:'';
       const verdict=it.type==='photo'?(it.status==='flaw'?`<span class="verdict bad">${it.judge}</span>`:'<span class="chev"><svg width="14" height="14"><use href="#i-chevr"/></svg></span>'):'';
-      const click=it.type==='photo'?`onclick="${ready||it.judge?`openPhotoReview(${it.idx})`:`enterCam(${it.idx})`}"`:'style="cursor:default"';
-      return `<div class="crow ${ready?'ready':''}" ${click}>${st}<div class="mid"><div class="nm">${title}</div><div class="meta">${count}</div></div><div class="rt">${inline}${verdict}</div></div>`;
+      const click=it.type==='photo'?`onclick="${it.status==='na'?`clearNotApplicableAndEnter(${it.idx})`:(ready||it.judge?`openPhotoReview(${it.idx})`:`enterCam(${it.idx})`)}"`:'style="cursor:default"';
+      return `<div class="crow ${ready?'ready':''}" data-idx="${it.idx}" ${click}>${st}<div class="mid"><div class="nm">${title}</div><div class="meta">${count}</div></div><div class="rt">${inline}${verdict}</div></div>`;
     }).join('');
     const groupTitle=g.g==='摄像头'?`${g.g}<span class="camera-total">已拍摄${cameraShotSummary()}张</span>`:g.g;
     return `<div class="grp"><div class="grp-h"><span class="gt">${groupTitle}</span><span class="gc"></span></div><div class="grp-card">${rows}</div></div>`;
   }).join('');
   $('chk-foot').textContent='连续拍照';
   $('chk-foot').onclick=()=>startContinuousShoot();
-  $('chk-submit').disabled=ALL.some(it=>!itemDone(it));
+  const hasUnfinished=ALL.some(it=>!itemDone(it));
+  $('chk-submit').disabled=false;
+  $('chk-submit').classList.toggle('soft-disabled',hasUnfinished);
 }
 function startContinuousShoot(){
   const t=ALL.findIndex(it=>it.type==='photo'&&!itemDone(it));
   if(t>=0)enterCam(t);else toast('照片已拍完，请标记检查结果');
+}
+function clearNotApplicableAndEnter(idx){
+  const it=ALL[idx];
+  if(!it)return;
+  it.judge=null;
+  it.shots=[];
+  refresh(it);
+  renderCheck();
+  toast(`「${displayItemName(it)}」已恢复为待拍摄`);
+  enterCam(idx);
+}
+function focusUnfinishedItem(){
+  const it=ALL.find(x=>!itemDone(x));
+  if(!it){return false}
+  const row=document.querySelector(`#chk-body [data-idx="${it.idx}"]`);
+  if(row){
+    row.scrollIntoView({block:'center',behavior:'smooth'});
+    row.classList.add('pulse');
+    setTimeout(()=>row.classList.remove('pulse'),900);
+  }
+  toast(`请先完成「${displayItemName(it)}」`);
+  return true;
 }
 function allPhotosDone(){return ALL.filter(it=>it.type==='photo').every(itemDone)}
 function saveCurrentCamItem(){
@@ -1435,18 +1465,19 @@ function renderCamActions(){
   const mid=$('shutter');
   const right=document.querySelector('#cam .cam-act .cam-side:last-child');
   if(camMode==='preview'){
-    left.innerHTML=retakeContinuePreview?'<div class="c"><svg width="22" height="22"><use href="#i-arrow"/></svg></div>继续拍摄':'<div class="c"><svg width="22" height="22"><use href="#i-close"/></svg></div>退出预览';
-    left.onclick=retakeContinuePreview?continueFromRetakePreview:exitPhotoPreview;
+    left.innerHTML=retakeContinuePreview?'<div class="c"><svg width="22" height="22"><use href="#i-arrow"/></svg></div>继续拍摄':'<div class="c"><svg width="22" height="22"><use href="#i-back"/></svg></div>上一张';
+    left.onclick=retakeContinuePreview?continueFromRetakePreview:previewPrevShot;
     mid.textContent='重拍';mid.onclick=retakeCurrentPreview;
-    right.innerHTML='<div class="c"><svg width="22" height="22"><use href="#i-alert"/></svg></div>标注异常';
-    right.onclick=markCurrentPreviewAbnormal;
+    right.innerHTML='<div class="c"><svg width="22" height="22"><use href="#i-arrow"/></svg></div>下一张';
+    right.onclick=previewNextShot;
   }else{
     const it=ALL[curIdx];
     const canGoNext=it&&itemDone(it)&&camShots.length>0;
+    const rightLabel=canGoNext?(it.freeCount?'确认':'下一项'):'不涉及';
     left.innerHTML='<div class="c"><svg width="22" height="22"><use href="#i-back"/></svg></div>上一项';
     left.onclick=prevPhotoItem;
     mid.textContent='';mid.onclick=shoot;
-    right.innerHTML=`<div class="c"><svg width="22" height="22"><use href="#i-arrow"/></svg></div>${canGoNext?'下一项':'不涉及'}`;
+    right.innerHTML=`<div class="c"><svg width="22" height="22"><use href="#i-arrow"/></svg></div>${rightLabel}`;
     right.onclick=canGoNext?goNextPhoto:skipNext;
   }
 }
@@ -1463,14 +1494,28 @@ function previewGroupShot(idx,i){
   if(!s)return;
   curIdx=idx;camShots=target.shots.slice();camMode='preview';previewIdx=i;renderCam();
 }
+function previewPrevShot(){
+  if(previewIdx<=0){toast('已经是第一张');return}
+  previewIdx-=1;
+  renderCam();
+}
+function previewNextShot(){
+  if(previewIdx>=camShots.length-1){toast('已经是最后一张');return}
+  previewIdx+=1;
+  renderCam();
+}
 function openCamForm(){
   openCheckFormFromCamera('已打开表单');
 }
 function exitCheck(){
   if(formReturnCamIdx!==null){
-    const idx=formReturnCamIdx;
+    const latest=latestUnfinishedPhotoIndex();
+    const idx=latest>=0?latest:formReturnCamIdx;
     formReturnCamIdx=null;
-    enterCam(idx);
+    const it=ALL[idx];
+    if(latest<0&&it&&it.type==='photo'&&it.shots.length){
+      curIdx=idx;camShots=it.shots.slice();camMode='preview';previewIdx=camShots.length-1;go('cam');renderCam();startCamera();
+    }else enterCam(idx);
     return;
   }
   go('home');
