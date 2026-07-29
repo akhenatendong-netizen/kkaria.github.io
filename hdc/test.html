@@ -494,7 +494,7 @@
   body.design-v2 #cam .cam-act{height:calc(var(--cam-panel-h) + env(safe-area-inset-bottom));padding:calc(119px * var(--fx)) calc(28px * var(--fx)) calc(23px * var(--fx) + env(safe-area-inset-bottom));background:rgba(44,44,44,.58);backdrop-filter:blur(calc(28px * var(--fx)));border-top:1px solid rgba(255,255,255,.2)}
   body.design-v2 #cam .cam-strip{left:calc(20px * var(--fx));right:calc(104px * var(--fx));bottom:calc(var(--cam-panel-h) - 72px * var(--fx));gap:calc(9px * var(--fx));min-height:calc(46px * var(--fx))}
   body.design-v2 #cam .thumb{width:calc(46px * var(--fx));height:calc(46px * var(--fx));border-radius:calc(8px * var(--fx));border-width:1px}
-  body.design-v2 #cam .thumb.cur{outline:calc(2px * var(--fx)) solid #2B82FF}
+  body.design-v2 #cam .thumb.cur{outline:calc(2px * var(--fx)) solid #2B82FF;background-color:rgba(43,130,255,.18);box-shadow:0 0 0 calc(2px * var(--fx)) rgba(43,130,255,.16)}
   body.design-v2 #cam .cam-native{position:absolute;right:calc(24px * var(--fx));bottom:calc(var(--cam-panel-h) - 82px * var(--fx));z-index:23;width:calc(58px * var(--fx));height:calc(58px * var(--fx));border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(2px * var(--fx));color:#fff;font-size:calc(10px * var(--fx));line-height:calc(13px * var(--fx));text-shadow:0 1px 3px rgba(0,0,0,.32);cursor:pointer;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.56)}
   body.design-v2 #cam .cam-native:before{content:'';position:absolute;left:calc(-18px * var(--fx));top:calc(3px * var(--fx));width:1px;height:calc(52px * var(--fx));background:rgba(255,255,255,.18)}
   body.design-v2 #cam .cam-native .c{width:calc(25px * var(--fx));height:calc(24px * var(--fx));border-radius:0;display:flex;align-items:center;justify-content:center;background:transparent;border:0}
@@ -805,7 +805,7 @@ const CHK={
 
 let stage=0,expenses=[],expCat='充电费',expInv=false,flawCount=0;
 let chkMode='out',ALL=[],GROUPS=[],curIdx=0,camShots=[];
-let camStream=null,burstTimer=null,bursting=false,camReady=false,camMode='shoot',previewIdx=0;
+let camStream=null,burstTimer=null,bursting=false,camReady=false,camMode='shoot',previewIdx=0,retakeSlotIndex=null,retakeStayAfterShot=false,retakeContinuePreview=false;
 
 function $(id){return document.getElementById(id)}
 function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');document.body.classList.toggle('cam-active',id==='cam');$('sbar').classList.toggle('light',id==='home'||id==='cam')}
@@ -942,7 +942,7 @@ function submitCheck(){
 }
 
 /* ============ 相机 ============ */
-function enterCam(idx){curIdx=idx;camMode='shoot';previewIdx=0;const it=ALL[idx];camShots=it.shots.slice();stopBurst();$('cam').classList.remove('preview');$('judge').classList.remove('on');$('perm').classList.remove('on');renderCam();go('cam');startCamera()}
+function enterCam(idx){curIdx=idx;camMode='shoot';previewIdx=0;retakeSlotIndex=null;retakeStayAfterShot=false;retakeContinuePreview=false;const it=ALL[idx];camShots=it.shots.slice();stopBurst();$('cam').classList.remove('preview');$('judge').classList.remove('on');$('perm').classList.remove('on');renderCam();go('cam');startCamera()}
 function renderCam(){
   const it=ALL[curIdx],n=camShots.length,total=it.need.length,full=n>=total;
   $('cam-n').textContent=it.name;$('cam-p').textContent=`第 ${it.idx+1} / ${ALL.length} 项`;
@@ -991,14 +991,40 @@ function captureFrame(){
 }
 function shoot(){
   const it=ALL[curIdx];
-  if(camShots.length>=it.need.length)return false;
+  if(retakeSlotIndex===null&&camShots.length>=it.need.length)return false;
   if(!camReady){toast('页内相机未就绪，请点原相机拍摄');return false}
   flashShot();
-  camShots.push({angle:it.need[camShots.length],src:captureFrame()});
+  addShotToCurrent(captureFrame(),false);
+  return true;
+}
+function addShotToCurrent(src,native=false){
+  const it=ALL[curIdx];
+  const shotIndex=retakeSlotIndex!==null?retakeSlotIndex:camShots.length;
+  const shot={angle:it.need[shotIndex]||`${shotIndex+1}号`,src};
+  if(native)shot.native=true;
+  if(retakeSlotIndex!==null){
+    const replacedIndex=retakeSlotIndex;
+    camShots[retakeSlotIndex]=shot;
+    retakeSlotIndex=null;
+    saveCurrentCamItem();
+    refresh(it);
+    if(retakeStayAfterShot){
+      retakeStayAfterShot=false;
+      retakeContinuePreview=true;
+      camMode='preview';
+      previewIdx=replacedIndex;
+      renderCam();
+      return;
+    }
+    camMode='shoot';
+    renderCam();
+    jumpToLatestPhotoItem();
+    return;
+  }
+  camShots.push(shot);
   saveCurrentCamItem();
   renderCam();
   afterShotAutoAdvance();
-  return true;
 }
 function shootBurst(){
   const it=ALL[curIdx];
@@ -1013,12 +1039,12 @@ function shootBurst(){
   burstTimer=setInterval(take,720);
 }
 function stopBurst(){if(burstTimer){clearInterval(burstTimer);burstTimer=null}bursting=false;if($('shutter'))$('shutter').classList.remove('burst')}
-function nativeShot(){const it=ALL[curIdx];stopBurst();if(camShots.length>=it.need.length)return;const input=$('native-cam-input');input.value='';input.click()}
+function nativeShot(){const it=ALL[curIdx];stopBurst();if(retakeSlotIndex===null&&camShots.length>=it.need.length)return;const input=$('native-cam-input');input.value='';input.click()}
 function handleNativeFile(event){
   const it=ALL[curIdx],file=event.target.files&&event.target.files[0];
-  if(!file||camShots.length>=it.need.length)return;
+  if(!file||(retakeSlotIndex===null&&camShots.length>=it.need.length))return;
   const reader=new FileReader();
-  reader.onload=()=>{flashShot();camShots.push({angle:it.need[camShots.length],native:true,src:reader.result});saveCurrentCamItem();renderCam();afterShotAutoAdvance()};
+  reader.onload=()=>{flashShot();addShotToCurrent(reader.result,true)};
   reader.readAsDataURL(file);
 }
 function advanceAfterShot(){
@@ -1032,6 +1058,14 @@ function advanceAfterShot(){
 }
 function camJudge(v){const it=ALL[curIdx];it.shots=camShots;it.judge=v;refresh(it);if(v===it.bad)toast(`「${it.name}」已标记${v}`);autoNext()}
 function skipNext(){const it=ALL[curIdx];it.na=it.na||'不涉及';it.judge=it.na;it.shots=[];camShots=[];refresh(it);autoNext(true)}
+function goNextPhoto(){saveCurrentCamItem();autoNext(true)}
+function jumpToLatestPhotoItem(){
+  const next=ALL.findIndex((x,i)=>i>=curIdx&&x.type==='photo'&&!itemDone(x)&&x.judge!==x.na);
+  const any=ALL.findIndex(x=>x.type==='photo'&&!itemDone(x)&&x.judge!==x.na);
+  const target=next>=0?next:any;
+  if(target>=0&&target!==curIdx){enterCam(target);return}
+  renderCam();
+}
 function autoNext(){
   stopBurst();
   const nx=ALL.findIndex((x,i)=>i>curIdx&&x.type==='photo'&&!itemDone(x)&&x.judge!==x.na);
@@ -1366,10 +1400,17 @@ function renderCam(){
     const slotTotal=item.freeCount?Math.min(item.need.length,Math.max(1,shots.length+(shots.length<item.need.length?1:0))):item.need.length;
     return Array.from({length:slotTotal},(_,i)=>{
     const s=shots[i];
-    const cur=item.idx===curIdx&&camMode==='preview'&&i===previewIdx;
-    return `<div class="thumb ${s?'filled':''} ${cur?'cur':''}" title="${displayItemName(item)} ${i+1}" ${s?`onclick="event.stopPropagation();previewGroupShot(${item.idx},${i})"`:''} style="${s&&s.src?`background-image:url('${s.src}')`:''}">${s&&s.native?'<span class="rt">原</span>':''}</div>`;
+    const targetSlot=retakeSlotIndex!==null?retakeSlotIndex:Math.min(shots.length,slotTotal-1);
+    const shootCur=item.idx===curIdx&&camMode!=='preview'&&i===targetSlot;
+    const previewCur=item.idx===curIdx&&camMode==='preview'&&i===previewIdx;
+    const cur=shootCur||previewCur;
+    return `<div class="thumb ${s?'filled':''} ${cur?'cur':''}" ${cur?'data-current="1"':''} title="${displayItemName(item)} ${i+1}" ${s?`onclick="event.stopPropagation();previewGroupShot(${item.idx},${i})"`:''} style="${s&&s.src?`background-image:url('${s.src}')`:''}">${s&&s.native?'<span class="rt">原</span>':''}</div>`;
   })}).join('');
-  if(camMode!=='preview')requestAnimationFrame(()=>{$('strip').scrollLeft=$('strip').scrollWidth});
+  requestAnimationFrame(()=>{
+    const current=$('strip').querySelector('[data-current="1"]');
+    if(current)current.scrollIntoView({block:'nearest',inline:'nearest'});
+    else if(camMode!=='preview')$('strip').scrollLeft=$('strip').scrollWidth;
+  });
   renderCamActions();
   $('vf').querySelector('.shot-toast')?.remove();
 }
@@ -1384,11 +1425,13 @@ function renderCamActions(){
     right.innerHTML='<div class="c"><svg width="22" height="22"><use href="#i-alert"/></svg></div>标注异常';
     right.onclick=markCurrentPreviewAbnormal;
   }else{
+    const it=ALL[curIdx];
+    const canGoNext=it&&itemDone(it)&&camShots.length>0;
     left.innerHTML='<div class="c"><svg width="22" height="22"><use href="#i-back"/></svg></div>上一项';
     left.onclick=prevPhotoItem;
     mid.textContent='';mid.onclick=shoot;
-    right.innerHTML='<div class="c"><svg width="22" height="22"><use href="#i-arrow"/></svg></div>不涉及';
-    right.onclick=skipNext;
+    right.innerHTML=`<div class="c"><svg width="22" height="22"><use href="#i-arrow"/></svg></div>${canGoNext?'下一项':'不涉及'}`;
+    right.onclick=canGoNext?goNextPhoto:skipNext;
   }
 }
 function previewCamShot(i){
@@ -1416,8 +1459,8 @@ function exitCheck(){
   }
   go('home');
 }
-function exitPhotoPreview(){camMode='shoot';renderCam()}
-function retakeCurrentPreview(){camShots.splice(previewIdx,1);camMode='shoot';renderCam()}
+function exitPhotoPreview(){camMode='shoot';retakeSlotIndex=null;renderCam()}
+function retakeCurrentPreview(){retakeSlotIndex=previewIdx;camMode='shoot';renderCam()}
 function markCurrentPreviewAbnormal(){const it=ALL[curIdx];it.shots=camShots;it.judge='异常';refresh(it);camMode='shoot';renderCam();toast('已标注异常')}
 function prevPhotoItem(){const p=ALL.map((x,i)=>({x,i})).filter(o=>o.i<curIdx&&o.x.type==='photo').pop();if(p)enterCam(p.i);else toast('已经是第一项')}
 function openPhotoReview(idx,focusIndex=0){
