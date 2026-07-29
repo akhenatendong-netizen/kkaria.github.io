@@ -1021,9 +1021,14 @@ function addShotToCurrent(src,native=false){
     jumpToLatestPhotoItem();
     return;
   }
+  const stayOnPreviousSide=isPreviousSideCapture();
   camShots.push(shot);
   saveCurrentCamItem();
   renderCam();
+  if(stayOnPreviousSide){
+    toast('已停留在当前面，可继续拍摄或预览');
+    return;
+  }
   afterShotAutoAdvance();
 }
 function shootBurst(){
@@ -1060,7 +1065,7 @@ function camJudge(v){const it=ALL[curIdx];it.shots=camShots;it.judge=v;refresh(i
 function skipNext(){const it=ALL[curIdx];it.na=it.na||'不涉及';it.judge=it.na;it.shots=[];camShots=[];refresh(it);autoNext(true)}
 function goNextPhoto(){saveCurrentCamItem();autoNext(true)}
 function latestUnfinishedPhotoIndex(){return ALL.findIndex(x=>x.type==='photo'&&!itemDone(x)&&x.judge!==x.na)}
-function isPreviousSideRetake(){
+function isPreviousSideCapture(){
   const latest=latestUnfinishedPhotoIndex();
   return latest>=0&&ALL[latest]&&ALL[curIdx]&&ALL[latest].groupName!==ALL[curIdx].groupName;
 }
@@ -1471,7 +1476,7 @@ function exitCheck(){
   go('home');
 }
 function exitPhotoPreview(){camMode='shoot';retakeSlotIndex=null;retakeStayAfterShot=false;retakeContinuePreview=false;renderCam()}
-function retakeCurrentPreview(){retakeSlotIndex=previewIdx;retakeStayAfterShot=isPreviousSideRetake();retakeContinuePreview=false;camMode='shoot';renderCam()}
+function retakeCurrentPreview(){retakeSlotIndex=previewIdx;retakeStayAfterShot=isPreviousSideCapture();retakeContinuePreview=false;camMode='shoot';renderCam()}
 function markCurrentPreviewAbnormal(){const it=ALL[curIdx];it.shots=camShots;it.judge='异常';refresh(it);camMode='shoot';renderCam();toast('已标注异常')}
 function prevPhotoItem(){const p=ALL.map((x,i)=>({x,i})).filter(o=>o.i<curIdx&&o.x.type==='photo').pop();if(p)enterCam(p.i);else toast('已经是第一项')}
 function openPhotoReview(idx,focusIndex=0){
