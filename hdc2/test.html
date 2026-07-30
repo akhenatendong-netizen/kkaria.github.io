@@ -480,15 +480,20 @@
   body.design-v2 #check .cfoot .foot-l,body.design-v2 #check #chk-submit{height:calc(42px * var(--fx));font-size:calc(13px * var(--fx));border-radius:calc(3px * var(--fx))}
   body.design-v2 #cam .cam-top{height:calc(var(--cam-top-h) + env(safe-area-inset-top));padding:calc(44px * var(--fx) + env(safe-area-inset-top)) calc(22px * var(--fx)) 0 calc(24px * var(--fx));background:#fff;border-bottom:1px solid #EEF0F4;backdrop-filter:none}
   body.design-v2.cam-active #sbar{display:none}
-  body.design-v2.cam-active #cam .cam-top{height:calc(76px * var(--fx) + env(safe-area-inset-top));padding:calc(20px * var(--fx) + env(safe-area-inset-top)) calc(22px * var(--fx)) 0 calc(24px * var(--fx))}
-  body.design-v2 #cam .cam-ti{gap:calc(8px * var(--fx));margin-left:calc(2px * var(--fx));min-width:0}
-  body.design-v2 #cam .cam-ti .n{font-size:calc(17px * var(--fx));line-height:calc(28px * var(--fx));font-weight:600;color:#252B36;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:calc(7px * var(--fx));min-width:0}
+  body.design-v2.cam-active #cam .cam-top{height:calc(76px * var(--fx) + env(safe-area-inset-top));padding:calc(20px * var(--fx) + env(safe-area-inset-top)) calc(22px * var(--fx)) 0 calc(24px * var(--fx));overflow:visible}
+  body.design-v2 #cam .cam-ti{position:absolute;left:50%;top:calc(51px * var(--fx) + env(safe-area-inset-top));transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:calc(13px * var(--fx));width:calc(300px * var(--fx));margin:0;text-align:center;pointer-events:none}
+  body.design-v2 #cam .cam-page-title{font-size:calc(22px * var(--fx));line-height:calc(28px * var(--fx));font-weight:500;color:#111;white-space:nowrap}
+  body.design-v2 #cam .cam-shoot-prompt{display:flex;align-items:center;justify-content:center;height:calc(50px * var(--fx));padding:0 calc(23px * var(--fx));background:rgba(35,35,35,.92);border-radius:0 0 calc(18px * var(--fx)) calc(18px * var(--fx));color:#fff;font-size:calc(25px * var(--fx));line-height:1;font-weight:400;letter-spacing:0;white-space:nowrap;box-shadow:0 calc(10px * var(--fx)) calc(20px * var(--fx)) rgba(0,0,0,.08)}
+  body.design-v2 #cam .cam-prompt-dir{color:#68FF42;font-weight:600;margin:0 calc(9px * var(--fx))}
+  body.design-v2 #cam .cam-hero-title{color:#fff;font-size:calc(56px * var(--fx));line-height:calc(62px * var(--fx));font-weight:600;text-shadow:0 calc(11px * var(--fx)) calc(20px * var(--fx)) rgba(34,38,62,.85),0 0 calc(28px * var(--fx)) rgba(50,55,86,.78);white-space:nowrap}
+  body.design-v2 #cam .cam-ti .n{display:none}
   body.design-v2 #cam .cam-dir-tag{display:inline-flex;align-items:center;height:calc(22px * var(--fx));padding:0 calc(8px * var(--fx));border-radius:calc(11px * var(--fx));background:#EEF3FF;color:#2B6FF6;font-size:calc(12px * var(--fx));font-weight:600;line-height:1;flex-shrink:0}
   body.design-v2 #cam .cam-name-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-  body.design-v2 #cam .cam-ti .p{font-size:calc(16px * var(--fx));line-height:calc(28px * var(--fx));font-weight:600;color:#8B94A3;white-space:nowrap;flex-shrink:0}
-  body.design-v2 #cam .cam-top .cx{width:calc(32px * var(--fx));height:calc(32px * var(--fx));margin-left:calc(-8px * var(--fx));color:#252B36}
-  body.design-v2 #cam .cam-top .cx svg{width:calc(22px * var(--fx));height:calc(22px * var(--fx))}
-  body.design-v2 #cam .cam-guide{height:calc(32px * var(--fx));padding:0 calc(12px * var(--fx));border-radius:calc(16px * var(--fx));font-size:calc(13px * var(--fx));flex-shrink:0}
+  body.design-v2 #cam .cam-ti .p{display:none}
+  body.design-v2 #cam .cam-top .cx{width:calc(32px * var(--fx));height:calc(32px * var(--fx));margin-left:calc(-8px * var(--fx));color:#3F4650;background:transparent;z-index:2}
+  body.design-v2 #cam .cam-top .cx svg{width:calc(28px * var(--fx));height:calc(28px * var(--fx))}
+  body.design-v2 #cam .cam-guide{width:calc(52px * var(--fx));height:calc(52px * var(--fx));padding:0;border-radius:50%;font-size:0;flex-shrink:0;position:absolute;right:calc(20px * var(--fx));top:calc(138px * var(--fx) + env(safe-area-inset-top));z-index:25;background:rgba(255,255,255,.92);color:#3F4650;box-shadow:0 calc(10px * var(--fx)) calc(18px * var(--fx)) rgba(0,0,0,.25)}
+  body.design-v2 #cam .cam-guide svg{display:block;width:calc(29px * var(--fx));height:calc(29px * var(--fx))}
   body.design-v2 #cam .vf{inset:0}
   body.design-v2 #cam .angle-hint{bottom:calc(var(--cam-panel-h) + 18px * var(--fx));font-size:calc(13px * var(--fx));line-height:calc(18px * var(--fx));padding:calc(5px * var(--fx)) calc(12px * var(--fx));border-radius:calc(14px * var(--fx))}
   body.design-v2 #cam .cam-act{height:calc(var(--cam-panel-h) + env(safe-area-inset-bottom));padding:calc(119px * var(--fx)) calc(28px * var(--fx)) calc(23px * var(--fx) + env(safe-area-inset-bottom));background:rgba(44,44,44,.58);backdrop-filter:blur(calc(28px * var(--fx)));border-top:1px solid rgba(255,255,255,.2)}
@@ -507,8 +512,8 @@
   body.design-v2 #cam .shutter:after{width:calc(58px * var(--fx));height:calc(58px * var(--fx))}
   body.design-v2 #cam.preview .cam-act{padding-top:calc(91px * var(--fx))}
   body.design-v2 #cam.preview .shutter{font-size:calc(17px * var(--fx))}
-  body.design-v2 #cam .cam-guide:after{content:'表单'}
-  body.design-v2 #cam .cam-float-guide{position:absolute;right:calc(18px * var(--fx));top:calc(var(--cam-top-h) + env(safe-area-inset-top) + 14px * var(--fx));z-index:24;width:calc(48px * var(--fx));height:calc(48px * var(--fx));border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;background:rgba(26,31,40,.48);border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(calc(18px * var(--fx)));box-shadow:0 calc(8px * var(--fx)) calc(24px * var(--fx)) rgba(0,0,0,.28);cursor:pointer}
+  body.design-v2 #cam .cam-guide:after{content:''}
+  body.design-v2 #cam .cam-float-guide{display:none}
   body.design-v2 #cam .cam-float-guide svg{width:calc(22px * var(--fx));height:calc(22px * var(--fx))}
   body.design-v2 #check .st{width:calc(22px * var(--fx));height:calc(22px * var(--fx));border:0!important;color:#fff!important}
   body.design-v2 #check .st.empty,body.design-v2 #check .st.part,body.design-v2 #check .st.na{background:#D8DEE8!important}
@@ -518,96 +523,6 @@
   body.design-v2 #check .na-text{color:#8F99A8;font-weight:500}
   body.design-v2 #check #chk-submit.soft-disabled{opacity:.55;background:#9DC7F8}
   body.design-v2 #check .crow.pulse{background:#EFF6FF}
-  body.design-v2.home-camera #sbar{height:calc(88px * var(--fx));padding:calc(38px * var(--fx)) calc(26px * var(--fx)) 0;color:#0A0A0A;font-size:calc(29px * var(--fx));font-weight:700;background:#fff;z-index:80}
-  body.design-v2.home-camera #sbar .ic{gap:calc(9px * var(--fx))}
-  body.design-v2.home-camera #sbar .ic:before{content:'';width:calc(30px * var(--fx));height:calc(20px * var(--fx));display:block;background:currentColor;clip-path:polygon(0 100%,12% 100%,12% 58%,24% 58%,24% 100%,36% 100%,36% 38%,48% 38%,48% 100%,60% 100%,60% 18%,72% 18%,72% 100%,84% 100%,84% 0,100% 0,100% 100%)}
-  body.design-v2.home-camera #sbar .ic svg:first-child{display:none}
-  body.design-v2.home-camera #sbar .ic svg:last-child{width:calc(49px * var(--fx));height:calc(24px * var(--fx))}
-  body.design-v2.home-camera .hbar{bottom:calc(10px * var(--fx));width:calc(279px * var(--fx));height:calc(8px * var(--fx));background:#000;border-radius:calc(8px * var(--fx))}
-  body.design-v2.home-camera #home{background:#0B0D0F;color:#fff}
-  body.design-v2.home-camera #home .scroll{height:100%;padding:0!important;overflow:hidden}
-  body.design-v2 .capture-home{position:absolute;inset:0;overflow:hidden;background:#141715}
-  body.design-v2 .capture-photo{position:absolute;inset:calc(188px * var(--fx)) 0 0;background:
-    radial-gradient(circle at 6% 16%,rgba(50,86,13,.78) 0 12%,transparent 22%),
-    radial-gradient(circle at 97% 24%,rgba(37,75,28,.72) 0 13%,transparent 24%),
-    linear-gradient(14deg,transparent 0 41%,rgba(5,5,5,.25) 42% 46%,transparent 47%),
-    linear-gradient(0deg,#E6DDC9 45%,#C98B60 45% 70%,#3D4652 70% 76%,#C98B60 76%);
-    background-color:#9A7B58}
-  body.design-v2 .capture-photo:before{content:'';position:absolute;left:calc(-25px * var(--fx));right:calc(14px * var(--fx));top:calc(554px * var(--fx));height:calc(178px * var(--fx));border-radius:50% 50% 0 0;background:#E7E1D7;box-shadow:inset 0 calc(12px * var(--fx)) 0 rgba(255,255,255,.68)}
-  body.design-v2 .capture-photo:after{content:'';position:absolute;left:calc(-30px * var(--fx));top:calc(568px * var(--fx));width:calc(210px * var(--fx));height:calc(160px * var(--fx));border-radius:50%;background:#59681A;filter:blur(calc(8px * var(--fx)))}
-  body.design-v2 .house-windows{position:absolute;inset:0;pointer-events:none;background:
-    linear-gradient(#F4F0E7,#F4F0E7) calc(34px * var(--fx)) calc(505px * var(--fx))/calc(43px * var(--fx)) calc(56px * var(--fx)) no-repeat,
-    linear-gradient(#F4F0E7,#F4F0E7) calc(470px * var(--fx)) calc(150px * var(--fx))/calc(44px * var(--fx)) calc(62px * var(--fx)) no-repeat,
-    linear-gradient(#F4F0E7,#F4F0E7) calc(694px * var(--fx)) calc(423px * var(--fx))/calc(48px * var(--fx)) calc(72px * var(--fx)) no-repeat,
-    linear-gradient(8deg,transparent 0 47%,#39424C 47% 54%,transparent 54%) 0 calc(372px * var(--fx))/100% calc(135px * var(--fx)) no-repeat,
-    linear-gradient(8deg,transparent 0 42%,#333D48 42% 53%,transparent 53%) 0 calc(28px * var(--fx))/100% calc(260px * var(--fx)) no-repeat}
-  body.design-v2 .capture-car{position:absolute;left:calc(-22px * var(--fx));top:calc(748px * var(--fx));width:calc(780px * var(--fx));height:calc(206px * var(--fx));border-radius:calc(92px * var(--fx)) calc(190px * var(--fx)) calc(36px * var(--fx)) calc(44px * var(--fx));background:linear-gradient(180deg,#197269,#0D5E5C 58%,#073C43);box-shadow:inset 0 calc(14px * var(--fx)) calc(32px * var(--fx)) rgba(255,255,255,.28),0 calc(14px * var(--fx)) calc(22px * var(--fx)) rgba(0,0,0,.3)}
-  body.design-v2 .capture-car:before{content:'';position:absolute;left:calc(175px * var(--fx));top:calc(12px * var(--fx));width:calc(280px * var(--fx));height:calc(86px * var(--fx));border-radius:calc(120px * var(--fx)) calc(120px * var(--fx)) calc(16px * var(--fx)) calc(20px * var(--fx));background:linear-gradient(115deg,#DDEBE9,#7DA1A3 42%,#284753 43%);box-shadow:calc(310px * var(--fx)) calc(42px * var(--fx)) 0 calc(-12px * var(--fx)) #0C3337}
-  body.design-v2 .capture-car:after{content:'';position:absolute;left:calc(110px * var(--fx));bottom:calc(-28px * var(--fx));width:calc(102px * var(--fx));height:calc(102px * var(--fx));border-radius:50%;background:radial-gradient(circle,#EDEFF2 0 20%,#38434B 21% 38%,#EEE 39% 42%,#171B20 43% 70%,transparent 71%),radial-gradient(circle at calc(548px * var(--fx)) 50%,#EDEFF2 0 20%,#38434B 21% 38%,#EEE 39% 42%,#171B20 43% 70%,transparent 71%);box-shadow:calc(548px * var(--fx)) 0 0 0 #171B20}
-  body.design-v2 .capture-nav{position:absolute;top:calc(88px * var(--fx));left:0;right:0;height:calc(100px * var(--fx));display:grid;grid-template-columns:calc(92px * var(--fx)) 1fr calc(92px * var(--fx));align-items:center;background:#fff;color:#111;z-index:15}
-  body.design-v2 .capture-back{width:calc(54px * var(--fx));height:calc(54px * var(--fx));display:flex;align-items:center;justify-content:center;margin-left:calc(26px * var(--fx));color:#39414B;cursor:pointer}
-  body.design-v2 .capture-back svg{width:calc(34px * var(--fx));height:calc(34px * var(--fx));stroke-width:2.4}
-  body.design-v2 .capture-title{text-align:center;font-size:calc(32px * var(--fx));font-weight:500;letter-spacing:0;color:#111}
-  body.design-v2 .capture-menu{position:absolute;right:calc(29px * var(--fx));top:calc(204px * var(--fx));z-index:18;width:calc(66px * var(--fx));height:calc(66px * var(--fx));border-radius:50%;background:rgba(255,255,255,.96);display:flex;align-items:center;justify-content:center;color:#4C5561;box-shadow:0 calc(8px * var(--fx)) calc(20px * var(--fx)) rgba(0,0,0,.12)}
-  body.design-v2 .capture-menu svg{width:calc(34px * var(--fx));height:calc(34px * var(--fx));stroke-width:2.2}
-  body.design-v2 .capture-hint{position:absolute;top:calc(188px * var(--fx));left:50%;transform:translateX(-50%);z-index:17;background:rgba(0,0,0,.72);border-radius:0 0 calc(18px * var(--fx)) calc(18px * var(--fx));padding:calc(20px * var(--fx)) calc(28px * var(--fx));font-size:calc(40px * var(--fx));line-height:1;font-weight:400;white-space:nowrap}
-  body.design-v2 .capture-hint b{color:#5BFF35;font-weight:700;margin:0 calc(13px * var(--fx))}
-  body.design-v2 .capture-target{position:absolute;top:calc(330px * var(--fx));left:0;right:0;text-align:center;z-index:16;font-size:calc(68px * var(--fx));font-weight:400;line-height:1;color:#fff;text-shadow:0 calc(3px * var(--fx)) calc(10px * var(--fx)) rgba(0,0,0,.28)}
-  body.design-v2 .capture-count{position:absolute;left:50%;bottom:calc(429px * var(--fx));transform:translateX(-50%);z-index:18;background:rgba(145,145,145,.58);color:#fff;border-radius:calc(30px * var(--fx));padding:calc(8px * var(--fx)) calc(22px * var(--fx));font-size:calc(25px * var(--fx));font-weight:700;line-height:1}
-  body.design-v2 .capture-panel{position:absolute;left:0;right:0;bottom:0;height:calc(386px * var(--fx));z-index:20;background:linear-gradient(115deg,rgba(0,0,0,.7),rgba(74,72,68,.62),rgba(155,150,152,.62));backdrop-filter:blur(calc(24px * var(--fx)));border:1px solid rgba(255,255,255,.26);border-left:0;border-right:0;color:#fff}
-  body.design-v2 .capture-slots{position:absolute;left:calc(32px * var(--fx));right:calc(194px * var(--fx));top:calc(23px * var(--fx));display:flex;gap:calc(13px * var(--fx))}
-  body.design-v2 .capture-slot{width:calc(90px * var(--fx));height:calc(90px * var(--fx));border-radius:calc(13px * var(--fx));border:calc(2px * var(--fx)) dashed rgba(255,255,255,.94);background:rgba(255,255,255,.04)}
-  body.design-v2 .capture-slot.filled{border-style:solid;background:linear-gradient(145deg,#415E31,#A3A19B)}
-  body.design-v2 .capture-native{position:absolute;right:calc(29px * var(--fx));top:calc(24px * var(--fx));width:calc(92px * var(--fx));height:calc(92px * var(--fx));border-radius:50%;border:calc(2px * var(--fx)) solid rgba(255,255,255,.72);background:rgba(255,255,255,.16);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(2px * var(--fx));font-size:calc(18px * var(--fx));line-height:1.12;cursor:pointer}
-  body.design-v2 .capture-native:before{content:'';position:absolute;left:calc(-24px * var(--fx));top:0;width:1px;height:calc(92px * var(--fx));background:rgba(255,255,255,.18)}
-  body.design-v2 .capture-native svg{width:calc(32px * var(--fx));height:calc(32px * var(--fx))}
-  body.design-v2 .capture-actions{position:absolute;left:calc(96px * var(--fx));right:calc(95px * var(--fx));bottom:calc(82px * var(--fx));height:calc(124px * var(--fx));display:flex;align-items:center;justify-content:space-between}
-  body.design-v2 .capture-side{width:calc(99px * var(--fx));text-align:center;font-size:calc(25px * var(--fx));line-height:1.18;color:#fff;cursor:pointer}
-  body.design-v2 .capture-side .circle{width:calc(101px * var(--fx));height:calc(101px * var(--fx));border-radius:50%;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.45);display:flex;align-items:center;justify-content:center;margin-bottom:calc(10px * var(--fx))}
-  body.design-v2 .capture-side svg{width:calc(45px * var(--fx));height:calc(45px * var(--fx))}
-  body.design-v2 .capture-side.skip svg{width:calc(52px * var(--fx));height:calc(52px * var(--fx))}
-  body.design-v2 .capture-shutter{position:absolute;left:50%;bottom:calc(95px * var(--fx));transform:translateX(-50%);width:calc(132px * var(--fx));height:calc(132px * var(--fx));border-radius:50%;border:calc(8px * var(--fx)) solid #fff;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer}
-  body.design-v2 .capture-shutter:after{content:'';width:calc(102px * var(--fx));height:calc(102px * var(--fx));border-radius:50%;background:#fff}
-  body.design-v2.home-camera .tabbar{display:none}
-  body.design-v2.home-camera #sbar{height:calc(44px * var(--fx));padding:calc(19px * var(--fx)) calc(26px * var(--fx)) 0;font-size:calc(15px * var(--fx))}
-  body.design-v2.home-camera #sbar .ic:before{width:calc(15px * var(--fx));height:calc(10px * var(--fx))}
-  body.design-v2.home-camera #sbar .ic svg:last-child{width:calc(25px * var(--fx));height:calc(13px * var(--fx))}
-  body.design-v2.home-camera .hbar{bottom:calc(5px * var(--fx));width:calc(140px * var(--fx));height:calc(4px * var(--fx))}
-  body.design-v2 .capture-nav{top:calc(44px * var(--fx));height:calc(50px * var(--fx));grid-template-columns:calc(46px * var(--fx)) 1fr calc(46px * var(--fx))}
-  body.design-v2 .capture-back{width:calc(27px * var(--fx));height:calc(27px * var(--fx));margin-left:calc(13px * var(--fx))}
-  body.design-v2 .capture-back svg{width:calc(17px * var(--fx));height:calc(17px * var(--fx))}
-  body.design-v2 .capture-title{font-size:calc(16px * var(--fx))}
-  body.design-v2 .capture-photo{inset:calc(94px * var(--fx)) 0 0}
-  body.design-v2 .capture-hint{top:calc(94px * var(--fx));font-size:calc(20px * var(--fx));padding:calc(10px * var(--fx)) calc(14px * var(--fx));border-radius:0 0 calc(9px * var(--fx)) calc(9px * var(--fx))}
-  body.design-v2 .capture-hint b{margin:0 calc(7px * var(--fx))}
-  body.design-v2 .capture-menu{right:calc(15px * var(--fx));top:calc(102px * var(--fx));width:calc(33px * var(--fx));height:calc(33px * var(--fx))}
-  body.design-v2 .capture-menu svg{width:calc(17px * var(--fx));height:calc(17px * var(--fx))}
-  body.design-v2 .capture-target{top:calc(165px * var(--fx));font-size:calc(34px * var(--fx))}
-  body.design-v2 .capture-count{bottom:calc(214px * var(--fx));font-size:calc(13px * var(--fx));padding:calc(4px * var(--fx)) calc(11px * var(--fx));border-radius:calc(15px * var(--fx))}
-  body.design-v2 .capture-panel{height:calc(193px * var(--fx))}
-  body.design-v2 .capture-slots{left:calc(16px * var(--fx));right:calc(97px * var(--fx));top:calc(12px * var(--fx));gap:calc(7px * var(--fx))}
-  body.design-v2 .capture-slot{width:calc(45px * var(--fx));height:calc(45px * var(--fx));border-radius:calc(7px * var(--fx));border-width:calc(1px * var(--fx));flex:0 0 auto}
-  body.design-v2 .capture-native{right:calc(15px * var(--fx));top:calc(12px * var(--fx));width:calc(46px * var(--fx));height:calc(46px * var(--fx));font-size:calc(9px * var(--fx));border-width:calc(1px * var(--fx))}
-  body.design-v2 .capture-native:before{left:calc(-12px * var(--fx));height:calc(46px * var(--fx))}
-  body.design-v2 .capture-native svg{width:calc(16px * var(--fx));height:calc(16px * var(--fx))}
-  body.design-v2 .capture-actions{left:calc(48px * var(--fx));right:calc(48px * var(--fx));bottom:calc(41px * var(--fx));height:calc(62px * var(--fx))}
-  body.design-v2 .capture-side{width:calc(50px * var(--fx));font-size:calc(13px * var(--fx))}
-  body.design-v2 .capture-side .circle{width:calc(50px * var(--fx));height:calc(50px * var(--fx));margin-bottom:calc(5px * var(--fx))}
-  body.design-v2 .capture-side svg{width:calc(23px * var(--fx));height:calc(23px * var(--fx))}
-  body.design-v2 .capture-side.skip svg{width:calc(26px * var(--fx));height:calc(26px * var(--fx))}
-  body.design-v2 .capture-shutter{bottom:calc(48px * var(--fx));width:calc(66px * var(--fx));height:calc(66px * var(--fx));border-width:calc(4px * var(--fx))}
-  body.design-v2 .capture-shutter:after{width:calc(51px * var(--fx));height:calc(51px * var(--fx))}
-  body.design-v2 .capture-photo:before{left:calc(-13px * var(--fx));right:calc(7px * var(--fx));top:calc(277px * var(--fx));height:calc(89px * var(--fx));box-shadow:inset 0 calc(6px * var(--fx)) 0 rgba(255,255,255,.68)}
-  body.design-v2 .capture-photo:after{left:calc(-15px * var(--fx));top:calc(284px * var(--fx));width:calc(105px * var(--fx));height:calc(80px * var(--fx));filter:blur(calc(4px * var(--fx)))}
-  body.design-v2 .house-windows{background:
-    linear-gradient(#F4F0E7,#F4F0E7) calc(17px * var(--fx)) calc(253px * var(--fx))/calc(22px * var(--fx)) calc(28px * var(--fx)) no-repeat,
-    linear-gradient(#F4F0E7,#F4F0E7) calc(235px * var(--fx)) calc(75px * var(--fx))/calc(22px * var(--fx)) calc(31px * var(--fx)) no-repeat,
-    linear-gradient(#F4F0E7,#F4F0E7) calc(347px * var(--fx)) calc(212px * var(--fx))/calc(24px * var(--fx)) calc(36px * var(--fx)) no-repeat,
-    linear-gradient(8deg,transparent 0 47%,#39424C 47% 54%,transparent 54%) 0 calc(186px * var(--fx))/100% calc(68px * var(--fx)) no-repeat,
-    linear-gradient(8deg,transparent 0 42%,#333D48 42% 53%,transparent 53%) 0 calc(14px * var(--fx))/100% calc(130px * var(--fx)) no-repeat}
-  body.design-v2 .capture-car{left:calc(-11px * var(--fx));top:calc(374px * var(--fx));width:calc(390px * var(--fx));height:calc(103px * var(--fx));border-radius:calc(46px * var(--fx)) calc(95px * var(--fx)) calc(18px * var(--fx)) calc(22px * var(--fx));box-shadow:inset 0 calc(7px * var(--fx)) calc(16px * var(--fx)) rgba(255,255,255,.28),0 calc(7px * var(--fx)) calc(11px * var(--fx)) rgba(0,0,0,.3)}
-  body.design-v2 .capture-car:before{left:calc(88px * var(--fx));top:calc(6px * var(--fx));width:calc(140px * var(--fx));height:calc(43px * var(--fx));border-radius:calc(60px * var(--fx)) calc(60px * var(--fx)) calc(8px * var(--fx)) calc(10px * var(--fx));box-shadow:calc(155px * var(--fx)) calc(21px * var(--fx)) 0 calc(-6px * var(--fx)) #0C3337}
-  body.design-v2 .capture-car:after{left:calc(55px * var(--fx));bottom:calc(-14px * var(--fx));width:calc(51px * var(--fx));height:calc(51px * var(--fx));box-shadow:calc(274px * var(--fx)) 0 0 0 #171B20}
   @media(max-width:440px){body{padding:0}.phone{width:100vw;height:100vh;border-radius:0;box-shadow:none}.cap{display:none}}
 </style>
 </head>
@@ -738,8 +653,13 @@
   <div class="screen" id="cam">
     <div class="perm" id="perm"><svg width="20" height="20" style="flex-shrink:0"><use href="#i-alert"/></svg><div class="pt">页内相机不可用，已自动切换到系统相机</div><div class="pb" onclick="dismissPerm()">知道了</div></div>
     <div class="cam-top">
-      <div class="cx" onclick="camExit()"><svg width="17" height="17"><use href="#i-close"/></svg></div>
-      <div class="cam-ti"><div class="n" id="cam-n">车外观</div><div class="p" id="cam-p">第 1 / 19 项</div></div>
+      <div class="cx" onclick="camExit()"><svg width="17" height="17"><use href="#i-back"/></svg></div>
+      <div class="cam-ti">
+        <div class="cam-page-title">采标运营</div>
+        <div class="cam-shoot-prompt">请在 <span class="cam-prompt-dir" id="cam-dir">正面</span> 拍摄</div>
+        <div class="cam-hero-title" id="cam-hero">前摄像头</div>
+        <div class="n" id="cam-n">车外观</div><div class="p" id="cam-p">第 1 / 19 项</div>
+      </div>
       <div class="cam-guide" onclick="openCamForm()"><svg width="18" height="18"><use href="#i-list"/></svg></div>
     </div>
     <div class="vf" id="vf">
@@ -900,7 +820,7 @@ let chkMode='out',ALL=[],GROUPS=[],curIdx=0,camShots=[];
 let camStream=null,burstTimer=null,bursting=false,camReady=false,camMode='shoot',previewIdx=0,retakeSlotIndex=null,retakeStayAfterShot=false,retakeContinuePreview=false,nativeCameraOpen=false,cameraResumeTimer=null;
 
 function $(id){return document.getElementById(id)}
-function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');document.body.classList.toggle('cam-active',id==='cam');document.body.classList.toggle('home-camera',id==='home');$('sbar').classList.toggle('light',id==='home'||id==='cam')}
+function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');document.body.classList.toggle('cam-active',id==='cam');$('sbar').classList.toggle('light',id==='home'||id==='cam')}
 let tT;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),2400)}
 
 /* ============ 主页 / 工作流 ============ */
@@ -1319,7 +1239,7 @@ function syncFigmaScale(){
 }
 syncFigmaScale();
 window.addEventListener('resize',syncFigmaScale);
-let dailyPunchDone=false,taskPunchMode='start',formReturnCamIdx=null,homeShotCount=4;
+let dailyPunchDone=false,taskPunchMode='start',formReturnCamIdx=null;
 const DESIGN_STEPS=[
   {k:'开始打卡',d:'开始任务时打卡，自动记录时间地点'},
   {k:'出车检查',d:'30项车况与设备检查'},
@@ -1402,36 +1322,21 @@ function liveCameraShotSummary(){
   return ALL.filter(it=>it.type==='photo'&&it.name==='摄像头').reduce((sum,it)=>sum+(it.idx===curIdx?validShotCount(camShots):itemShotCount(it)),0);
 }
 function renderHome(){
-  const slots=Array.from({length:5},(_,i)=>`<div class="capture-slot ${i<homeShotCount?'filled':''}"></div>`).join('');
-  document.querySelector('#home .scroll').innerHTML=`
-    <div class="capture-home">
-      <div class="capture-nav">
-        <div class="capture-back" onclick="toast('返回上一页')"><svg><use href="#i-back"/></svg></div>
-        <div class="capture-title">采标运营</div>
-      </div>
-      <div class="capture-photo">
-        <div class="house-windows"></div>
-        <div class="capture-car"></div>
-      </div>
-      <div class="capture-hint">请在 <b>正面</b> 拍摄</div>
-      <div class="capture-menu" onclick="startCheck('out')"><svg><use href="#i-list"/></svg></div>
-      <div class="capture-target">前摄像头</div>
-      <div class="capture-count">已拍${homeShotCount}张</div>
-      <div class="capture-panel">
-        <div class="capture-slots">${slots}</div>
-        <div class="capture-native" onclick="startCheck('out')"><svg><use href="#i-cam"/></svg><span>原相机</span></div>
-        <div class="capture-actions">
-          <div class="capture-side" onclick="toast('已切换到上一项')"><div class="circle"><svg><use href="#i-back"/></svg></div><span>上一项</span></div>
-          <div class="capture-side skip" onclick="toast('已标记为不涉及')"><div class="circle"><svg><use href="#i-close"/></svg></div><span>不涉及</span></div>
-        </div>
-        <div class="capture-shutter" onclick="captureHomeShot()"></div>
-      </div>
-    </div>`;
-}
-function captureHomeShot(){
-  homeShotCount=Math.min(5,homeShotCount+1);
-  renderHome();
-  toast(homeShotCount>=5?'当前项拍摄完成':'已拍摄一张');
+  const dailyLabel=dailyPunchDone?'已打卡':'下班打卡';
+  const rows=DESIGN_STEPS.map((s,i)=>{
+    const cls=i<stage?'done':(i===stage?'now':'');
+    const act=i===stage;
+    let label='';let handler='';
+    if(act&&i===0){label='去打卡';handler="openTaskPunch('start')"}
+    else if(act&&i===1){label='去检查';handler="startCheck('out')"}
+    else if(act&&i===2){label='完成执行';handler='finishExec()'}
+    else if(act&&i===3){label='去检查';handler="startCheck('in')"}
+    else if(act&&i===4){label='去打卡';handler="openTaskPunch('end')"}
+    else if(act&&i===5){label='去完成';handler='finishReturnDisk()'}
+    const btn=label?`<button class="flow-btn" onclick="${handler}">${label}</button>`:'';
+    return `<div class="flow-row ${cls}"><div class="flow-dot">${i<stage?'<svg width="11" height="11"><use href="#i-check"/></svg>':i+1}</div><div class="flow-mid"><div class="flow-title">${s.k}${i<stage?'<span class="flow-tag">已完成</span>':''}</div><div class="flow-sub">${s.d}</div>${btn}</div></div>`;
+  }).join('');
+  document.querySelector('#home .scroll').innerHTML=`<div class="home-blue"><div class="home-date">7月14日 周二 <svg width="13" height="13"><use href="#i-cal"/></svg></div><div class="clock-card"><div class="clock-ico"><svg width="17" height="17"><use href="#i-doc"/></svg></div><div class="clock-main"><b>上下班打卡</b><span>${dailyPunchDone?'今日考勤已记录':'上班打卡时间：12:00'}</span></div><div class="clock-pill" onclick="dailyPunch()">${dailyLabel}</div></div></div><div class="task-wrap"><div class="task-label">任务列表</div><div class="task-card"><div class="task-head"><b>今日任务1</b><span class="plate-badge">京A·B77970</span></div><div class="task-desc">上午班 · HX00372（常规） · 土五感知<br>拍摄30个路口的红绿灯，重点覆盖早高峰时段，注意信号灯完整入画。</div><div class="flow-line">${rows}</div></div></div>`;
 }
 function dailyPunch(){dailyPunchDone=true;renderHome();toast('每日上下班打卡已记录')}
 function openTaskPunch(mode){taskPunchMode=mode;setupPunch(mode==='start'?'punch-in':'punch-out');go('punch')}
@@ -1557,10 +1462,21 @@ function showStartShootTip(){
   $('guide-steps').innerHTML='<div class="guide-step"><div class="gn">1</div><div class="gx">请站在车辆正面，按照顺时针绕车一圈拍摄。</div></div><div class="review-actions"><button class="btn primary" onclick="closeGuide()">开始拍摄</button></div>';
   $('guide-mask').classList.add('on');
 }
+function cameraHeroTitle(it){
+  if(!it)return '';
+  if(it.name==='摄像头'){
+    if(it.groupName==='正面')return '前摄像头';
+    if(it.groupName==='后面')return '后摄像头';
+    return `${it.groupName}摄像头`;
+  }
+  return it.name.replace(/[（(].*?[）)]/g,'');
+}
 function renderCam(){
   const it=ALL[curIdx],n=validShotCount(camShots),total=it.need.length,full=n>=total;
   $('cam-n').innerHTML=displayItemTitleHtml(it);
   $('cam-p').textContent=it.freeCount?`已拍摄${liveCameraShotSummary()}张`:`(${n}/${total})`;
+  $('cam-dir').textContent=it.groupName||it.need[Math.min(n,total-1)]||'正面';
+  $('cam-hero').textContent=cameraHeroTitle(it);
   $('vf').style.background=`linear-gradient(180deg,#e5e5e5,#cfcfcf)`;
   $('cam').classList.toggle('preview',camMode==='preview');
   const video=$('cam-video'),fallback=$('cam-fallback'),ps=camShots[previewIdx];
