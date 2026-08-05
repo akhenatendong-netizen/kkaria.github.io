@@ -807,7 +807,7 @@ const CHK={
 
 let stage=0,expenses=[],expCat='充电费',expInv=false,flawCount=0;
 let chkMode='out',ALL=[],GROUPS=[],curIdx=0,camShots=[];
-let camStream=null,burstTimer=null,bursting=false,camReady=false,camMode='shoot',previewIdx=0,retakeSlotIndex=null,retakeStayAfterShot=false,retakeContinuePreview=false;
+let camStream=null,burstTimer=null,bursting=false,camReady=false,camMode='shoot',previewIdx=0,retakeSlotIndex=null,retakeStayAfterShot=false,retakeContinuePreview=false,nativeCameraOpen=false,cameraResumeTimer=null;
 
 function $(id){return document.getElementById(id)}
 function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');document.body.classList.toggle('cam-active',id==='cam');$('sbar').classList.toggle('light',id==='home'||id==='cam')}
@@ -964,13 +964,22 @@ function renderCam(){
   $('dots').innerHTML=it.need.map((_,i)=>`<div class="adot ${i<n?'shot':''} ${i===n&&!full?'cur':''}"></div>`).join('');
   $('strip').innerHTML=camShots.map(s=>`<div class="thumb" style="${s.src?`background-image:url('${s.src}');background-size:cover;background-position:center`:`background:linear-gradient(150deg,hsl(${it.hue},30%,44%),hsl(${it.hue+28},28%,28%))`}">${s.native?'<span class="rt">原</span>':''}</div>`).join('')||'<span style="color:rgba(255,255,255,.4);font-size:13px">按快门连拍当前检查项</span>';
 }
-async function startCamera(){
+function cameraScreenActive(){return $('cam')&&$('cam').classList.contains('on')}
+function scheduleCameraResume(delay=260){
+  clearTimeout(cameraResumeTimer);
+  cameraResumeTimer=setTimeout(()=>{
+    if(cameraScreenActive()&&camMode!=='preview')startCamera(true);
+  },delay);
+}
+async function startCamera(force=false){
   const video=$('cam-video'),fallback=$('cam-fallback');
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
     camReady=false;video.classList.add('off');fallback.classList.remove('off');fallback.querySelector('span').textContent='页内相机不可用，可点原相机拍摄';
     return;
   }
   try{
+    if(force&&camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null}
+    if(camStream&&!camStream.getVideoTracks().some(t=>t.readyState==='live')){camStream=null;camReady=false}
     if(!camStream){
       camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false});
       video.srcObject=camStream;
@@ -983,7 +992,7 @@ async function startCamera(){
     if(!$('perm').classList.contains('shown')){$('perm').classList.add('on','shown');setTimeout(()=>$('perm').classList.remove('on'),2600)}
   }
 }
-function stopCamera(){if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null}camReady=false;$('cam-video').classList.add('off')}
+function stopCamera(){clearTimeout(cameraResumeTimer);if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null}camReady=false;$('cam-video').classList.add('off')}
 function flashShot(){$('flash').classList.remove('go');void $('flash').offsetWidth;$('flash').classList.add('go')}
 function captureFrame(){
   const video=$('cam-video'),frame=$('vf');
@@ -998,7 +1007,7 @@ function captureFrame(){
 function shoot(){
   const it=ALL[curIdx];
   if(retakeSlotIndex===null&&camShots.length>=it.need.length)return false;
-  if(!camReady){toast('页内相机未就绪，请点原相机拍摄');return false}
+  if(!camReady){toast('正在恢复相机，请稍后再拍');startCamera(true);return false}
   flashShot();
   addShotToCurrent(captureFrame(),false);
   return true;
@@ -1050,12 +1059,24 @@ function shootBurst(){
   burstTimer=setInterval(take,720);
 }
 function stopBurst(){if(burstTimer){clearInterval(burstTimer);burstTimer=null}bursting=false;if($('shutter'))$('shutter').classList.remove('burst')}
-function nativeShot(){const it=ALL[curIdx];stopBurst();if(retakeSlotIndex===null&&camShots.length>=it.need.length)return;const input=$('native-cam-input');input.value='';input.click()}
+function nativeShot(){
+  const it=ALL[curIdx];
+  stopBurst();
+  if(retakeSlotIndex===null&&camShots.length>=it.need.length)return;
+  nativeCameraOpen=true;
+  stopCamera();
+  const input=$('native-cam-input');
+  input.value='';
+  input.click();
+  scheduleCameraResume(1200);
+}
 function handleNativeFile(event){
   const it=ALL[curIdx],file=event.target.files&&event.target.files[0];
+  nativeCameraOpen=false;
+  scheduleCameraResume(500);
   if(!file||(retakeSlotIndex===null&&camShots.length>=it.need.length))return;
   const reader=new FileReader();
-  reader.onload=()=>{flashShot();addShotToCurrent(reader.result,true)};
+  reader.onload=()=>{flashShot();addShotToCurrent(reader.result,true);scheduleCameraResume(350)};
   reader.readAsDataURL(file);
 }
 function advanceAfterShot(){
@@ -1100,6 +1121,18 @@ function camExit(){stopBurst();stopCamera();const it=ALL[curIdx];it.shots=camSho
 function openGuide(){const it=ALL[curIdx];$('guide-title').textContent=it.name+' · 拍摄指南';$('guide-img').textContent='示例图（'+it.name+'）';$('guide-steps').innerHTML=(it.guide||[]).map((s,i)=>`<div class="guide-step"><div class="gn">${i+1}</div><div class="gx">${s}</div></div>`).join('');$('guide-mask').classList.add('on')}
 function closeGuide(){$('guide-mask').classList.remove('on')}
 function dismissPerm(){$('perm').classList.remove('on')}
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&cameraScreenActive()){
+    nativeCameraOpen=false;
+    scheduleCameraResume(300);
+  }
+});
+window.addEventListener('focus',()=>{
+  if(cameraScreenActive()){
+    nativeCameraOpen=false;
+    scheduleCameraResume(300);
+  }
+});
 function openJump(){
   $('jump-list').innerHTML=GROUPS.map(g=>{
     const rows=g.items.map(it=>{
