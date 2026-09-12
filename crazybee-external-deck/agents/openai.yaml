@@ -1,0 +1,7 @@
+interface:
+  display_name: "Crazybee External Deck"
+  short_description: "创建符合 Crazybee 品牌规范的高质量对外介绍 PPT"
+  icon_small: "./assets/logos/crazybee-app-icon-red.svg"
+  icon_large: "./assets/logos/crazybee-lockup-gray-897x292.svg"
+  brand_color: "#FF3535"
+  default_prompt: "Use $crazybee-external-deck to create a polished Crazybee external presentation with product mockups and evidence-led storytelling."
