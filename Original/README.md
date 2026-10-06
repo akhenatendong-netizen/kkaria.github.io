@@ -1,37 +1,28 @@
-# CrazyBee — 方案 A · Original
+# CrazyBee B-Restaurant — 可直接打开 / GitHub Pages 版
 
-独立的 React + TypeScript + Three.js + Vite 品牌官网源码。
+## 直接查看
 
-首页为原版 IP 与光晕互动场景。
+双击本文件旁边的 `index.html`。脚本、字体、品牌图片和 3D 场景代码已内嵌，无需安装依赖或启动服务器。
 
-此项目固定为方案 A，不包含 A/B 切换入口。其他页面内容、用户与商家角色及品牌资源与对比版一致。
+## GitHub Pages
 
-## 上传 GitHub
+1. 解压，将根目录 `index.html` 上传到你的 GitHub 仓库根目录，替换旧的同名文件；也可上传全部内容（包括 `.nojekyll` 和源码目录）。不要把 ZIP 本身作为网页上传。
+2. 仓库 **Settings → Pages → Build and deployment**，Source 选择 **Deploy from a branch**，Branch 选择 **main**（或实际上传文件的分支），目录选择 **/(root)**，点击 Save。
+3. 等部署完成后打开 Pages 提供的网址；如仍看到旧页，强制刷新。
 
-1. 解压本压缩包。
-2. 新建 GitHub 仓库，将解压后的全部文件和文件夹上传到仓库根目录，确保 `package.json` 与 `index.html` 位于根目录。
-3. 不要只上传 ZIP 文件：GitHub 不会自动解压它。
+`index.html` 已是完整发布页面，支持仓库子路径，不需要 GitHub Actions 构建。
 
-## 本地运行
+## 继续开发
 
-使用 Node.js 22 LTS，执行：
+完整 React + TypeScript + Three.js + Vite 源码在 `source/`。
 
 ```sh
+cd source
 npm ci
 npm run dev
 ```
 
-## 构建
+修改后执行 `npm run build:portable`，自动重新生成上一级可直接发布的 `index.html`。
+常规 Vite 构建为 `npm run build`；本包的便携发布入口使用 `build:portable`。
 
-```sh
-npm run build
-npm run preview
-```
-
-构建产物位于 `dist/`。压缩包包含源码、锁文件、配置和品牌素材，不包含 `node_modules` 或生成文件。
-
-## 说明
-
-这是品牌网站预览；优惠与餐厅内容不是实时交易数据。现有团餐入口为 https://order.crazybee.life/delivery ，商务邮箱为 business@crazybee.life。
-
-素材路径以 `/assets/` 开头，默认用于域名根目录部署；若使用 GitHub Pages 仓库子路径，发布前需配置相应资源基础路径。上传源码本身不会自动发布网站。
+3D 交互需要浏览器开启 WebGL。团餐跳转等外部链接仍需要联网。此包不包含真实交易数据。
