@@ -1,4 +1,4 @@
-# CrazyBee B-Restaurant — 可直接打开 / GitHub Pages 版
+# CrazyBee A-Original — 可直接打开 / GitHub Pages 版
 
 ## 直接查看
 
