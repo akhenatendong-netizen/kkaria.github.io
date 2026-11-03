@@ -1,0 +1,1033 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Change Coordination Agent</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Noto+Sans+SC:wght@400;500;600&amp;family=Noto+Serif+SC:wght@400;600&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F2F4F6}
+button{font:inherit;cursor:pointer}
+button:disabled{cursor:not-allowed}
+button:focus-visible,a:focus-visible{outline:2px solid #1F4E8C;outline-offset:2px}
+button:not(:disabled):hover{filter:brightness(.96)}
+a{color:#1F4E8C}a:hover{color:#163A69}
+</style>
+</helmet>
+
+<div lang="{{langCode}}" style="min-height: 100vh; box-sizing: border-box; background: #F2F4F6; color: #16202A; font-family: 'IBM Plex Sans', 'Noto Sans SC', system-ui, sans-serif; font-size: 15px; line-height: 1.5; display: flex; flex-direction: column">
+
+  <header style="background: #16202A; color: #FFFFFF; padding: 12px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px">
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+      <strong style="font-size: 16px; font-weight: 600">{{t.app}}</strong>
+      <span style="font-size: 13px; color: #C8D2DC">{{t.proto}}</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+      <span style="font-size: 13px; color: #C8D2DC; display: inline-flex; align-items: center; gap: 6px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z M12 7v5l3 2"></path></svg>
+        {{t.sync}}
+      </span>
+      <div role="group" aria-label="Language" style="display: flex; border: 1px solid #5C6B7A; border-radius: 6px; overflow: hidden">
+        <button type="button" onClick="{{setEn}}" aria-pressed="{{enPressed}}" style="{{enStyle}}">EN</button>
+        <button type="button" onClick="{{setZh}}" aria-pressed="{{zhPressed}}" style="{{zhStyle}}">中文</button>
+      </div>
+      <button type="button" onClick="{{restart}}" style="min-height: 36px; padding: 0 12px; background: transparent; color: #FFFFFF; border: 1px solid #5C6B7A; border-radius: 6px; font-size: 13px">{{t.restart}}</button>
+    </div>
+  </header>
+
+  <nav aria-label="{{t.navLabel}}" style="background: #FFFFFF; border-bottom: 1px solid #D8DEE4; padding: 0 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 24px">
+    <div style="display: flex; flex-wrap: wrap; gap: 4px">
+      <sc-for list="{{tabs}}" as="tab" hint-placeholder-count="3">
+        <button type="button" onClick="{{tab.go}}" aria-current="{{tab.current}}" style="{{tab.style}}">
+          <span>{{tab.label}}</span>
+          <sc-if value="{{tab.showBadge}}" hint-placeholder-val="{{false}}">
+            <span style="min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box; border-radius: 10px; background: #16202A; color: #FFFFFF; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center">{{tab.badge}}</span>
+          </sc-if>
+        </button>
+      </sc-for>
+    </div>
+    <div style="font-size: 13px; color: #55616D; padding: 8px 0">{{t.viewing}} <strong style="color: #16202A; font-weight: 600">{{persona}}</strong></div>
+  </nav>
+
+  <main style="flex: 1 1 auto; width: 100%; max-width: 1360px; margin: 0 auto; box-sizing: border-box; padding: 24px">
+
+    <!-- 1. UPDATES -->
+    <sc-if value="{{isUpdates}}" hint-placeholder-val="{{true}}">
+      <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+        <section aria-labelledby="updates-heading" style="flex: 1 1 300px; min-width: 0; max-width: 100%; display: flex; flex-direction: column; gap: 8px">
+          <h1 id="updates-heading" style="margin: 0; font-size: 20px; font-weight: 600">{{t.updatesTitle}}</h1>
+          <p style="margin: 0 0 8px; color: #55616D; font-size: 14px">{{t.topic}}</p>
+          <sc-for list="{{updateList}}" as="u" hint-placeholder-count="3">
+            <button type="button" onClick="{{u.select}}" aria-pressed="{{u.pressed}}" style="{{u.style}}">
+              <span style="{{u.pill.style}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{u.pill.icon}}"></path></svg>{{u.pill.text}}</span>
+              <span style="font-weight: 600; font-size: 15px">{{u.title}}</span>
+              <span style="font-size: 13px; color: #55616D">{{u.meta}}</span>
+            </button>
+          </sc-for>
+        </section>
+
+        <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+          <section aria-label="{{t.sourceTitle}}" style="background: #FFFFFF; border: 1px solid #D8DEE4; border-radius: 8px; padding: 20px 24px">
+            <h2 style="margin: 0 0 12px; font-size: 13px; font-weight: 600; color: #55616D">{{t.sourceTitle}}</h2>
+            <div style="font-size: 13px; color: #55616D">{{cur.meta}}</div>
+            <div style="font-size: 17px; font-weight: 600; margin: 4px 0 8px">{{cur.subject}}</div>
+            <p style="margin: 0; font-family: 'Source Serif 4', 'Noto Serif SC', Georgia, serif; font-size: 16px; line-height: 1.6; text-wrap: pretty">{{cur.body}}</p>
+          </section>
+
+          <section aria-label="{{t.foundTitle}}" style="background: #FFFFFF; border: 1px solid #D8DEE4; border-radius: 8px; padding: 20px 24px; display: flex; flex-direction: column; gap: 12px">
+            <h2 style="margin: 0; font-size: 13px; font-weight: 600; color: #55616D">{{t.foundTitle}}</h2>
+            <p style="margin: 0; text-wrap: pretty">{{cur.found}}</p>
+            <sc-if value="{{cur.hasDiff}}" hint-placeholder-val="{{true}}">
+              <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; font-size: 16px">
+                <s style="color: #55616D">{{cur.oldValue}}</s>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16 M14 6l6 6-6 6"></path></svg>
+                <strong style="font-weight: 600">{{cur.newValue}}</strong>
+              </div>
+            </sc-if>
+            <sc-if value="{{cur.hasItems}}" hint-placeholder-val="{{true}}">
+              <div>
+                <div style="font-size: 13px; color: #55616D; margin-bottom: 8px">{{t.appliesTo}}</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px">
+                  <sc-for list="{{cur.items}}" as="chip" hint-placeholder-count="5">
+                    <span style="padding: 4px 10px; border: 1px solid #D8DEE4; border-radius: 6px; background: #F7F8FA; font-size: 13px">{{chip}}</span>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+          </section>
+
+          <section aria-label="{{t.labelTitle}}" style="background: #FFFFFF; border: 1px solid #D8DEE4; border-radius: 8px; padding: 20px 24px; display: flex; flex-direction: column; gap: 12px">
+            <h2 style="margin: 0; font-size: 13px; font-weight: 600; color: #55616D">{{t.labelTitle}}</h2>
+
+            <sc-if value="{{cur.isOpen}}" hint-placeholder-val="{{true}}">
+              <div style="display: flex; flex-direction: column; gap: 12px">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 8px">
+                  <sc-for list="{{options}}" as="o" hint-placeholder-count="3">
+                    <button type="button" onClick="{{o.pick}}" aria-pressed="{{o.pressed}}" disabled="{{o.disabled}}" style="{{o.style}}">
+                      <span style="{{o.pill.style}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{o.pill.icon}}"></path></svg>{{o.pill.text}}</span>
+                      <span style="font-size: 13px; color: #3C4752">{{o.desc}}</span>
+                    </button>
+                  </sc-for>
+                </div>
+                <p style="margin: 0; font-size: 13px; color: #55616D; text-wrap: pretty">{{cur.ownerNote}}</p>
+                <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+                  <button type="button" onClick="{{confirmLabel}}" style="min-height: 44px; padding: 0 20px; background: #1F4E8C; color: #FFFFFF; border: 0; border-radius: 6px; font-weight: 600">{{t.confirm}}</button>
+                  <span style="font-size: 13px; color: #55616D">{{t.nothingSent}}</span>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{cur.isDone}}" hint-placeholder-val="{{false}}">
+              <div style="display: flex; flex-direction: column; gap: 12px; align-items: flex-start">
+                <span style="{{cur.pill.style}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{cur.pill.icon}}"></path></svg>{{cur.pill.text}}</span>
+                <p style="margin: 0; text-wrap: pretty">{{cur.doneText}}</p>
+                <sc-if value="{{cur.showNext}}" hint-placeholder-val="{{false}}">
+                  <button type="button" onClick="{{cur.next}}" style="min-height: 44px; padding: 0 20px; background: #1F4E8C; color: #FFFFFF; border: 0; border-radius: 6px; font-weight: 600">{{cur.nextLabel}}</button>
+                </sc-if>
+              </div>
+            </sc-if>
+          </section>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- 2. DRAFTS -->
+    <sc-if value="{{isDrafts}}" hint-placeholder-val="{{false}}">
+      <div style="display: flex; flex-direction: column; gap: 16px">
+        <div style="display: flex; flex-wrap: wrap; gap: 8px" role="group" aria-label="{{t.draftsTitle}}">
+          <sc-for list="{{docTabs}}" as="d" hint-placeholder-count="2">
+            <button type="button" onClick="{{d.go}}" aria-pressed="{{d.pressed}}" style="{{d.style}}">{{d.label}}</button>
+          </sc-for>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+          <article style="flex: 999 1 560px; min-width: 0; background: #FFFFFF; border: 1px solid #D8DEE4; border-radius: 8px; padding: clamp(20px, 4vw, 40px); box-sizing: border-box">
+            <div style="font-size: 13px; color: #55616D; margin-bottom: 8px">{{doc.stage}}</div>
+            <h1 style="margin: 0 0 24px; font-family: 'Source Serif 4', 'Noto Serif SC', Georgia, serif; font-size: 28px; line-height: 1.25; font-weight: 600">{{doc.title}}</h1>
+            <div style="display: flex; flex-direction: column; gap: 20px; font-family: 'Source Serif 4', 'Noto Serif SC', Georgia, serif; font-size: 17px; line-height: 1.65">
+              <sc-for list="{{doc.blocks}}" as="b" hint-placeholder-count="4">
+                <div>
+                  <sc-if value="{{b.hasQ}}" hint-placeholder-val="{{true}}">
+                    <h2 style="margin: 0 0 4px; font-size: 17px; font-weight: 600">{{b.q}}</h2>
+                  </sc-if>
+                  <p style="margin: 0; text-wrap: pretty">
+                    <sc-for list="{{b.segs}}" as="s" hint-placeholder-count="1">
+                      <sc-if value="{{s.isMark}}" hint-placeholder-val="{{false}}">
+                        <a href="{{s.href}}" style="{{s.style}}">{{s.text}}<sup style="{{s.tagStyle}}">{{s.num}}</sup></a>
+                      </sc-if>
+                      <sc-if value="{{s.isPlain}}" hint-placeholder-val="{{true}}">
+                        <span style="{{s.style}}">{{s.text}}</span>
+                      </sc-if>
+                    </sc-for>
+                  </p>
+                </div>
+              </sc-for>
+            </div>
+          </article>
+
+          <aside aria-label="{{t.alertsTitle}}" style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+            <h2 style="margin: 0; font-size: 16px; font-weight: 600">{{t.alertsTitle}}</h2>
+
+            <sc-if value="{{noAlerts}}" hint-placeholder-val="{{false}}">
+              <div style="background: #FFFFFF; border: 1px solid #D8DEE4; border-radius: 8px; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start">
+                <p style="margin: 0; text-wrap: pretty">{{t.noAlerts}}</p>
+                <sc-if value="{{needsOwner}}" hint-placeholder-val="{{false}}">
+                  <button type="button" onClick="{{goUpdates}}" style="min-height: 44px; padding: 0 16px; background: #FFFFFF; color: #16202A; border: 1px solid #16202A; border-radius: 6px; font-weight: 500">{{t.backToUpdates}}</button>
+                </sc-if>
+              </div>
+            </sc-if>
+
+            <sc-for list="{{alerts}}" as="a" hint-placeholder-count="2">
+              <div id="{{a.domId}}" style="{{a.style}}">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap">
+                  <span style="{{a.pill.style}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{a.pill.icon}}"></path></svg>{{a.pill.text}}</span>
+                  <span style="font-size: 13px; color: #55616D">{{t.line}} {{a.num}}</span>
+                </div>
+                <div style="font-weight: 600; font-size: 15px">{{a.title}}</div>
+                <p style="margin: 0; font-size: 14px; color: #3C4752; text-wrap: pretty">{{a.reason}}</p>
+                <sc-if value="{{a.hasSuggestion}}" hint-placeholder-val="{{true}}">
+                  <div style="background: #F7F8FA; border-radius: 6px; padding: 10px 12px; font-size: 14px; display: flex; flex-direction: column; gap: 4px">
+                    <s style="color: #55616D">{{a.oldText}}</s>
+                    <span style="font-weight: 500">{{a.newText}}</span>
+                  </div>
+                </sc-if>
+                <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 8px">
+                  <div style="flex: 1 1 200px; min-width: 0; font-size: 13px; color: #55616D; display: flex; flex-direction: column; gap: 2px">
+                    <span>{{a.source}}</span>
+                    <span>{{a.confirmedBy}}</span>
+                  </div>
+                  <button type="button" onClick="{{a.viewSource}}" style="min-height: 44px; padding: 0 8px; background: transparent; color: #1F4E8C; border: 0; font-weight: 500; font-size: 14px">{{t.viewSource}}</button>
+                </div>
+                <sc-if value="{{a.isOpen}}" hint-placeholder-val="{{true}}">
+                  <div style="display: flex; flex-wrap: wrap; gap: 8px">
+                    <sc-if value="{{a.canFix}}" hint-placeholder-val="{{true}}">
+                      <button type="button" onClick="{{a.accept}}" style="min-height: 44px; padding: 0 16px; background: #1F4E8C; color: #FFFFFF; border: 0; border-radius: 6px; font-weight: 600">{{t.accept}}</button>
+                      <button type="button" onClick="{{a.reject}}" style="min-height: 44px; padding: 0 16px; background: #FFFFFF; color: #16202A; border: 1px solid #8895A2; border-radius: 6px; font-weight: 500">{{t.reject}}</button>
+                    </sc-if>
+                    <sc-if value="{{a.canAsk}}" hint-placeholder-val="{{false}}">
+                      <button type="button" onClick="{{a.ask}}" style="min-height: 44px; padding: 0 16px; background: #1F4E8C; color: #FFFFFF; border: 0; border-radius: 6px; font-weight: 600">{{t.ask}}</button>
+                      <button type="button" onClick="{{a.keep}}" style="min-height: 44px; padding: 0 16px; background: #FFFFFF; color: #16202A; border: 1px solid #8895A2; border-radius: 6px; font-weight: 500">{{t.keep}}</button>
+                    </sc-if>
+                  </div>
+                </sc-if>
+                <sc-if value="{{a.isClosed}}" hint-placeholder-val="{{false}}">
+                  <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px">
+                    <span style="font-size: 14px; font-weight: 500">{{a.doneText}}</span>
+                    <sc-if value="{{a.canUndo}}" hint-placeholder-val="{{true}}">
+                      <button type="button" onClick="{{a.undo}}" style="min-height: 44px; padding: 0 8px; background: transparent; color: #1F4E8C; border: 0; font-weight: 500">{{t.undo}}</button>
+                    </sc-if>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+
+            <sc-if value="{{showDraftNext}}" hint-placeholder-val="{{false}}">
+              <div style="background: #16202A; color: #FFFFFF; border-radius: 8px; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start">
+                <p style="margin: 0">{{draftNextText}}</p>
+                <button type="button" onClick="{{draftNext}}" style="min-height: 44px; padding: 0 16px; background: #FFFFFF; color: #16202A; border: 0; border-radius: 6px; font-weight: 600">{{draftNextLabel}}</button>
+              </div>
+            </sc-if>
+          </aside>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- 3. COMPLETION -->
+    <sc-if value="{{isTracker}}" hint-placeholder-val="{{false}}">
+      <div style="display: flex; flex-direction: column; gap: 16px">
+        <sc-if value="{{trackerEmpty}}" hint-placeholder-val="{{false}}">
+          <section style="background: #FFFFFF; border: 1px solid #D8DEE4; border-radius: 8px; padding: 32px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start">
+            <h1 style="margin: 0; font-size: 20px; font-weight: 600">{{t.emptyTitle}}</h1>
+            <p style="margin: 0; color: #3C4752">{{t.emptyBody}}</p>
+            <button type="button" onClick="{{goUpdates}}" style="min-height: 44px; padding: 0 20px; background: #1F4E8C; color: #FFFFFF; border: 0; border-radius: 6px; font-weight: 600">{{t.backToUpdates}}</button>
+          </section>
+        </sc-if>
+
+        <sc-if value="{{trackerActive}}" hint-placeholder-val="{{true}}">
+          <section aria-labelledby="change-heading" style="background: #FFFFFF; border: 1px solid #D8DEE4; border-radius: 8px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; align-items: flex-start">
+              <div style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 8px; align-items: flex-start">
+                <span style="{{change.pill.style}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{change.pill.icon}}"></path></svg>{{change.pill.text}}</span>
+                <h1 id="change-heading" style="margin: 0; font-size: 22px; line-height: 1.3; font-weight: 600">{{change.title}}</h1>
+                <p style="margin: 0; font-size: 14px; color: #55616D">{{change.meta}}</p>
+              </div>
+              <div style="flex: 0 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 8px">
+                <div style="font-size: 14px; font-weight: 500">{{change.progress}}</div>
+                <div aria-hidden="true" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px">
+                  <sc-for list="{{change.bar}}" as="seg" hint-placeholder-count="5">
+                    <span style="{{seg.style}}"></span>
+                  </sc-for>
+                </div>
+                <button type="button" onClick="{{closeChange}}" disabled="{{change.closeDisabled}}" style="{{change.closeStyle}}">{{change.closeLabel}}</button>
+              </div>
+            </div>
+            <sc-if value="{{change.isClosed}}" hint-placeholder-val="{{false}}">
+              <p style="margin: 0; padding: 12px 16px; background: #E6F4EC; color: #1C6B45; border-radius: 6px; font-weight: 500">{{t.closedNote}}</p>
+            </sc-if>
+          </section>
+
+          <section aria-label="{{t.affectedTitle}}" style="background: #FFFFFF; border: 1px solid #D8DEE4; border-radius: 8px; padding: 8px 0">
+            <h2 style="margin: 12px 24px; font-size: 16px; font-weight: 600">{{t.affectedTitle}}</h2>
+            <div style="overflow-x: auto">
+              <table style="width: 100%; min-width: 860px; border-collapse: collapse; font-size: 14px">
+                <thead>
+                  <tr style="text-align: left; color: #55616D; font-size: 13px">
+                    <th scope="col" style="padding: 8px 12px 8px 24px; font-weight: 500; border-bottom: 1px solid #D8DEE4">{{t.colItem}}</th>
+                    <th scope="col" style="padding: 8px 12px; font-weight: 500; border-bottom: 1px solid #D8DEE4">{{t.colStage}}</th>
+                    <th scope="col" style="padding: 8px 12px; font-weight: 500; border-bottom: 1px solid #D8DEE4">{{t.colPerson}}</th>
+                    <th scope="col" style="padding: 8px 12px; font-weight: 500; border-bottom: 1px solid #D8DEE4">{{t.colStatus}}</th>
+                    <th scope="col" style="padding: 8px 24px 8px 12px; font-weight: 500; border-bottom: 1px solid #D8DEE4">{{t.colAction}}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+                    <tr>
+                      <td style="padding: 12px 12px 12px 24px; border-bottom: 1px solid #E8ECF0; vertical-align: top; width: 38%">
+                        <div style="font-weight: 600">{{r.name}}</div>
+                        <div style="color: #55616D; font-size: 13px; text-wrap: pretty">{{r.note}}</div>
+                      </td>
+                      <td style="padding: 12px; border-bottom: 1px solid #E8ECF0; vertical-align: top">{{r.stage}}</td>
+                      <td style="padding: 12px; border-bottom: 1px solid #E8ECF0; vertical-align: top">{{r.person}}</td>
+                      <td style="padding: 12px; border-bottom: 1px solid #E8ECF0; vertical-align: top"><span style="{{r.statusStyle}}">{{r.status}}</span></td>
+                      <td style="padding: 8px 24px 8px 12px; border-bottom: 1px solid #E8ECF0; vertical-align: top">
+                        <sc-if value="{{r.hasAction}}" hint-placeholder-val="{{true}}">
+                          <button type="button" onClick="{{r.act}}" style="min-height: 40px; padding: 0 12px; background: #FFFFFF; color: #16202A; border: 1px solid #8895A2; border-radius: 6px; font-weight: 500">{{r.actLabel}}</button>
+                        </sc-if>
+                      </td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </sc-if>
+
+        <sc-if value="{{hasChecks}}" hint-placeholder-val="{{false}}">
+          <section aria-label="{{t.checksTitle}}" style="background: #FFFFFF; border: 1px solid #D8DEE4; border-radius: 8px; padding: 20px 24px; display: flex; flex-direction: column; gap: 12px">
+            <h2 style="margin: 0; font-size: 16px; font-weight: 600">{{t.checksTitle}}</h2>
+            <sc-for list="{{checks}}" as="c" hint-placeholder-count="1">
+              <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px">
+                <span style="{{c.pill.style}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{c.pill.icon}}"></path></svg>{{c.pill.text}}</span>
+                <span style="font-weight: 500">{{c.title}}</span>
+                <span style="font-size: 13px; color: #55616D">{{c.meta}}</span>
+              </div>
+            </sc-for>
+          </section>
+        </sc-if>
+      </div>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1040}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = Object.assign({ lang: 'en' }, this.fresh());
+  }
+
+  fresh() {
+    return {
+      tab: 'updates',
+      sel: 'u1',
+      doc: 'faq',
+      pick: { u1: 'red', u2: 'yellow' },
+      saved: { u1: null, u2: null },
+      lines: { f1: 'open', f2: 'open', p1: 'open', e1: 'open', e2: 'open' },
+      manual: { social: 'open', web: 'open', brief: 'open' },
+      closed: false
+    };
+  }
+
+  copy() {
+    return {
+      en: {
+        app: 'Change Coordination Agent',
+        proto: 'Prototype · Simulated data',
+        sync: 'Last successful sync 14:20',
+        restart: 'Restart demo',
+        navLabel: 'Prototype sections',
+        tabUpdates: '1  Updates',
+        tabDrafts: '2  Drafts',
+        tabTracker: '3  Completion',
+        viewing: 'Viewing as',
+        maya: 'Maya Chen, policy owner',
+        ana: 'Ana Silva, FAQ writer',
+        tom: 'Tom Reid, press officer',
+        mayaName: 'Maya Chen',
+        anaName: 'Ana Silva',
+        tomName: 'Tom Reid',
+        updatesTitle: 'New updates',
+        topic: 'Community Repair Grant',
+        needLabel: 'Needs your label',
+        sourceTitle: 'Original source',
+        foundTitle: 'What the agent found',
+        appliesTo: 'Likely to affect',
+        labelTitle: 'Label',
+        confirm: 'Confirm label',
+        nothingSent: 'No one is alerted until you confirm.',
+        ownerNote: 'You are the named owner of this topic, so you can confirm Red. Other staff can only propose it.',
+        ownerNoteNoRed: 'Red needs a confirmed decision in the source. This message says nothing has been agreed.',
+        levelRed: 'Red: Action required',
+        levelYellow: 'Yellow: Check before using',
+        levelGreen: 'Green: No change required',
+        descRed: 'A confirmed change must be reflected in relevant content.',
+        descYellow: 'May be relevant, but is provisional, advisory or needs clarification.',
+        descGreen: 'Does not currently require a change to related drafts.',
+        doneRed: 'Confirmed by Maya Chen at 14:12. Five affected items are now being tracked.',
+        doneYellow: 'Labelled by Maya Chen at 14:13. Related drafts show a check prompt marked as unconfirmed.',
+        doneGreen: 'Kept as background context. No alert was sent.',
+        autoGreen: 'The agent filed this as background because it mentions no topic in a live draft. Green means no change is currently required. It does not mean verified as correct.',
+        openFaq: 'Open the FAQ draft',
+        draftsTitle: 'Drafts',
+        alertsTitle: 'Alerts for this draft',
+        line: 'Marker',
+        accept: 'Accept change',
+        reject: 'Reject',
+        ask: 'Ask Maya',
+        keep: 'Keep wording for now',
+        viewSource: 'View source',
+        undo: 'Undo',
+        noAlerts: 'No alerts for this draft. That does not mean it has been verified.',
+        backToUpdates: 'Go to Updates',
+        acceptedBy: 'Updated by ',
+        rejectedText: 'Rejected. Sent to Maya for review.',
+        askedText: 'Question sent to Maya. Still unconfirmed.',
+        keptText: 'Kept for now. Still unconfirmed.',
+        nextPress: 'All Red alerts in this draft are handled.',
+        openPress: 'Open the press notice',
+        nextTracker: 'All Red alerts in both drafts are handled.',
+        openTracker: 'See completion',
+        emptyTitle: 'No confirmed change yet',
+        emptyBody: 'This page starts tracking once the owner confirms a Red label.',
+        affectedTitle: 'Affected items',
+        colItem: 'Item',
+        colStage: 'Stage',
+        colPerson: 'Person',
+        colStatus: 'Status',
+        colAction: 'Action',
+        stNot: 'Not updated',
+        stNotified: 'Person notified',
+        stReview: 'Rejected line needs review',
+        stDone: 'Updated',
+        actOpen: 'Open draft',
+        actReturn: 'Send back to writer',
+        actDone: 'Mark as updated',
+        checksTitle: 'Open checks',
+        changeTitle: 'Closing date moved from 31 March to 28 April',
+        changeMeta: 'Owner: Maya Chen · Confirmed at 14:12 · Needed before Thursday’s announcement',
+        progressOf: ' of 5 items resolved',
+        closeLabel: 'Close this change',
+        closedLabel: 'Change closed',
+        closedNote: 'Closed by Maya Chen. The record keeps the source, label, timestamps and each decision.',
+        linesUpdated: ' of 2 lines updated',
+        waiting: ' question waiting',
+        unconfirmedBy: 'Unconfirmed · Owner: Maya Chen · '
+      },
+      zh: {
+        app: '变更协调助手',
+        proto: '原型 · 模拟数据',
+        sync: '最近一次成功同步 14:20',
+        restart: '重新演示',
+        navLabel: '原型页面',
+        tabUpdates: '1  更新',
+        tabDrafts: '2  稿件',
+        tabTracker: '3  完成情况',
+        viewing: '当前身份',
+        maya: 'Maya Chen，政策负责人',
+        ana: 'Ana Silva，FAQ 撰稿人',
+        tom: 'Tom Reid，新闻官',
+        mayaName: 'Maya Chen',
+        anaName: 'Ana Silva',
+        tomName: 'Tom Reid',
+        updatesTitle: '新更新',
+        topic: '社区修缮补助',
+        needLabel: '等待你标注',
+        sourceTitle: '原始来源',
+        foundTitle: '助手发现的内容',
+        appliesTo: '可能影响',
+        labelTitle: '标签',
+        confirm: '确认标签',
+        nothingSent: '你确认之前，不会提醒任何人。',
+        ownerNote: '你是此主题的指定负责人，可以确认红色。其他员工只能提议。',
+        ownerNoteNoRed: '红色要求来源中有已确认的决定。这条消息说明目前尚未达成一致。',
+        levelRed: '红色：需要处理',
+        levelYellow: '黄色：使用前先核实',
+        levelGreen: '绿色：无需修改',
+        descRed: '已确认的变更必须反映到相关内容中。',
+        descYellow: '可能相关，但属于暂定、建议性内容，或需要进一步澄清。',
+        descGreen: '目前不需要修改相关稿件。',
+        doneRed: 'Maya Chen 已于 14:12 确认。现已开始追踪 5 个受影响项目。',
+        doneYellow: 'Maya Chen 已于 14:13 标注。相关稿件会显示核实提示，并标记为未确认。',
+        doneGreen: '已保留为背景信息，未发送提醒。',
+        autoGreen: '这条消息没有涉及进行中稿件的主题，所以助手把它归为背景信息。绿色表示目前无需修改，不代表内容已核实无误。',
+        openFaq: '打开 FAQ 稿件',
+        draftsTitle: '稿件',
+        alertsTitle: '此稿件的提醒',
+        line: '标记',
+        accept: '接受修改',
+        reject: '拒绝',
+        ask: '询问 Maya',
+        keep: '暂时保留原文',
+        viewSource: '查看来源',
+        undo: '撤销',
+        noAlerts: '此稿件暂无提醒。这不代表稿件已经核实。',
+        backToUpdates: '前往“更新”',
+        acceptedBy: '更新人：',
+        rejectedText: '已拒绝，已转交 Maya 审核。',
+        askedText: '问题已发送给 Maya，内容仍未确认。',
+        keptText: '已暂时保留，内容仍未确认。',
+        nextPress: '此稿件的红色提醒已全部处理。',
+        openPress: '打开新闻稿',
+        nextTracker: '两份稿件的红色提醒已全部处理。',
+        openTracker: '查看完成情况',
+        emptyTitle: '暂无已确认的变更',
+        emptyBody: '负责人确认红色标签后，这里才开始追踪。',
+        affectedTitle: '受影响项目',
+        colItem: '项目',
+        colStage: '阶段',
+        colPerson: '负责人',
+        colStatus: '状态',
+        colAction: '操作',
+        stNot: '未更新',
+        stNotified: '已通知负责人',
+        stReview: '被拒绝的内容需要审核',
+        stDone: '已更新',
+        actOpen: '打开稿件',
+        actReturn: '退回给撰稿人',
+        actDone: '标记为已更新',
+        checksTitle: '待核实事项',
+        changeTitle: '截止日期从 3 月 31 日改为 4 月 28 日',
+        changeMeta: '负责人：Maya Chen · 14:12 确认 · 需在周四公告前完成',
+        progressOf: ' / 5 个项目已处理',
+        closeLabel: '关闭此变更',
+        closedLabel: '变更已关闭',
+        closedNote: 'Maya Chen 已关闭此变更。记录中保留来源、标签、时间戳和每项决定。',
+        linesUpdated: ' / 2 处内容已更新',
+        waiting: ' 个问题等待回复',
+        unconfirmedBy: '未确认 · 负责人：Maya Chen · '
+      }
+    }[this.state.lang];
+  }
+
+  content() {
+    return {
+      en: {
+        updates: {
+          u1: {
+            title: 'Closing date decision',
+            meta: 'Email · Today 14:05',
+            sourceMeta: 'Email from Daniel Ford to Maya Chen · Today 14:05',
+            subject: 'Community Repair Grant: closing date',
+            body: 'Maya, the programme board agreed this morning that the closing date moves from 31 March to 28 April. Please make sure all public lines reflect this before Thursday’s announcement.',
+            found: 'This message states a confirmed decision. It replaces a date used across current content.',
+            oldValue: '31 March',
+            newValue: '28 April',
+            items: ['FAQ draft', 'Press notice', 'Social post', 'Grant web page', 'Stakeholder briefing']
+          },
+          u2: {
+            title: 'Possible eligibility change',
+            meta: 'Chat · Today 11:40',
+            sourceMeta: 'Chat message from Priya Nair · Today 11:40',
+            subject: 'Eligibility for charities',
+            body: 'Heads up: we are discussing whether community charities can apply too. Nothing is agreed yet, and we may know more next week.',
+            found: 'This message may affect who can apply, but it describes a discussion and not a decision.',
+            items: ['FAQ draft', 'Press notice']
+          },
+          u3: {
+            title: 'Press rota for next week',
+            meta: 'Email · Today 09:15',
+            sourceMeta: 'Email from the press office · Today 09:15',
+            subject: 'Rota update',
+            body: 'The press rota for next week is attached. Please tell us about any clashes by Friday.',
+            found: 'This message does not mention the grant or any live draft.'
+          }
+        },
+        check: { u1: 'Closing date may change', u2: 'Who can apply may change' },
+        lines: {
+          f1: { old: 'Applications close at 23:59 on 31 March.', new: 'Applications close at 23:59 on 28 April.', title: 'Closing date changed', reason: 'This line uses the old date.' },
+          f2: { old: 'Yes. You have less than a month left to apply.', new: 'Yes. You have until 28 April to apply.', title: 'Closing date changed', reason: 'Indirect wording. The date is not named, but this line depends on it. Read it closely.' },
+          p1: { old: 'Applications close at the end of March.', new: 'Applications close on 28 April.', title: 'Closing date changed', reason: 'This line refers to the old date in general terms.' },
+          e1: { old: 'Registered community groups with a local address can apply.', title: 'Who can apply may change', reason: 'Community charities may be added. Check with Maya before changing this line.' },
+          e2: { old: 'Registered community groups can apply for up to £20,000 to repair shared local buildings.', title: 'Who can apply may change', reason: 'Community charities may be added. Check with Maya before changing this line.' }
+        },
+        src: {
+          u1: 'Email from Daniel Ford · Today 14:05',
+          u2: 'Chat message from Priya Nair · Today 11:40',
+          conf_u1: 'Label confirmed by Maya Chen · 14:12',
+          conf_u2: 'Labelled by Maya Chen · 14:13 · Unconfirmed'
+        },
+        docs: {
+          faq: {
+            tab: 'FAQ draft',
+            stage: 'Draft · Ana Silva',
+            title: 'Community Repair Grant: frequently asked questions',
+            blocks: [
+              { q: 'Who can apply?', segs: [{ line: 'e1' }] },
+              { q: 'How much can we apply for?', segs: [{ text: 'You can apply for up to £20,000 per project.' }] },
+              { q: 'When is the closing date?', segs: [{ line: 'f1' }] },
+              { q: 'Is there still time to apply?', segs: [{ line: 'f2' }] }
+            ]
+          },
+          press: {
+            tab: 'Press notice',
+            stage: 'In clearance · Tom Reid',
+            title: 'Grant opens for community repairs',
+            blocks: [
+              { segs: [{ line: 'e2' }] },
+              { segs: [{ text: 'The grant will help groups keep halls, meeting rooms and shared spaces open. ' }, { line: 'p1' }] }
+            ]
+          }
+        },
+        rows: {
+          faq: { name: 'FAQ draft', stage: 'Draft', person: 'Ana Silva' },
+          press: { name: 'Press notice', stage: 'In clearance', person: 'Tom Reid', note: 'Clearance has started, so the reviewer also needs to see the update.' },
+          social: { name: 'Social post', stage: 'Scheduled, Thu 09:00', person: 'Lee Park', note: 'Scheduled copy still says 31 March.', act: 'Notify Lee' },
+          web: { name: 'Grant web page', stage: 'Published', person: 'Digital team', note: 'The live page still shows the old date.', act: 'Notify digital team' },
+          brief: { name: 'Stakeholder briefing', stage: 'Draft, restricted', person: 'Sam Okafor', note: 'Sam cannot open the source. He is told only that something changed and to contact Maya.', act: 'Share change with Sam' }
+        }
+      },
+      zh: {
+        updates: {
+          u1: {
+            title: '截止日期决定',
+            meta: '邮件 · 今天 14:05',
+            sourceMeta: 'Daniel Ford 发给 Maya Chen 的邮件 · 今天 14:05',
+            subject: '社区修缮补助：截止日期',
+            body: 'Maya，项目委员会今天上午已同意把截止日期从 3 月 31 日改为 4 月 28 日。请确保所有对外口径在周四公告前完成更新。',
+            found: '这条消息说明了一项已确认的决定，并替换了当前内容中使用的日期。',
+            oldValue: '3 月 31 日',
+            newValue: '4 月 28 日',
+            items: ['FAQ 稿件', '新闻稿', '社交媒体帖子', '补助网页', '利益相关方简报']
+          },
+          u2: {
+            title: '申请资格可能变更',
+            meta: '聊天消息 · 今天 11:40',
+            sourceMeta: 'Priya Nair 发送的聊天消息 · 今天 11:40',
+            subject: '慈善机构的申请资格',
+            body: '提前说一声：我们正在讨论社区慈善机构是否也可以申请。目前还没有达成一致，下周可能会有更多消息。',
+            found: '这条消息可能影响申请资格，但它描述的是讨论，不是决定。',
+            items: ['FAQ 稿件', '新闻稿']
+          },
+          u3: {
+            title: '下周新闻值班表',
+            meta: '邮件 · 今天 09:15',
+            sourceMeta: '新闻办公室发送的邮件 · 今天 09:15',
+            subject: '值班表更新',
+            body: '附件是下周的新闻值班表。如有时间冲突，请在周五前告诉我们。',
+            found: '这条消息没有提到这项补助，也没有提到任何进行中的稿件。'
+          }
+        },
+        check: { u1: '截止日期可能变更', u2: '申请资格可能变更' },
+        lines: {
+          f1: { old: '申请截止时间为 3 月 31 日 23:59。', new: '申请截止时间为 4 月 28 日 23:59。', title: '截止日期已变更', reason: '这句话使用了旧日期。' },
+          f2: { old: '来得及。距离申请截止已不足一个月。', new: '来得及。你可以在 4 月 28 日前申请。', title: '截止日期已变更', reason: '间接表述。这句话没有写出日期，但内容依赖旧日期，请仔细阅读。' },
+          p1: { old: '申请将于 3 月底截止。', new: '申请将于 4 月 28 日截止。', title: '截止日期已变更', reason: '这句话用笼统的说法提到了旧日期。' },
+          e1: { old: '拥有本地地址的注册社区团体可以申请。', title: '申请资格可能变更', reason: '社区慈善机构可能被纳入。修改这句话之前，请先向 Maya 核实。' },
+          e2: { old: '注册社区团体可申请最高 20,000 英镑，用于修缮本地共用建筑。', title: '申请资格可能变更', reason: '社区慈善机构可能被纳入。修改这句话之前，请先向 Maya 核实。' }
+        },
+        src: {
+          u1: 'Daniel Ford 发送的邮件 · 今天 14:05',
+          u2: 'Priya Nair 发送的聊天消息 · 今天 11:40',
+          conf_u1: '标签由 Maya Chen 确认 · 14:12',
+          conf_u2: '由 Maya Chen 标注 · 14:13 · 未确认'
+        },
+        docs: {
+          faq: {
+            tab: 'FAQ 稿件',
+            stage: '草稿 · Ana Silva',
+            title: '社区修缮补助：常见问题',
+            blocks: [
+              { q: '谁可以申请？', segs: [{ line: 'e1' }] },
+              { q: '我们可以申请多少？', segs: [{ text: '每个项目最高可申请 20,000 英镑。' }] },
+              { q: '截止日期是什么时候？', segs: [{ line: 'f1' }] },
+              { q: '现在申请还来得及吗？', segs: [{ line: 'f2' }] }
+            ]
+          },
+          press: {
+            tab: '新闻稿',
+            stage: '审批中 · Tom Reid',
+            title: '补助开放，支持社区修缮',
+            blocks: [
+              { segs: [{ line: 'e2' }] },
+              { segs: [{ text: '这项补助将帮助社区团体维持礼堂、会议室和共用空间的开放。' }, { line: 'p1' }] }
+            ]
+          }
+        },
+        rows: {
+          faq: { name: 'FAQ 稿件', stage: '草稿', person: 'Ana Silva' },
+          press: { name: '新闻稿', stage: '审批中', person: 'Tom Reid', note: '审批已经开始，审批人也需要看到这次更新。' },
+          social: { name: '社交媒体帖子', stage: '已排期，周四 09:00', person: 'Lee Park', note: '排期内容仍写着 3 月 31 日。', act: '通知 Lee' },
+          web: { name: '补助网页', stage: '已发布', person: '数字团队', note: '线上页面仍显示旧日期。', act: '通知数字团队' },
+          brief: { name: '利益相关方简报', stage: '草稿，受限', person: 'Sam Okafor', note: 'Sam 无权打开来源。他只会收到“有变更，请联系 Maya”的通知。', act: '向 Sam 共享变更' }
+        }
+      }
+    }[this.state.lang];
+  }
+
+  pill(level, t) {
+    const icons = {
+      red: 'M8.5 3h7L21 8.5v7L15.5 21h-7L3 15.5v-7L8.5 3z M12 8v5 M12 16.5v.01',
+      yellow: 'M12 3.5 22 20.5H2L12 3.5z M12 10v4.5 M12 17.5v.01',
+      green: 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z M8 12.2l2.7 2.7L16 9.6',
+      pending: 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z M12 7v5l3 2'
+    };
+    const tone = {
+      red: 'background: #FCEBE9; color: #A1231B; border: 1px solid #E7B3AE',
+      yellow: 'background: #FFF3D6; color: #7A4E00; border: 1px solid #E6C878',
+      green: 'background: #E6F4EC; color: #1C6B45; border: 1px solid #A9D4BC',
+      pending: 'background: #EEF1F4; color: #3C4752; border: 1px solid #CDD5DC'
+    };
+    const text = { red: t.levelRed, yellow: t.levelYellow, green: t.levelGreen, pending: t.needLabel };
+    return {
+      icon: icons[level],
+      text: text[level],
+      style: 'display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 6px; font-size: 13px; font-weight: 500; align-self: flex-start; ' + tone[level]
+    };
+  }
+
+  lineOwner(id) { return id === 'e1' || id === 'e2' ? 'u2' : 'u1'; }
+
+  activeLevel(id) {
+    const level = this.state.saved[this.lineOwner(id)];
+    return level === 'red' || level === 'yellow' ? level : null;
+  }
+
+  docLines() { return { faq: ['e1', 'f1', 'f2'], press: ['e2', 'p1'] }; }
+
+  countOpen(doc) {
+    return this.docLines()[doc].filter((id) => this.activeLevel(id) && this.state.lines[id] === 'open').length;
+  }
+
+  redOpen(doc) {
+    return this.docLines()[doc].filter((id) => this.activeLevel(id) === 'red' && this.state.lines[id] === 'open').length;
+  }
+
+  setLine(id, value) {
+    this.setState({ lines: Object.assign({}, this.state.lines, { [id]: value }) });
+  }
+
+  rowState(key) {
+    const lines = this.state.lines;
+    if (key === 'faq') {
+      if (lines.f1 === 'rejected' || lines.f2 === 'rejected') return 'review';
+      const count = ['f1', 'f2'].filter((id) => lines[id] === 'accepted').length;
+      return count === 2 ? 'done' : count === 1 ? 'partial' : 'open';
+    }
+    if (key === 'press') {
+      return lines.p1 === 'rejected' ? 'review' : lines.p1 === 'accepted' ? 'done' : 'open';
+    }
+    return this.state.manual[key];
+  }
+
+  renderVals() {
+    const s = this.state;
+    const t = this.copy();
+    const c = this.content();
+    const ownerRed = s.saved.u1 === 'red';
+
+    const langBtn = (on) => 'min-height: 36px; min-width: 44px; padding: 0 10px; border: 0; font-size: 13px; font-weight: 500; background: ' + (on ? '#FFFFFF' : 'transparent') + '; color: ' + (on ? '#16202A' : '#FFFFFF');
+
+    const unsaved = ['u1', 'u2'].filter((id) => !s.saved[id]).length;
+    const openAlerts = this.countOpen('faq') + this.countOpen('press');
+    const rowKeys = ['faq', 'press', 'social', 'web', 'brief'];
+    const resolved = rowKeys.filter((k) => this.rowState(k) === 'done').length;
+    const unresolved = ownerRed && !s.closed ? 5 - resolved : 0;
+
+    const tabDef = [
+      { id: 'updates', label: t.tabUpdates, badge: unsaved },
+      { id: 'drafts', label: t.tabDrafts, badge: openAlerts },
+      { id: 'tracker', label: t.tabTracker, badge: unresolved }
+    ];
+    const tabs = tabDef.map((tab) => {
+      const on = s.tab === tab.id;
+      return {
+        label: tab.label,
+        badge: tab.badge,
+        showBadge: tab.badge > 0,
+        current: on ? 'page' : 'false',
+        go: () => this.setState({ tab: tab.id }),
+        style: 'min-height: 48px; padding: 0 14px; background: transparent; border: 0; border-bottom: 3px solid ' + (on ? '#1F4E8C' : 'transparent') + '; color: #16202A; font-weight: ' + (on ? '600' : '500') + '; display: inline-flex; align-items: center; gap: 8px; white-space: pre'
+      };
+    });
+
+    const persona = s.tab === 'drafts' ? (s.doc === 'faq' ? t.ana : t.tom) : t.maya;
+    const writerName = s.doc === 'faq' ? t.anaName : t.tomName;
+
+    /* Updates */
+    const levelOf = (id) => (id === 'u3' ? 'green' : s.saved[id] || 'pending');
+    const updateList = ['u1', 'u2', 'u3'].map((id) => {
+      const on = s.sel === id;
+      return {
+        title: c.updates[id].title,
+        meta: c.updates[id].meta,
+        pill: this.pill(levelOf(id), t),
+        pressed: on ? 'true' : 'false',
+        select: () => this.setState({ sel: id }),
+        style: 'width: 100%; text-align: left; padding: 14px 16px; background: #FFFFFF; color: #16202A; border-radius: 8px; display: flex; flex-direction: column; gap: 6px; border: ' + (on ? '2px solid #1F4E8C; padding: 13px 15px' : '1px solid #D8DEE4')
+      };
+    });
+
+    const u = c.updates[s.sel];
+    const isAuto = s.sel === 'u3';
+    const savedLevel = isAuto ? 'green' : s.saved[s.sel];
+    const cur = {
+      meta: u.sourceMeta,
+      subject: u.subject,
+      body: u.body,
+      found: u.found,
+      hasDiff: !!u.oldValue,
+      oldValue: u.oldValue,
+      newValue: u.newValue,
+      hasItems: !!u.items,
+      items: u.items || [],
+      isOpen: !savedLevel,
+      isDone: !!savedLevel,
+      ownerNote: s.sel === 'u2' ? t.ownerNoteNoRed : t.ownerNote,
+      pill: savedLevel ? this.pill(savedLevel, t) : this.pill('pending', t),
+      doneText: isAuto ? t.autoGreen : savedLevel === 'red' ? t.doneRed : savedLevel === 'yellow' ? t.doneYellow : t.doneGreen,
+      showNext: !isAuto && (savedLevel === 'red' || savedLevel === 'yellow'),
+      nextLabel: t.openFaq,
+      next: () => this.setState({ tab: 'drafts', doc: 'faq' })
+    };
+
+    const levels = ['red', 'yellow', 'green'];
+    const descs = { red: t.descRed, yellow: t.descYellow, green: t.descGreen };
+    const options = levels.map((level) => {
+      const on = s.pick[s.sel] === level;
+      const disabled = s.sel === 'u2' && level === 'red';
+      return {
+        pill: this.pill(level, t),
+        desc: descs[level],
+        pressed: on ? 'true' : 'false',
+        disabled: disabled,
+        pick: () => this.setState({ pick: Object.assign({}, s.pick, { [s.sel]: level }) }),
+        style: 'text-align: left; padding: 12px; border-radius: 8px; display: flex; flex-direction: column; gap: 8px; background: ' + (on ? '#EEF3FA' : '#FFFFFF') + '; opacity: ' + (disabled ? '0.55' : '1') + '; border: ' + (on ? '2px solid #1F4E8C; padding: 11px' : '1px solid #D8DEE4')
+      };
+    });
+
+    /* Drafts */
+    const docTabs = ['faq', 'press'].map((id) => {
+      const on = s.doc === id;
+      return {
+        label: c.docs[id].tab,
+        pressed: on ? 'true' : 'false',
+        go: () => this.setState({ doc: id }),
+        style: 'min-height: 44px; padding: 0 16px; border-radius: 6px; font-weight: 500; background: ' + (on ? '#16202A' : '#FFFFFF') + '; color: ' + (on ? '#FFFFFF' : '#16202A') + '; border: 1px solid ' + (on ? '#16202A' : '#8895A2')
+      };
+    });
+
+    const numbers = {};
+    this.docLines()[s.doc].forEach((id) => {
+      if (this.activeLevel(id)) numbers[id] = Object.keys(numbers).length + 1;
+    });
+
+    const markStyle = (level, state) => {
+      const base = 'color: inherit; text-decoration: none; padding: 1px 2px; border-radius: 3px; -webkit-box-decoration-break: clone; box-decoration-break: clone; ';
+      if (state === 'accepted') return base + 'background: #E6F4EC; border-bottom: 2px solid #1C6B45';
+      if (level === 'red') return base + 'background: #FCEBE9; border-bottom: 2px solid #A1231B';
+      return base + 'background: #FFF3D6; border-bottom: 2px dashed #7A4E00';
+    };
+
+    const docSrc = c.docs[s.doc];
+    const doc = {
+      stage: docSrc.stage,
+      title: docSrc.title,
+      blocks: docSrc.blocks.map((b) => ({
+        hasQ: !!b.q,
+        q: b.q,
+        segs: b.segs.map((seg) => {
+          if (!seg.line) return { isMark: false, isPlain: true, text: seg.text, style: '' };
+          const line = c.lines[seg.line];
+          const level = this.activeLevel(seg.line);
+          const state = s.lines[seg.line];
+          const text = state === 'accepted' ? line.new : line.old;
+          if (!level) return { isMark: false, isPlain: true, text: text, style: '' };
+          return {
+            isMark: true,
+            isPlain: false,
+            text: text,
+            num: numbers[seg.line],
+            href: '#alert-' + seg.line,
+            style: markStyle(level, state),
+            tagStyle: 'font-family: \'IBM Plex Sans\', \'Noto Sans SC\', sans-serif; font-size: 11px; font-weight: 600; margin-left: 3px; line-height: 0'
+          };
+        })
+      }))
+    };
+
+    const rank = (id) => (this.activeLevel(id) === 'red' ? 0 : 1);
+    const alertIds = this.docLines()[s.doc].filter((id) => this.activeLevel(id)).sort((a, b) => rank(a) - rank(b));
+    const alerts = alertIds.map((id) => {
+      const level = this.activeLevel(id);
+      const owner = this.lineOwner(id);
+      const line = c.lines[id];
+      const state = s.lines[id];
+      const isOpen = state === 'open';
+      const doneText = state === 'accepted' ? t.acceptedBy + writerName
+        : state === 'rejected' ? t.rejectedText
+        : state === 'asked' ? t.askedText
+        : t.keptText;
+      return {
+        domId: 'alert-' + id,
+        num: numbers[id],
+        pill: this.pill(level, t),
+        title: line.title,
+        reason: line.reason,
+        hasSuggestion: level === 'red' && isOpen,
+        oldText: line.old,
+        newText: line.new,
+        source: c.src[owner],
+        confirmedBy: c.src['conf_' + owner],
+        isOpen: isOpen,
+        isClosed: !isOpen,
+        canUndo: !s.closed,
+        canFix: level === 'red',
+        canAsk: level === 'yellow',
+        doneText: doneText,
+        accept: () => this.setLine(id, 'accepted'),
+        reject: () => this.setLine(id, 'rejected'),
+        ask: () => this.setLine(id, 'asked'),
+        keep: () => this.setLine(id, 'kept'),
+        undo: () => this.setLine(id, 'open'),
+        viewSource: () => this.setState({ tab: 'updates', sel: owner }),
+        style: 'background: #FFFFFF; border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; scroll-margin-top: 16px; border: 1px solid ' + (isOpen && level === 'red' ? '#E7B3AE' : isOpen ? '#E6C878' : '#D8DEE4')
+      };
+    });
+
+    const redHandledHere = ownerRed && this.redOpen(s.doc) === 0;
+    const otherDoc = s.doc === 'faq' ? 'press' : 'faq';
+    const bothHandled = redHandledHere && this.redOpen(otherDoc) === 0;
+
+    /* Completion */
+    const statusStyle = (state) => {
+      const tone = {
+        done: 'background: #E6F4EC; color: #1C6B45',
+        review: 'background: #FCEBE9; color: #A1231B',
+        notified: 'background: #EEF3FA; color: #1F4E8C',
+        partial: 'background: #EEF3FA; color: #1F4E8C',
+        open: 'background: #EEF1F4; color: #3C4752'
+      };
+      return 'display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 13px; font-weight: 500; ' + tone[state];
+    };
+
+    const rows = rowKeys.map((key) => {
+      const row = c.rows[key];
+      const state = this.rowState(key);
+      const isDraftRow = key === 'faq' || key === 'press';
+      const accepted = ['f1', 'f2'].filter((id) => s.lines[id] === 'accepted').length;
+      const status = state === 'done' ? t.stDone
+        : state === 'review' ? t.stReview
+        : state === 'notified' ? t.stNotified
+        : state === 'partial' ? accepted + t.linesUpdated
+        : t.stNot;
+      let actLabel = '';
+      let act = null;
+      if (!s.closed) {
+        if (isDraftRow && state === 'review') {
+          actLabel = t.actReturn;
+          const ids = key === 'faq' ? ['f1', 'f2'] : ['p1'];
+          act = () => {
+            const next = Object.assign({}, s.lines);
+            ids.forEach((id) => { if (next[id] === 'rejected') next[id] = 'open'; });
+            this.setState({ lines: next });
+          };
+        } else if (isDraftRow && state !== 'done') {
+          actLabel = t.actOpen;
+          act = () => this.setState({ tab: 'drafts', doc: key });
+        } else if (!isDraftRow && state === 'open') {
+          actLabel = row.act;
+          act = () => this.setState({ manual: Object.assign({}, s.manual, { [key]: 'notified' }) });
+        } else if (!isDraftRow && state === 'notified') {
+          actLabel = t.actDone;
+          act = () => this.setState({ manual: Object.assign({}, s.manual, { [key]: 'done' }) });
+        }
+      }
+      return {
+        name: row.name,
+        note: row.note || '',
+        stage: row.stage,
+        person: row.person,
+        status: status,
+        statusStyle: statusStyle(state),
+        hasAction: !!act,
+        actLabel: actLabel,
+        act: act
+      };
+    });
+
+    const canClose = resolved === 5 && !s.closed;
+    const change = {
+      pill: this.pill(s.closed ? 'green' : 'red', t),
+      title: t.changeTitle,
+      meta: t.changeMeta,
+      progress: resolved + t.progressOf,
+      bar: rowKeys.map((k, i) => ({
+        style: 'height: 8px; border-radius: 2px; background: ' + (i < resolved ? '#1C6B45' : '#D8DEE4')
+      })),
+      closeDisabled: !canClose,
+      closeLabel: s.closed ? t.closedLabel : t.closeLabel,
+      isClosed: s.closed,
+      closeStyle: 'min-height: 44px; padding: 0 16px; border: 0; border-radius: 6px; font-weight: 600; background: ' + (canClose ? '#1F4E8C' : '#E2E7EC') + '; color: ' + (canClose ? '#FFFFFF' : '#55616D')
+    };
+    if (s.closed) change.pill = Object.assign({}, change.pill, { text: t.closedLabel });
+
+    const checks = ['u1', 'u2'].filter((id) => s.saved[id] === 'yellow').map((id) => {
+      const ids = id === 'u1' ? ['f1', 'f2', 'p1'] : ['e1', 'e2'];
+      const waiting = ids.filter((line) => s.lines[line] === 'asked').length;
+      return {
+        pill: this.pill('yellow', t),
+        title: c.check[id],
+        meta: t.unconfirmedBy + waiting + t.waiting
+      };
+    });
+
+    return {
+      t: t,
+      langCode: s.lang === 'zh' ? 'zh-Hans' : 'en',
+      setEn: () => this.setState({ lang: 'en' }),
+      setZh: () => this.setState({ lang: 'zh' }),
+      enPressed: s.lang === 'en' ? 'true' : 'false',
+      zhPressed: s.lang === 'zh' ? 'true' : 'false',
+      enStyle: langBtn(s.lang === 'en'),
+      zhStyle: langBtn(s.lang === 'zh'),
+      restart: () => this.setState(this.fresh()),
+      tabs: tabs,
+      persona: persona,
+      isUpdates: s.tab === 'updates',
+      isDrafts: s.tab === 'drafts',
+      isTracker: s.tab === 'tracker',
+      updateList: updateList,
+      cur: cur,
+      options: options,
+      confirmLabel: () => this.setState({ saved: Object.assign({}, s.saved, { [s.sel]: s.pick[s.sel] }) }),
+      docTabs: docTabs,
+      doc: doc,
+      alerts: alerts,
+      noAlerts: alerts.length === 0,
+      needsOwner: alerts.length === 0 && unsaved > 0,
+      goUpdates: () => this.setState({ tab: 'updates' }),
+      showDraftNext: redHandledHere,
+      draftNextText: bothHandled ? t.nextTracker : t.nextPress,
+      draftNextLabel: bothHandled ? t.openTracker : (s.doc === 'faq' ? t.openPress : t.openFaq),
+      draftNext: () => (bothHandled ? this.setState({ tab: 'tracker' }) : this.setState({ doc: otherDoc })),
+      trackerActive: ownerRed,
+      trackerEmpty: !ownerRed,
+      change: change,
+      rows: rows,
+      closeChange: () => { if (canClose) this.setState({ closed: true }); },
+      hasChecks: checks.length > 0,
+      checks: checks
+    };
+  }
+}
+</script>
+</body>
+</html>
