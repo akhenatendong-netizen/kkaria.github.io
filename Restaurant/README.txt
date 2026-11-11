@@ -1,12 +1,15 @@
-CrazyBee · App 体验版
+CrazyBee — Original App UI revision
 
-预览：直接双击根目录 index.html，用现代浏览器打开。
-GitHub Pages：将 index.html 与 .nojekyll 上传到发布目录，选择该目录发布。不要将 source/index.html 当成成品页面。
+完整解压后打开 index.html；请将 demos 和 assets 保留在同一目录。GitHub Pages 上传 index.html、assets、demos 和 .nojekyll。source 为完整可编辑源码。
 
-source 文件夹：React + TypeScript + Three.js + Vite 源码。
-开发：npm ci，然后 npm run dev。
-重新生成单文件：npm run build:portable。
+App 原版素材取自用户提供的 Figma 文件 aHCc8gyl0YlcGNpDsm7iSm：
+主页 1531:25234；搜索建议 1492:23032；搜索结果 1492:20957；Discover Restaurant 1539:26538；Coupon 1531:26122；餐厅详情 1813:28455；订单确认 1903:15216；Special Events 809:3437；Boba 670:34472；签到 675:17721。
 
-本版：正面手机与红色光环首页；发现、确认订单、校园配送、活动分别展示对应页面；保留 3D 餐厅与活动实拍。
-App 页面是设计演示，非实时交易系统。下载地址仍待补充。
-之前的 A 与餐厅首页版本未覆盖。
+独立手机 HTML：
+home.html / search.html / results.html / discover.html / restaurant.html / offer.html / checkout.html / events.html / event.html / delivery.html，均位于 demos 文件夹。搜索输入支持键盘输入与回车，手机上使用系统键盘；Restaurant / Coupon 标签可切换。
+
+还原了紫色礼盒活动主视觉、红色活动海报、活动卡片、签到二维码和原设计的餐厅/菜品素材。原设计中的历史日期与占位内容仅供演示。付款、核销不会产生实际交易。
+
+10 家餐厅 Logo 为单排无缝循环播放，鼠标悬停或键盘聚焦暂停；减弱动态效果偏好下可手动横向浏览。
+
+源码：npm install；npm run dev；npm run build（含重新生成手机 HTML）。

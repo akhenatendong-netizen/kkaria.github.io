@@ -1,0 +1,16 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="172" height="150" viewBox="0 0 172 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Rectangle 1223" filter="url(#filter0_d_0_62)">
+<path d="M12 33.8925C12 21.8016 21.8016 12 33.8925 12H130.107C142.198 12 152 21.8016 152 33.8925V108.107C152 120.198 142.198 130 130.107 130H33.8925C21.8016 130 12 120.198 12 108.107V33.8925Z" fill="white"/>
+</g>
+<defs>
+<filter id="filter0_d_0_62" x="0" y="0" width="172" height="150" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dx="4" dy="4"/>
+<feGaussianBlur stdDeviation="8"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.588235 0 0 0 0 0.588235 0 0 0 0 0.603922 0 0 0 0.15 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_62"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_62" result="shape"/>
+</filter>
+</defs>
+</svg>
