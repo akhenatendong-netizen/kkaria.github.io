@@ -4,7 +4,7 @@ import {resolve,dirname,extname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 const root=dirname(fileURLToPath(import.meta.url));
 const out=resolve(root,process.argv[2]||'../index.html');
-const result=await build({entryPoints:[resolve(root,'src/main.tsx')],absWorkingDir:root,bundle:true,write:false,outfile:'portable.js',format:'iife',platform:'browser',target:'es2022',minify:true,jsx:'automatic',define:{'process.env.NODE_ENV':'"production"'},external:['/assets/*'],legalComments:'inline'});
+const result=await build({entryPoints:[resolve(root,'src/main.tsx')],absWorkingDir:root,bundle:true,write:false,outfile:'portable.js',format:'iife',platform:'browser',target:'es2022',minify:true,jsx:'automatic',define:{'process.env.NODE_ENV':'"production"'},external:['/assets/*'],legalComments:'inline',loader:{'.png':'dataurl'}});
 const mime={'.png':'image/png','.jpg':'image/jpeg','.svg':'image/svg+xml','.ttf':'font/ttf'};
 async function inlineAssets(text){
  const paths=[...new Set(text.match(/\/assets\/[a-zA-Z0-9_.-]+/g)||[])];

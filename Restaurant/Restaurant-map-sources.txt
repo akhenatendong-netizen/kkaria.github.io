@@ -1,0 +1,11 @@
+Restaurant map: eight locations; QJ Kitchen and Yangguofu excluded.
+Coordinates geocoded from street addresses with the US Census Geocoder on 2026-11-11.
+Sharetea: https://www.1992sharetea.com/berkeley-california
+Curry Pizza House: https://currypizzahouse.com/locations/berkeley/
+Chengdu Style: https://www.chengdustylerestaurant.com/order/
+Katsumi Sushi: https://www.telegraphberkeley.org/telegraph_business/katsami-sushi/
+Nash Cafe: https://www.downtownberkeley.com/bizdirectory/nash-cafe/
+Bears Ramen House: https://www.visitberkeley.com/directory/bears-ramen-house/
+Wojia (Albany): https://www.law.berkeley.edu/about-us/visit/steve-sugarman-dining-guide-alphabetical-list/
+Ben Ben: https://www.benbenhotpotberkeley.com/contact
+Map tiles: OpenStreetMap contributors, https://www.openstreetmap.org/copyright. Internet connection required for basemap.
