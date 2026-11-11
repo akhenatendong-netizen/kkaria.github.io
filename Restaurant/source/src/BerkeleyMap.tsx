@@ -15,12 +15,11 @@ const places=[
 export function BerkeleyMap(){
  const host=useRef<HTMLDivElement>(null),map=useRef<L.Map|null>(null),markers=useRef<L.Marker[]>([]);const [selected,setSelected]=useState<number|null>(null);
  const bounds=L.latLngBounds(places.map(p=>[p.lat,p.lng] as L.LatLngTuple));
- useEffect(()=>{if(!host.current)return;const m=L.map(host.current,{scrollWheelZoom:false,zoomControl:false,attributionControl:true}).fitBounds(bounds,{padding:[35,35]});map.current=m;
+ const campusBounds=L.latLngBounds([0,1,2,3,5].map(i=>[places[i].lat,places[i].lng] as L.LatLngTuple));
+ useEffect(()=>{if(!host.current)return;const m=L.map(host.current,{scrollWheelZoom:false,zoomControl:false,attributionControl:true}).fitBounds(campusBounds,{padding:[55,55],maxZoom:18});map.current=m;
  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(m);
  L.control.zoom({position:'topright'}).addTo(m);
- markers.current=places.map((p,i)=>{const pin=L.marker([p.lat,p.lng],{icon:L.divIcon({className:'bee-map-pin',html:`<span>${i+1}</span>`,iconSize:[28,28],iconAnchor:i===3?[0,36]:i===5?[29,-2]:[14,28]}),title:p.name,keyboard:true}).on('click',()=>setSelected(i));pin.bindPopup(`<strong>${p.name}</strong><br>${p.address}`);return pin});
- const campus=[0,1,2,3,5];const cluster=L.marker([37.8681,-122.2585],{icon:L.divIcon({className:'bee-map-cluster',html:'<span>5</span><b>Near campus</b>',iconSize:[105,36],iconAnchor:[18,18]}),title:'Explore five restaurants near UC Berkeley'}).on('click',()=>m.fitBounds(L.latLngBounds(campus.map(i=>[places[i].lat,places[i].lng] as L.LatLngTuple)),{padding:[55,55],maxZoom:18}));
- const update=()=>{const grouped=m.getZoom()<16;markers.current.forEach((pin,i)=>{if(grouped&&campus.includes(i)){m.removeLayer(pin)}else if(!m.hasLayer(pin)){pin.addTo(m)}});if(grouped)cluster.addTo(m);else m.removeLayer(cluster)};m.on('zoomend',update);update();
+ markers.current=places.map((p,i)=>{const pin=L.marker([p.lat,p.lng],{icon:L.divIcon({className:'bee-map-pin',html:`<span>${i+1}</span>`,iconSize:[28,28],iconAnchor:i===3?[0,36]:i===5?[29,-2]:[14,28]}),title:p.name,keyboard:true}).on('click',()=>setSelected(i));pin.bindPopup(`<strong>${p.name}</strong><br>${p.address}`);return pin.addTo(m)});
  const resize=new ResizeObserver(()=>m.invalidateSize());resize.observe(host.current);
  return()=>{resize.disconnect();m.remove();map.current=null};
  },[]);
