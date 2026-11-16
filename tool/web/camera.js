@@ -57,7 +57,7 @@
           <button id="camera-switch" class="camera-flip" data-camera="switch" hidden disabled aria-label="Switch front or rear camera">${icon('loop')}</button>
         </div>
         <div class="camera-actions">
-          <h2>${mode==='qr'?'Scan a collection point.':'Start with a photo.'}</h2>
+          <h2>${mode==='qr'?'Scan a collection point':'Start with a photo'}</h2>
           <p class="camera-intro">${mode==='qr'?'Scan the code on your recycling point.':'Photograph your item, then choose its type.'}</p>
           <div class="camera-controls"><button id="camera-capture" class="btn full" data-camera="capture" hidden disabled>${cameraIcon}Take photo</button><button id="camera-start" class="btn full" data-camera="start">Enable camera</button></div>
           <button class="upload-button" data-camera="choose-file">${imageIcon}${mode==='qr'?'Upload QR image':'Choose a photo'}</button>
@@ -145,7 +145,7 @@
   function showQR(value) {
     stop();
     const point = pointFromQR(value);
-    modal(`<div class="modal-icon">${icon(point?'check':'scan')}</div><h2>${point?'Collection point found.':'QR code read.'}</h2>
+    modal(`<div class="modal-icon">${icon(point?'check':'scan')}</div><h2>${point?'Collection point found':'QR code read'}</h2>
       ${point?'<span class="tag">RIV-01 · Demo collection point</span><h3 style="margin-top:18px">Riverside Community Hub</h3><p>The code was genuinely decoded. Collection rules and results remain demonstration data.</p>':'<p>This QR code is not a registered collection point in this prototype. Its contents are shown below; no external link has been opened.</p>'}
       ${point?'':`<div class="qr-value">${escapeHTML(value.slice(0,2000))}</div>`}
       ${point?'<button class="btn full" data-camera="open-point">Open collection point '+icon('arrow')+'</button>':''}
