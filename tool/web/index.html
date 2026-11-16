@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#255c46">
+  <meta name="description" content="Recycling Loop: an interactive concept connecting recycling guidance with transparent local outcomes.">
+  <title>Recycling Loop — Your action, connected</title>
+  <link rel="stylesheet" href="styles.css?v=20261113product">
+  <link rel="stylesheet" href="product.css?v=20261113product">
+  <link rel="stylesheet" href="workflow.css">
+</head>
+<body data-view="home">
+  <div id="world" aria-hidden="true"></div><div id="world-fallback" aria-hidden="true"></div>
+  <div id="world-loader"><span class="loader-orbit">↻</span><strong>A world beyond the bin.</strong><span id="load-status">Preparing the scene…</span></div>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header"><div class="topbar"><a class="brand" href="#home" aria-label="Recycling Loop home"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M25 12a10 10 0 0 0-17-4L5 11m0-6v6h6M7 20a10 10 0 0 0 17 4l3-3m0 6v-6h-6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>recycling<span>loop</span></a><nav id="desktop-nav" aria-label="Main navigation"></nav><button class="demo-label" data-action="about">Demo</button></div></header>
+  <div class="layout"><main id="main" tabindex="-1"></main></div>
+  <footer class="site-footer"><a class="brand" href="#home"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M25 12a10 10 0 0 0-17-4L5 11m0-6v6h6M7 20a10 10 0 0 0 17 4l3-3m0 6v-6h-6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>recycling<span>loop</span></a><p>See what happens next.</p><div><button data-action="about">About the demo</button><button data-action="feedback">Feedback</button></div></footer>
+  <nav id="bottom-nav" aria-label="Mobile navigation"></nav>
+  <dialog id="dialog"><button class="close" aria-label="Close dialog" data-action="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button><div id="dialog-content"></div></dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="vendor/jsQR.js"></script>
+  <script src="model.js?v=20261113product"></script>
+  <script src="app.js?v=20261113product"></script>
+  <script src="camera.js"></script>
+  <script src="workflow.js"></script>
+  <script type="module" src="world.js"></script>
+</body>
+</html>
