@@ -1,0 +1,2 @@
+import {T} from '../primitives.js';
+export function build(world,island){const group=new T.Group();island.group.add(group);const actions=[{id:'notice',label:'Explore the herb beds',point:new T.Vector3(0,2.6,0),run:()=>{world.discover(island,'notice');world.events.message?.('Plants and cultural knowledge meet here. This illustration offers no medicinal advice.');}}];island.landmark.userData.action=actions[0].run;return {group,actions,update(){}};}

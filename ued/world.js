@@ -43,14 +43,14 @@ export class GardenWorld {
   }else if(zone.id==='evolution'){
    tree(g,-1.8,-1.3,5.1,'#8eb58a');tree(g,1.9,-2.3,3.4,'#a0c282','palm');fern(g,-2.6,1.5,.8);fern(g,2.4,.3,.7);for(let i=0;i<5;i++)mushroom(g,2+Math.sin(i*1.4)*.8,2+i*.18,.35+(i%2)*.2,i%2?'#dab4db':'#e4bc8b');bench(g,-2.6,-2.6,-.8);
    const fossil=ball(g,'#e4d9b9',.65,1.1,.3,1.0,.25,.85);for(let i=0;i<22;i++){const a=i*.5,r=.03+i*.024;ball(g,'#baa889',.65+Math.cos(a)*r,1.34,.3+Math.sin(a)*r,.05,.025,.05);}landmark=fossil;
-  }else if(zone.id==='pond'){
-   const basin=cylinder(g,'#ead4b8',-.55,1.01,0,2.75,2.85,.15,64);basin.scale.z=.76;const p=cylinder(g,material('#79c7d1',.12),-.55,1.12,0,2.57,2.57,.03,64);p.scale.z=.76;landmark=p;g.userData.pond=p;
-   tree(g,2.6,-2.2,4.2,'#a2c28a');tree(g,-3.1,-2.3,3.0,'#75a88a');bench(g,2.5,1.8,-.8);
-   for(let i=0;i<5;i++){const a=i*2.4;const leaf=mesh(new T.CircleGeometry(.37,32,0,Math.PI*1.82),material('#65a996',.3),g,-.55+Math.cos(a)*1.6,1.15,Math.sin(a)*1.2);leaf.rotation.x=-Math.PI/2;leaf.rotation.z=a;if(i%2===0){const f=flower(g,leaf.position.x,leaf.position.z,'#edb2ca',.12);f.position.y=1.13;}}
+  }else if(zone.id==='herbs'){
+   const gate=new T.Group();g.add(gate);gate.position.set(0,2.5,-1.8);mesh(new T.TorusGeometry(1.35,.19,12,48),'#f1e8d4',gate);landmark=gate;
+   for(const x of [-2.2,2.2])for(const z of [-.4,1.5]){box(g,'#d7b58f',x,1.12,z,1.3,.35,1.15);for(let i=0;i<4;i++)fern(g,x+(i%2-.5)*.45,z+(Math.floor(i/2)-.5)*.4,.25);}
+   tree(g,-3,-2.6,3.3,'#80ad88');bench(g,2.3,-2.6,-.3);
   }else{
-   tree(g,-2.6,-2.4,4.1,'#b4c78a');tree(g,2.4,-1.7,3.7,'#8caf80');bench(g,-2.5,.4,.8);
-   for(let i=0;i<25;i++){const a=i*2.399,r=1.2+(i%6)*.43,x=Math.cos(a)*r,z=Math.sin(a)*r;if(Math.abs(x)<.7)continue;flower(g,x,z,['#f7b2be','#e4c1ee','#ffdf80','#fff4d0'][i%4],.45+(i%3)*.2);}
-   const arch=new T.Group();g.add(arch);arch.position.set(.3,1,-2.1);tube(arch,[[-1.5,0,0],[-1.5,1.7,0],[0,3.1,0],[1.5,1.7,0],[1.5,0,0]],.11,'#f6e2bb',40);for(let i=0;i<9;i++){const a=i/8*Math.PI;ball(arch,['#efb1c8','#e9ce91','#c5b0df'][i%3],Math.cos(a)*1.5,1.5+Math.sin(a)*1.1,0,.2,.17,.19);}landmark=arch;
+   tree(g,-2,-1.8,3.4,'#acba91');tree(g,2.8,-2.1,3.2,'#91a484');bench(g,-2.7,1.1,.7);
+   const rock=ball(g,'#e8d7b1',.3,1.18,-.2,1.05,.36,.72);landmark=rock;
+   for(let i=0;i<15;i++){const a=i*2.399,r=1.3+(i%5)*.42,x=Math.cos(a)*r,z=Math.sin(a)*r;ball(g,i%2?'#a9bc91':'#8ca387',x,1.1,z,.35,.24,.35);if(i%3===0)flower(g,x,z,'#c0a5de',.6);}
   }
   // A little glass bowl holds any feelings left during this visit.
   const vessel=new T.Group();vessel.position.set(2.65,.98,2.8);g.add(vessel);vessel.userData.action=()=>this.events.feedback?.();cylinder(vessel,'#f8e1b8',0,.05,0,1.0,.91,.18,40);const glassMat=new T.MeshPhysicalMaterial({color:'#f6ffff',transparent:true,opacity:.28,roughness:.12,side:T.DoubleSide,depthWrite:false,metalness:.05});mesh(new T.CylinderGeometry(.92,.84,1.45,40,1,true),glassMat,vessel,0,.86,0);const rim=mesh(new T.TorusGeometry(.92,.04,8,50),'#e2eee0',vessel,0,1.6,0);rim.rotation.x=Math.PI/2;vessel.userData.feelings=[];
@@ -78,7 +78,7 @@ export class GardenWorld {
  async enter(id){
   const island=this.islands.find(i=>i.zone.id===id);if(!island)return;const token=++this.token;this.active=id;this.events.zone?.(island.zone);this.events.loading?.(true);
   if(!this.loaded.has(id)){
-   const loads={glasshouse:()=>import('./zones/glasshouse.js'),evolution:()=>import('./zones/evolution.js'),pond:()=>import('./zones/pond.js'),meadow:()=>import('./zones/meadow.js')};
+   const loads={glasshouse:()=>import('./zones/glasshouse.js'),evolution:()=>import('./zones/evolution.js'),herbs:()=>import('./zones/herbs.js'),mediterranean:()=>import('./zones/mediterranean.js')};
    this.loaded.set(id,loads[id]().then(m=>m.build(this,island)).then(detail=>{island.detail=detail;detail.group.scale.setScalar(this.reduced?1:.001);this.growing.push({group:detail.group,start:performance.now()});return detail;}).catch(e=>{this.loaded.delete(id);throw e;}));
   }
   try{await this.loaded.get(id);}catch(e){this.events.loading?.(false);this.events.error?.('This island could not load. Please try again.');return;}
@@ -94,8 +94,8 @@ export class GardenWorld {
  setNight(value){this.night=value;this.lightTransition={start:performance.now(),from:this.dayValue||0,to:value?1:0};}
  setReduced(value){this.reduced=value;}
  discover(island,action){this.events.discover?.(island.zone,action);this.burst(island.group.position.clone().add(new T.Vector3(0,3,0)),0xffde91,26);}
- burst(point,color,count=18){for(let i=0;i<count;i++){const b=ball(this.scene,i%3===0?'#fff4c9':new T.MeshBasicMaterial({color}),point.x,point.y,point.z,.055+(i%3)*.018);b.castShadow=false;this.effects.push({type:'particle',object:b,velocity:new T.Vector3((Math.random()-.5)*3,Math.random()*2+.6,(Math.random()-.5)*3),life:1.6,age:0});}}
- ripple(point){for(let i=0;i<3;i++){const ring=mesh(new T.RingGeometry(.25,.29,48),new T.MeshBasicMaterial({color:'#e6fff3',transparent:true,opacity:.65,side:T.DoubleSide,depthWrite:false}),this.scene,point.x,point.y+.02,point.z);ring.rotation.x=-Math.PI/2;ring.castShadow=false;this.effects.push({type:'ripple',object:ring,life:2.4,age:-i*.24});}}
+ burst(point,color,count=18){if(this.reduced)return;for(let i=0;i<count;i++){const b=ball(this.scene,i%3===0?'#fff4c9':new T.MeshBasicMaterial({color}),point.x,point.y,point.z,.055+(i%3)*.018);b.castShadow=false;this.effects.push({type:'particle',object:b,velocity:new T.Vector3((Math.random()-.5)*3,Math.random()*2+.6,(Math.random()-.5)*3),life:1.6,age:0});}}
+ ripple(point){if(this.reduced)return;for(let i=0;i<3;i++){const ring=mesh(new T.RingGeometry(.25,.29,48),new T.MeshBasicMaterial({color:'#e6fff3',transparent:true,opacity:.65,side:T.DoubleSide,depthWrite:false}),this.scene,point.x,point.y+.02,point.z);ring.rotation.x=-Math.PI/2;ring.castShadow=false;this.effects.push({type:'ripple',object:ring,life:2.4,age:-i*.24});}}
  leaveFeeling(id){
   if(!this.active)return;const island=this.islands.find(i=>i.zone.id===this.active),v=island.vessel;const count=v.userData.feelings.length;if(count>=12){const old=v.userData.feelings.shift();v.remove(old);}
   const feeling=emoji(v,id,.22);feeling.position.set((Math.random()-.5)*.7,4,(Math.random()-.5)*.7);feeling.rotation.y=Math.atan2(this.camera.position.x-island.group.position.x,this.camera.position.z-island.group.position.z);
